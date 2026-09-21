@@ -1,0 +1,125 @@
+# 短线选股策略预设配置
+#
+# 使用方法：
+#   py -3.11 -m stock_selector.main --preset aggressive
+#   py -3.11 -m stock_selector.main --preset conservative
+#
+# 说明：命令行参数优先级高于预设配置
+
+presets:
+  # 默认策略：适中的选股标准
+  default:
+    turnover: 15.0
+    change: [1, 3]
+    volume: 1.5
+    sector: 20
+    check_outer_inner: true
+    check_kdj: true
+    check_rsi: true
+    filter_cyb: false
+    filter_kcb: false
+
+  # 激进策略：捕捉强势股
+  # 特点：高换手、大涨幅、强放量
+  aggressive:
+    turnover: 20.0
+    change: [3, 7]
+    volume: 2.5
+    sector: 15
+    check_outer_inner: true
+    check_kdj: true
+    check_rsi: false  # 允许超买，捕捉强势
+    filter_cyb: false
+    filter_kcb: false
+
+  # 保守策略：稳健标的
+  # 特点：低换手、小涨幅、适度放量
+  conservative:
+    turnover: 8.0
+    change: [0, 3]
+    volume: 1.2
+    sector: 25
+    check_outer_inner: true
+    check_kdj: true
+    check_rsi: true
+    filter_cyb: true   # 过滤创业板
+    filter_kcb: true   # 过滤科创板
+
+  # 低吸策略：寻找反弹机会
+  # 特点：允许小跌、低位反弹
+  dip_buying:
+    turnover: 12.0
+    change: [-2, 2]
+    volume: 1.8
+    sector: 20
+    check_outer_inner: true
+    check_kdj: true
+    check_rsi: true
+    filter_cyb: false
+    filter_kcb: false
+
+  # 突破策略：捕捉放量突破
+  # 特点：大幅放量、中等涨幅
+  breakout:
+    turnover: 18.0
+    change: [2, 5]
+    volume: 3.0
+    sector: 15
+    check_outer_inner: true
+    check_kdj: false   # 不限制KDJ
+    check_rsi: false   # 不限制RSI
+    filter_cyb: false
+    filter_kcb: false
+
+  # 主板稳健策略：只选主板股
+  # 特点：过滤创业板和科创板
+  mainboard_only:
+    turnover: 12.0
+    change: [1, 4]
+    volume: 1.5
+    sector: 20
+    check_outer_inner: true
+    check_kdj: true
+    check_rsi: true
+    filter_cyb: true
+    filter_kcb: true
+    mainboard_only: true  # 只选主板
+
+  # 题材轮动策略：捕捉板块轮动机会
+  sector_rotation:
+    turnover: 18.0
+    change: [3, 6]
+    volume: 2.5
+    sector: 3                # 每板块只取前3
+    check_outer_inner: true
+    check_kdj: true
+    check_rsi: false
+    filter_cyb: false
+    filter_kcb: false
+    mainboard_only: false
+
+  # 价值回归策略：找到超跌后开始反弹的股票
+  value_return:
+    turnover: 8.0
+    change: [-5, 0]          # 允许较大跌幅
+    volume: 1.5              # 开始放量
+    sector: 25
+    check_outer_inner: true  # 资金开始流入
+    check_kdj: true          # KDJ低位
+    check_rsi: true          # RSI低位
+    filter_cyb: false
+    filter_kcb: false
+    mainboard_only: true     # 主板更稳定
+
+  # 打板策略：找到接近涨停的强势股
+  limit_up_chase:
+    turnover: 30.0           # 超高换手
+    change: [8, 9.5]         # 接近涨停
+    volume: 4.0              # 巨量
+    sector: 5                # 每板块只取最强
+    check_outer_inner: true
+    check_kdj: false         # 允许超买
+    check_rsi: false
+    filter_cyb: false
+    filter_kcb: false
+    mainboard_only: false

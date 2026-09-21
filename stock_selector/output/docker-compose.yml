@@ -1,0 +1,282 @@
+name: mingyang-apps
+
+# 业务层（server B）编排：镜像导入模式
+# 与 docker/apps 的区别：无 build 段，全部引用 mingyang-apps/<服务名>:v1 镜像。
+# 镜像由构建机产出（见 prepare.sh）并通过 docker save/load 传输，server B 无需 go/pnpm。
+#
+# 配置由镜像内置 etc 目录提供，另走 etcd 配置中心（热更新）；不挂载宿主机目录。
+# 改配置：直接改 etcd；或改本地 yaml 重新出镜像，首启 CONF_PUSH=force 覆盖 etcd。
+# 中间件（server A）另见 ../middleware/docker-compose.yml
+
+x-common: &common
+  restart: unless-stopped
+  mem_limit: 512m
+  environment: &common-env
+    TZ: Asia/Shanghai
+    APP_ENV: pro
+    # 前后端 AES-256-GCM 加解密密钥，与前端 VITE_GLOB_CRYPTO_SECRET 默认值一致
+    APP_SECRET: 0123456789abcdef0123456789abcdef
+    # etcd 配置中心（server A）：设置 ETCD_HOSTS 后服务从 etcd 拉配置，首启自动灌入本地 {APP_ENV}.yaml（当前为 pro.yaml）。
+    # 改 IP 只需改这里；切回本地文件模式删掉 ETCD_HOSTS 即可（回退读本地 pro.yaml）。
+    ETCD_HOSTS: "192.168.103.166:2379"
+    # 启动时本地 pro.yaml 与 etcd 不一致则强制覆盖 etcd（发布流水线以 git 配置为准）
+    CONF_PUSH: force
+  networks:
+    - apps
+
+services:
+  # ---------- RPC 层 ----------
+  core-rpc:
+    <<: *common
+    image: 192.168.201.81:30180/iot/simple-admin-service:core-rpc-37
+    environment:
+      <<: *common-env
+      ETCD_CONF_KEY: mingyang/core-rpc/pro.yaml
+    ports:
+      - "9101:9101"
+    # 挂载已禁用：空挂载目录会覆盖镜像内置 etc，改用镜像内置配置 + etcd
+    # volumes:
+    #   - ./etc/core-rpc:/app/rpc/etc
+
+  cms-rpc:
+    <<: *common
+    image: 192.168.201.81:30180/iot/simple-admin-service:cms-rpc-37
+    environment:
+      <<: *common-env
+      ETCD_CONF_KEY: mingyang/cms-rpc/pro.yaml
+    ports:
+      - "9901:9901"
+    # volumes:
+    #   - ./etc/cms-rpc:/app/etc
+
+  iot-rpc:
+    <<: *common
+    image: 192.168.201.81:30180/iot/simple-admin-service:iot-rpc-37
+    environment:
+      <<: *common-env
+      ETCD_CONF_KEY: mingyang/iot-rpc/pro.yaml
+    ports:
+      - "9200:9200"
+    # volumes:
+    #   - ./etc/iot-rpc:/app/etc
+
+  ws-rpc:
+    <<: *common
+    image: 192.168.201.81:30180/iot/simple-admin-service:websocket-rpc-37
+    environment:
+      <<: *common-env
+      ETCD_CONF_KEY: mingyang/ws-rpc/pro.yaml
+    ports:
+      - "9904:9904"
+    # volumes:
+    #   - ./etc/ws-rpc:/app/etc
+
+  ai-rpc:
+    <<: *common
+    image: 192.168.201.81:30180/iot/simple-admin-service:ai-rpc-37
+    environment:
+      <<: *common-env
+      ETCD_CONF_KEY: mingyang/ai-rpc/pro.yaml
+    ports:
+      - "11005:11005"
+    # volumes:
+    #   - ./etc/ai-rpc:/app/etc
+
+  pay-rpc:
+    <<: *common
+    image: 192.168.201.81:30180/iot/simple-admin-service:pay-rpc-37
+    environment:
+      <<: *common-env
+      ETCD_CONF_KEY: mingyang/pay-rpc/pro.yaml
+    ports:
+      - "11001:11001"
+    # volumes:
+    #   - ./etc/pay-rpc:/app/etc
+
+  job:
+    <<: *common
+    image: 192.168.201.81:30180/iot/simple-admin-service:job-37
+    environment:
+      <<: *common-env
+      ETCD_CONF_KEY: mingyang/job/pro.yaml
+    ports:
+      - "9105:9105"
+    # volumes:
+    #   - ./etc/job:/app/etc
+
+  mcms:
+    <<: *common
+    image: 192.168.201.81:30180/iot/simple-admin-service:message-37
+    environment:
+      <<: *common-env
+      ETCD_CONF_KEY: mingyang/mcms/pro.yaml
+    ports:
+      - "9106:9106"
+    # volumes:
+    #   - ./etc/mcms:/app/etc
+
+  ip2location:
+    <<: *common
+    image: 192.168.201.81:30180/iot/simple-admin-service:ip2location-37
+    environment:
+      <<: *common-env
+      ETCD_CONF_KEY: mingyang/ip2location/pro.yaml
+    ports:
+      - "10001:10001"
+    # volumes:
+    #   - ./etc/ip2location:/app/etc
+
+  # ---------- API 层 ----------
+  core-api:
+    <<: *common
+    image: 192.168.201.81:30180/iot/simple-admin-service:core-api-37
+    environment:
+      <<: *common-env
+      ETCD_CONF_KEY: mingyang/core-api/pro.yaml
+    ports:
+      - "9100:9100"
+    depends_on:
+      - core-rpc
+    # volumes:
+    #   - ./etc/core-api:/app/api/etc
+
+  fms:
+    <<: *common
+    image: 192.168.201.81:30180/iot/simple-admin-service:file-37
+    environment:
+      <<: *common-env
+      ETCD_CONF_KEY: mingyang/fms/pro.yaml
+    ports:
+      - "9102:9102"
+    # volumes:
+    #   - ./etc/fms:/app/etc
+
+  cms-api:
+    <<: *common
+    image: 192.168.201.81:30180/iot/simple-admin-service:cms-api-37
+    environment:
+      <<: *common-env
+      ETCD_CONF_KEY: mingyang/cms-api/pro.yaml
+    ports:
+      - "9902:9902"
+    depends_on:
+      - cms-rpc
+      - pay-rpc
+      - core-rpc
+      - ip2location
+    # volumes:
+    #   - ./etc/cms-api:/app/etc
+
+  iot-api:
+    <<: *common
+    image: 192.168.201.81:30180/iot/simple-admin-service:iot-api-37
+    environment:
+      <<: *common-env
+      ETCD_CONF_KEY: mingyang/iot-api/pro.yaml
+    ports:
+      - "9201:9201"
+    depends_on:
+      - iot-rpc
+    # volumes:
+    #   - ./etc/iot-api:/app/etc
+
+  ws-api:
+    <<: *common
+    image: 192.168.201.81:30180/iot/simple-admin-service:websocket-api-37
+    environment:
+      <<: *common-env
+      ETCD_CONF_KEY: mingyang/ws-api/pro.yaml
+    ports:
+      - "9903:9903"
+    depends_on:
+      - ws-rpc
+      - iot-rpc
+      - ai-rpc
+    # volumes:
+    #   - ./etc/ws-api:/app/etc
+
+  ai-api:
+    <<: *common
+    image: 192.168.201.81:30180/iot/simple-admin-service:ai-api-37
+    environment:
+      <<: *common-env
+      ETCD_CONF_KEY: mingyang/ai-api/pro.yaml
+    ports:
+      - "11006:11006"
+    depends_on:
+      - ai-rpc
+    # volumes:
+    #   - ./etc/ai-api:/app/etc
+
+  pay-api:
+    <<: *common
+    image: 192.168.201.81:30180/iot/simple-admin-service:pay-api-37
+    environment:
+      <<: *common-env
+      ETCD_CONF_KEY: mingyang/pay-api/pro.yaml
+    ports:
+      - "11000:11000"
+    depends_on:
+      - pay-rpc
+      - iot-rpc
+    # volumes:
+    #   - ./etc/pay-api:/app/etc
+
+  signaling-api:
+    <<: *common
+    image: 192.168.201.81:30180/iot/simple-admin-service:signaling-api-37
+    environment:
+      <<: *common-env
+      ETCD_CONF_KEY: mingyang/signaling-api/pro.yaml
+    ports:
+      - "8888:8888"
+    depends_on:
+    #   - signaling-rpc
+      - iot-rpc
+      - ws-rpc
+    # volumes:
+    #   - ./etc/signaling-api:/app/etc
+
+  # ---------- 网关 / 入口 ----------
+  gateway:
+    <<: *common
+    image: 192.168.201.81:30180/iot/simple-admin-service:gateway-37
+    environment:
+      <<: *common-env
+      ETCD_CONF_KEY: mingyang/gateway/pro.yaml
+    ports:
+      - "7788:7788"
+    depends_on:
+      - core-api
+      - cms-api
+      - iot-api
+      - ws-api
+      - ai-api
+      - pay-api
+      - signaling-api
+      - fms
+    # volumes:
+    #   - ./etc/gateway:/app/etc
+
+  # ---------- Web 前端 ----------
+  camera-admin-web:
+    <<: *common
+    mem_limit: 256m
+    image: 192.168.201.81:30180/iot/camera-admin-web:dev-265
+    ports:
+      - "8080:80"
+    depends_on:
+      - gateway
+
+  camera-cloud-h5:
+    <<: *common
+    mem_limit: 256m
+    image: 192.168.201.229/iot/camera-cloud-h5:dev-1
+    ports:
+      - "8090:80"
+    depends_on:
+      - gateway
+
+networks:
+  apps:
+    driver: bridge
