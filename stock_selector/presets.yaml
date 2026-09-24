@@ -123,3 +123,44 @@ presets:
     filter_cyb: false
     filter_kcb: false
     mainboard_only: false
+
+  # === 资金流向策略 ===
+
+  # 大单流入500万
+  big_order_500w:
+    strategy_type: big_order_inflow
+    big_order_threshold: 500
+    min_net_inflow: 500
+    turnover: 10.0
+    change: [-3, 8]
+
+  # 大单流入1000万
+  big_order_1000w:
+    strategy_type: big_order_inflow
+    big_order_threshold: 1000
+    min_net_inflow: 1000
+    turnover: 12.0
+    change: [-2, 8]
+
+  # 大单流入5000万(超大资金)
+  big_order_5000w:
+    strategy_type: big_order_inflow
+    big_order_threshold: 5000
+    min_net_inflow: 5000
+    turnover: 15.0
+    change: [0, 10]
+
+  # 资金抢筹
+  capital_grab:
+    strategy_type: capital_grab
+    min_net_inflow: 1000      # 最小主力净流入1000万
+    min_main_ratio: 5.0       # 主力净占比>5%
+    turnover: 10.0
+    change: [-2, 8]
+
+  # 猛烈打压(寻找洗盘机会)
+  violent_suppress:
+    strategy_type: violent_suppress
+    min_net_outflow: 1000     # 最小净流出1000万
+    max_change_pct: -2.0      # 最大跌幅-2%
+    turnover: 8.0

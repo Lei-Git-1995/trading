@@ -1,0 +1,19 @@
+{
+  "name": "go-stock",
+  "outputfilename": "go-stock",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "http://localhost:5173",
+  "author": {
+    "name": "spark",
+    "email": "sparkmemory@163.com"
+  },
+  "info": {
+    "companyName": "sparkmemory",
+    "productName": "go-stock",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright#sparkmemory@163.com",
+    "comments": "股票行情实时获取,AI赋能分析股票,支持DeepSeek，OpenAI， Ollama，LMStudio，AnythingLLM，硅基流动，火山方舟，阿里云百炼等平台或模型。软件发行版见GitHub：https://github.com/ArvinLovegood/go-stock"
+  }
+}

@@ -1,0 +1,56 @@
+{{ template "header" . }}
+<h1>投资学习资料</h1>
+
+<div class="_get2gvw6r3"></div>
+<script type="text/javascript">
+    (window.slotbydup = window.slotbydup || []).push({
+        id: "u6682254",
+        container: "_get2gvw6r3",
+        async: true
+    });
+</script>
+
+{{ range $TypedMaterialSeries := .AllMaterialsList }}
+<div class="section">
+{{ range $TypeName, $MaterialSeriesList := $TypedMaterialSeries }}
+    <h2 class="header">{{ $TypeName }}</h2>
+    <div>
+        <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-format="fluid"
+            data-ad-layout-key="-fb+5w+4e-db+86"
+            data-ad-client="ca-pub-3022214826355647"
+            data-ad-slot="8490125346"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
+    <ul class="collapsible">
+    {{ range $i, $MaterialSeries := $MaterialSeriesList }}
+        <li>
+            {{ range $SeriesName, $MaterialItemList := $MaterialSeries }}
+            <div class="collapsible-header" id="{{ $SeriesName }}"><h3>{{ $SeriesName }}</h3></div>
+                <div class="collapsible-body collection">
+                {{ range $MaterialItem := $MaterialItemList }}
+                    <div class="collection-item">
+                        <p><a href="{{ $MaterialItem.DownloadURL }}" target="_blank"><h4>{{ $MaterialItem.Name }}</h4></a></p>
+                        <p>{{ $MaterialItem.Desc }}</p>
+                    </div>
+                {{ end }}
+                </div>
+            {{ end }}
+        </li>
+    {{ end }}
+    </ul>
+    <div class="_yf526959pt8"></div>
+    <script type="text/javascript">
+        (window.slotbydup = window.slotbydup || []).push({
+            id: "u6682250",
+            container: "_yf526959pt8",
+            async: true
+        });
+    </script>
+{{ end }}
+</div>
+{{ end }}
+{{ template "footer" . }}

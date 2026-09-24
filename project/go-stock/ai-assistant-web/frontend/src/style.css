@@ -1,0 +1,135 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  background: #f5f7fb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background: #f5f7fb;
+  color: #1f2937;
+}
+
+#app {
+  height: 100vh;
+}
+
+/* Markdown 预览样式优化 */
+.md-editor-preview-wrapper {
+  padding: 0 !important;
+}
+
+.md-editor-preview {
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+}
+
+.md-editor-preview h1,
+.md-editor-preview h2,
+.md-editor-preview h3,
+.md-editor-preview h4,
+.md-editor-preview h5,
+.md-editor-preview h6 {
+  margin-top: 1em !important;
+  margin-bottom: 0.5em !important;
+}
+
+.md-editor-preview p {
+  margin-bottom: 0.8em !important;
+}
+
+.md-editor-preview pre {
+  margin: 0.5em 0 !important;
+  border-radius: 6px !important;
+}
+
+.md-editor-preview code {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+}
+
+.md-editor-preview ul,
+.md-editor-preview ol {
+  padding-left: 2em !important;
+  margin-bottom: 0.8em !important;
+}
+
+.md-editor-preview blockquote {
+  border-left: 4px solid #ddd !important;
+  padding-left: 1em !important;
+  margin: 0.5em 0 !important;
+  color: #666 !important;
+}
+
+.md-editor-preview table {
+  border-collapse: collapse !important;
+  width: 100% !important;
+  margin: 0.5em 0 !important;
+}
+
+.md-editor-preview th,
+.md-editor-preview td {
+  border: 1px solid #ddd !important;
+  padding: 0.5em !important;
+  text-align: left !important;
+}
+
+.md-editor-preview th {
+  background: #f5f5f5 !important;
+  font-weight: 600 !important;
+}
+
+/* 滚动条美化 */
+.chat-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.chat-list::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.chat-list::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .settings {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .settings > * {
+    flex: 1;
+    min-width: 120px;
+  }
+}

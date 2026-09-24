@@ -45,8 +45,12 @@ def parse_args():
     # 预设相关
     parser.add_argument('--preset', type=str, default=None,
                         help=f'使用预设策略：{", ".join(list_presets())}')
+    parser.add_argument('--preset-v2', type=str, default=None,
+                        help='使用v2架构策略：ultra_short, momentum_start, weak_to_strong')
     parser.add_argument('--list-presets', action='store_true',
                         help='列出所有可用的预设策略并退出')
+    parser.add_argument('--list-v2', action='store_true',
+                        help='列出所有v2架构策略并退出')
 
     # 筛选参数（会覆盖预设中的对应值）
     parser.add_argument('--turnover', type=float, default=None, help='最低换手率门槛（%%），默认15')
@@ -123,6 +127,23 @@ def main():
 
     args = parse_args()
 
+    # 处理 --list-v2
+    if args.list_v2:
+        print('\n可用的 v2 架构策略：')
+        print('=' * 70)
+        import yaml
+        config_path = Path(__file__).parent / 'presets_v2.yaml'
+        if config_path.exists():
+            with open(config_path, 'r', encoding='utf-8') as f:
+                v2_config = yaml.safe_load(f)
+            for name, config in v2_config['strategies'].items():
+                print(f'\n策略: {name}')
+                print(f'名称: {config["name"]}')
+                print(f'说明: {config["description"]}')
+                print(f'使用: py -3.11 -m stock_selector.main --preset-v2 {name}')
+                print('-' * 70)
+        return
+
     # 处理 --list-presets
     if args.list_presets:
         print('\n可用的预设策略：')
@@ -150,6 +171,86 @@ def main():
     logger.info(f'日志级别: {args.log_level}')
     if log_file:
         logger.info(f'日志文件: {log_file}')
+
+    # ============================================================
+    # 检查是否使用 v2 架构策略
+    # ============================================================
+    if args.preset_v2:
+        logger.info('\n' + '=' * 70)
+        logger.info('使用 v2 多维度评分架构')
+        logger.info('=' * 70)
+
+        from stock_selector.strategies.strategy_adapter import load_v2_strategy
+
+        try:
+            # 加载 v2 策略
+            adapter = load_v2_strategy(args.preset_v2)
+
+            # 数据源选择（智能选择）
+            from stock_selector.data.smart_provider_manager import SmartProviderManager
+
+            preferred = args.source if args.source else None
+            provider_manager = SmartProviderManager(preferred)
+
+            logger.info('[智能数据源] 正在选择最佳数据源...')
+            provider = provider_manager.get_provider()
+
+            if provider is None:
+                logger.error('错误：所有数据源均不可用，请检查网络连接')
+                return
+
+            source = provider_manager.current_provider_name
+            logger.info(f'[智能数据源] 已选择: {source}')
+
+            logger.info('=' * 70)
+            logger.info('每日短线选股系统 v2.0')
+            logger.info(f'执行时间: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
+            logger.info(f'数据源: {[d for n, d in list_providers() if n == source][0]}')
+            logger.info('=' * 70)
+
+            # 1. 获取行情列表
+            with timeit('获取行情列表'):
+                logger.info('[1/3] 获取沪深A股行情...')
+                stock_list = provider.get_all_stocks()
+                if stock_list is None or stock_list.empty:
+                    logger.error('\n错误：无法获取股票数据，请检查网络')
+                    return
+                logger.info(f'  有效A股: {len(stock_list)} 只')
+
+            # 2. 运行 v2 策略
+            with timeit('v2策略筛选'):
+                results = adapter.run(stock_list, provider)
+
+            # 3. 生成报告
+            data_date = datetime.now().strftime('%Y-%m-%d')
+            OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+            output_file = str(OUTPUT_DIR / f'{datetime.now().strftime("%Y-%m-%d")}_v2_{args.preset_v2}.md')
+
+            with timeit('生成报告'):
+                # 使用 v2 专用报告生成器
+                from stock_selector.reports.markdown_report_v2 import generate_v2_report
+                generate_v2_report(results, data_date, output_file, adapter.strategy_config)
+
+            logger.info('\n' + '=' * 70)
+            logger.info(f'完成: 选出 {len(results)} 只')
+            for i, s in enumerate(results[:5], 1):
+                logger.info(f'  {i}. {s["code"]} {s["name"]}  '
+                            f'涨{s["change_pct"]:.2f}%  换手{s["turnover"]:.1f}%  '
+                            f'得分{s["score"]:.1f}分')
+                if s.get('signals'):
+                    logger.info(f'      信号: {", ".join(s["signals"][:2])}')
+            logger.info(f'报告: {output_file}')
+            logger.info('=' * 70)
+
+            # 显示性能统计
+            print_stats()
+            return
+
+        except Exception as e:
+            logger.error(f'\nv2策略执行失败: {e}')
+            import traceback
+            traceback.print_exc()
+            return
 
     # 加载预设配置
     preset_config = {}
@@ -234,12 +335,21 @@ def main():
         filter_kcb=args.no_kcb,
     )
 
-    # 0. 数据源选择
-    source = args.source if args.source else interactive_select()
-    if source not in {n for n, _ in list_providers()}:
-        logger.error(f'错误：未知数据源 {source}，可选: {", ".join(n for n, _ in list_providers())}')
+    # 0. 数据源选择（智能选择）
+    from stock_selector.data.smart_provider_manager import SmartProviderManager
+
+    preferred = args.source if args.source else None
+    provider_manager = SmartProviderManager(preferred)
+
+    logger.info('\n[智能数据源] 正在选择最佳数据源...')
+    provider = provider_manager.get_provider()
+
+    if provider is None:
+        logger.error('错误：所有数据源均不可用，请检查网络连接')
         return
-    provider = create_provider(source)
+
+    source = provider_manager.current_provider_name
+    logger.info(f'[智能数据源] 已选择: {source}')
 
     logger.info('=' * 70)
     logger.info('每日短线选股系统')
