@@ -1,0 +1,26 @@
+{
+  "eastmoney": [
+    {
+      "test_time": "2026-09-23T17:23:52.157215",
+      "available": false,
+      "response_time": 0.3061211109161377,
+      "error": "返回数据为空"
+    }
+  ],
+  "tencent": [
+    {
+      "test_time": "2026-09-23T17:24:00.383435",
+      "available": true,
+      "response_time": 8.22622036933899,
+      "error": null
+    }
+  ],
+  "akshare": [
+    {
+      "test_time": "2026-09-23T17:24:16.399116",
+      "available": false,
+      "response_time": 16.01568055152893,
+      "error": "K线数据获取失败"
+    }
+  ]
+}

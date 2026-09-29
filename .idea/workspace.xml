@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="80e5262d-bf5f-448f-913c-7e19aa05266a" name="Changes" comment="config(database): 更新数据库配置和启用更多数据处理任务&#10;&#10;- 将数据库主机从 localhost 更改为 192.168.201.62&#10;- 将数据库名称从 instockdb 更改为 instock&#10;- 启用股票指标数据表创建任务 (gdj.main)&#10;- 启用股票k">
+      <change afterPath="$PROJECT_DIR$/stock_analysis/docs/stock_analysis_template.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stock_selector/data/intraday_client.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stock_selector/data/provider_health.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stock_selector/data/provider_health_monitor.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stock_selector/data/sector_client.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stock_selector/data/smart_provider_manager.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stock_selector/docs/DELIVERY.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stock_selector/docs/IMPLEMENTATION_REPORT.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stock_selector/docs/ROADMAP.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stock_selector/docs/TODO.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stock_selector/docs/V2_GUIDE.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stock_selector/presets_v2.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stock_selector/reports/markdown_report_v2.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stock_selector/strategies/scoring_engine.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stock_selector/strategies/strategy_adapter.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stock_selector/test_v2.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stock_selector/test_v2_offline.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/stock/instock/bin/run_job.bat" beforeDir="false" afterPath="$PROJECT_DIR$/project/stock/instock/bin/run_job.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/stock/instock/bin/run_web.bat" beforeDir="false" afterPath="$PROJECT_DIR$/project/stock/instock/bin/run_web.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/stock/instock/core/crawling/stock_hist_em.py" beforeDir="false" afterPath="$PROJECT_DIR$/project/stock/instock/core/crawling/stock_hist_em.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/stock/instock/core/eastmoney_fetcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/project/stock/instock/core/eastmoney_fetcher.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_analysis/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/stock_analysis/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/000002.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/000532.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/000593.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/000710.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/000823.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/000868.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/000995.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/001232.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/001266.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/001268.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/001330.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/001373.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/001393.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002081.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002084.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002106.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002134.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002146.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002164.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002313.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002328.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002436.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002491.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002564.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002579.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002613.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002636.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002646.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002669.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002757.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002836.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002848.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002886.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002975.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002980.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/002990.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/003001.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300112.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300162.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300179.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300283.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300291.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300319.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300404.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300489.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300491.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300554.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300566.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300642.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300670.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300671.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300725.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300776.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300829.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300862.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300917.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300936.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300943.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/300964.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301041.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301071.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301085.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301122.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301176.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301218.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301230.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301362.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301366.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301392.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301509.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301516.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301591.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301601.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301607.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301628.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301655.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301666.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301687.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301688.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301697.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301707.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/301717.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/600059.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/600110.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/600127.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/600172.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/600186.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/600367.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/600479.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/600503.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/600552.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/600593.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/600616.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/600664.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/600667.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/600714.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/603075.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/603118.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/603186.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/603230.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/603232.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/603407.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/603448.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/603598.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/605088.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/605258.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/688026.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/688146.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/688222.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/688356.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/688388.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/688530.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/688655.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/688783.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/688790.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/688806.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/688807.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/688828.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/.cache/tencent/688837.pkl" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="GOROOT" url="file://D:/Go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.0.windows-amd64" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Lei-Git-1995&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Lei-Git-1995/trading.git&quot;,
+    &quot;accountId&quot;: &quot;d54641d0-7d08-4a52-906c-46533d2af752&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="3JcveM0x8msQ1K2P0bW6ARYXlhX" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;true&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/trading&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;ssh.settings&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\trading\project" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-gosdk-d297c17c1fbd-57c114c3cede-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-243.24978.59" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="config(database): 更新数据库配置和启用更多数据处理任务&#10;&#10;- 将数据库主机从 localhost 更改为 192.168.201.62&#10;- 将数据库名称从 instockdb 更改为 instock&#10;- 启用股票指标数据表创建任务 (gdj.main)&#10;- 启用股票k" />
+    <option name="LAST_COMMIT_MESSAGE" value="config(database): 更新数据库配置和启用更多数据处理任务&#10;&#10;- 将数据库主机从 localhost 更改为 192.168.201.62&#10;- 将数据库名称从 instockdb 更改为 instock&#10;- 启用股票指标数据表创建任务 (gdj.main)&#10;- 启用股票k" />
+  </component>
+  <component name="VgoProject">
+    <settings-migrated>true</settings-migrated>
+  </component>
+</project>

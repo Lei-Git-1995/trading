@@ -83,7 +83,7 @@ class eastmoney_fetcher:
         session.cookies.update({'Cookie': self._get_cookie()})
         return session
 
-    def make_request(self, url, params=None, retry=3, timeout=10):
+    def make_request(self, url, params=None, retry=6, timeout=15):
         """
         发送请求
         :param url: 请求URL
@@ -105,12 +105,12 @@ class eastmoney_fetcher:
             except requests.exceptions.RequestException as e:
                 print(f"请求错误: {e}, 第 {i + 1}/{retry} 次重试")
                 if i < retry - 1:
-                    # 随机延迟后重试
-                    time.sleep(random.uniform(1, 3))
+                    # 指数退避 + 随机抖动，绕开东财高频风控
+                    time.sleep(min(2 ** i, 30) + random.uniform(0, 2))
                 else:
                     raise
 
-    def make_post_request(self, url, data=None, json=None, params=None, retry=3, timeout=60):
+    def make_post_request(self, url, data=None, json=None, params=None, retry=6, timeout=60):
         """
         发送POST请求
         :param url: 请求URL
@@ -136,8 +136,8 @@ class eastmoney_fetcher:
             except requests.exceptions.RequestException as e:
                 print(f"请求错误: {e}, 第 {i + 1}/{retry} 次重试")
                 if i < retry - 1:
-                    # 随机延迟后重试
-                    time.sleep(random.uniform(1, 3))
+                    # 指数退避 + 随机抖动，绕开东财高频风控
+                    time.sleep(min(2 ** i, 30) + random.uniform(0, 2))
                 else:
                     raise
 

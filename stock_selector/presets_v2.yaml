@@ -1,0 +1,357 @@
+# 策略配置 v2.0 - 多维度评分架构
+#
+# 使用方法：
+#   py -3.11 -m stock_selector.main --preset-v2 ultra_short
+#
+# 架构说明：
+#   filters:  第一层 - 基础过滤（硬条件，不通过直接淘汰）
+#   signals:  第二层 - 信号评分（多维度打分，加权求和）
+#   risk:     第三层 - 风险控制（识别风险因素，扣分或警告）
+#   output:   第四层 - 输出控制（排序、数量限制）
+
+strategies:
+  # ============================================================
+  # 超短线启动策略 (1-2日持仓)
+  #
+  # 核心思想：
+  #   不追高，寻找刚刚启动、强于板块、有资金流入、
+  #   技术位置合理的短线机会。
+  #
+  # 适合场景：
+  #   - 盘后选股，次日冲高卖出
+  #   - 1-2个交易日持仓
+  #   - 追求短期价差，不追涨停
+  # ============================================================
+  ultra_short:
+    name: "超短线启动策略"
+    description: "1-2日强势启动，不追高，寻找启动点"
+
+    # --------------------------------------------------------
+    # 第一层：基础过滤（硬条件）
+    # --------------------------------------------------------
+    filters:
+      # 流动性要求
+      liquidity:
+        turnover_min: 10.0        # 换手率至少10%
+        turnover_max: 35.0        # 换手率不超35%（过高可能分歧大）
+        amount_min: 2.0           # 成交额至少2亿
+        volume_ratio_min: 2.0     # 量比至少2倍
+
+      # 价格要求
+      price:
+        change_min: 2.0           # 涨幅至少2%
+        change_max: 7.0           # 涨幅不超7%（不追已经大涨的）
+        price_min: 3.0            # 价格至少3元（过滤低价股）
+        price_max: 300.0          # 价格不超300元
+
+      # 板块要求
+      board:
+        allow_cyb: true           # 允许创业板
+        allow_kcb: true           # 允许科创板
+        allow_st: false           # 不选ST
+        min_list_days: 60         # 至少上市60天
+
+    # --------------------------------------------------------
+    # 第二层：信号评分（满分100分）
+    # --------------------------------------------------------
+    signals:
+      # 动能信号 (25分)
+      momentum:
+        weight: 25
+        metrics:
+          - name: relative_strength
+            min: 0.0              # 降低要求（板块数据不稳定）
+            optimal: [2.0, 5.0]   # 最佳区间：强于板块2-5%
+            score: 10
+
+          - name: recent_change
+            days: 5
+            min: -5
+            max: 20               # 5日涨幅不超20%（防止追高）
+            optimal: [5, 15]      # 最佳区间：5-15%
+            score: 10
+
+          - name: consecutive_up_days
+            max: 3                # 连续上涨不超3天
+            score: 5
+
+      # 技术信号 (20分)
+      technical:
+        weight: 20
+        metrics:
+          - name: ma_position
+            min: -3               # 距MA20不超-3%
+            max: 15               # 距MA20不超+15%
+            optimal: [0, 10]      # 最佳区间：在MA20上方0-10%
+            score: 8
+
+          - name: breakout
+            enabled: true
+            lookback: 20          # 突破20日高点
+            score: 12
+
+      # 资金信号 (25分)
+      capital_flow:
+        weight: 25
+        metrics:
+          - name: main_force_flow
+            min: 0                # 降低要求（腾讯数据源资金流向不稳定）
+            optimal: [1000, 5000] # 最佳区间：1000-5000万
+            score: 15
+
+          - name: outer_ratio
+            min: 0.55             # 外盘占比至少55%
+            optimal: [0.60, 0.70] # 最佳区间：60-70%
+            score: 10
+
+      # 量价信号 (15分)
+      volume:
+        weight: 15
+        metrics:
+          - name: volume_ratio
+            min: 2.0
+            optimal: [2.0, 3.5]   # 最佳区间：2-3.5倍
+            score: 15
+
+      # 形态信号 (15分)
+      pattern:
+        weight: 15
+        metrics:
+          - name: kdj_k
+            max: 80               # KDJ不超买
+            optimal: [30, 60]     # 最佳区间：30-60
+            score: 8
+
+          - name: platform_breakout
+            enabled: true
+            score: 7
+
+    # --------------------------------------------------------
+    # 第三层：风险控制（扣分）
+    # --------------------------------------------------------
+    risk:
+      deduct:
+        - name: consecutive_up_days
+          threshold: 5
+          penalty: -20           # 连续上涨5天扣20分
+
+        - name: ma_position
+          threshold: 20          # 距MA20超20%
+          penalty: -15           # 扣15分
+
+        - name: recent_change
+          days: 3
+          threshold: 30          # 3日涨超30%
+          penalty: -25           # 扣25分（可能是短线追高）
+
+        - name: turnover
+          threshold: 40          # 换手率超40%
+          penalty: -10           # 扣10分（分歧过大）
+
+    # --------------------------------------------------------
+    # 第四层：输出控制
+    # --------------------------------------------------------
+    output:
+      min_score: 45              # 降低准入门槛（适应当前数据源）
+      top_n: 50                  # 最多50只
+      group_by_sector: true      # 按板块分组
+      max_per_sector: 5          # 每板块最多5只
+      sort_by: score             # 按得分排序
+
+
+  # ============================================================
+  # 启动策略（偏保守版本）
+  #
+  # 与 ultra_short 的区别：
+  #   - 更关注技术位置（MA20支撑）
+  #   - 更严格的涨幅限制
+  #   - 更看重资金持续流入
+  # ============================================================
+  momentum_start:
+    name: "启动策略"
+    description: "寻找刚刚启动、技术位置好的机会"
+
+    filters:
+      liquidity:
+        turnover_min: 8.0
+        turnover_max: 30.0
+        amount_min: 2.0
+        volume_ratio_min: 1.8
+
+      price:
+        change_min: 1.5
+        change_max: 5.0          # 更保守的涨幅区间
+        price_min: 3.0
+        price_max: 200.0
+
+      board:
+        allow_cyb: true
+        allow_kcb: false         # 不选科创板（波动大）
+        allow_st: false
+        min_list_days: 90
+
+    signals:
+      momentum:
+        weight: 20
+        metrics:
+          - name: relative_strength
+            min: 0.5
+            optimal: [1.0, 3.0]
+            score: 10
+
+          - name: recent_change
+            days: 5
+            min: -3
+            max: 15
+            optimal: [3, 10]
+            score: 10
+
+      technical:
+        weight: 30               # 更看重技术位置
+        metrics:
+          - name: ma_position
+            min: -2
+            max: 10
+            optimal: [0, 5]      # 更严格：在MA20附近启动
+            score: 15
+
+          - name: breakout
+            enabled: true
+            lookback: 15
+            score: 15
+
+      capital_flow:
+        weight: 25
+        metrics:
+          - name: main_force_flow
+            min: 800
+            optimal: [1500, 3000]
+            score: 15
+
+          - name: outer_ratio
+            min: 0.58
+            optimal: [0.62, 0.75]
+            score: 10
+
+      volume:
+        weight: 15
+        metrics:
+          - name: volume_ratio
+            min: 1.8
+            optimal: [2.0, 3.0]
+            score: 15
+
+      pattern:
+        weight: 10
+        metrics:
+          - name: kdj_k
+            max: 75
+            optimal: [35, 60]
+            score: 5
+
+          - name: rsi6
+            max: 70
+            optimal: [40, 60]
+            score: 5
+
+    risk:
+      deduct:
+        - name: consecutive_up_days
+          threshold: 4
+          penalty: -25
+
+        - name: ma_position
+          threshold: 15
+          penalty: -20
+
+        - name: recent_change
+          days: 3
+          threshold: 20
+          penalty: -20
+
+    output:
+      min_score: 65              # 更高的准入门槛
+      top_n: 30
+      group_by_sector: true
+      max_per_sector: 3          # 每板块更少
+      sort_by: score
+
+
+  # ============================================================
+  # 弱转强策略
+  #
+  # 寻找：
+  #   昨日弱势/分歧 → 今日放量转强
+  # ============================================================
+  weak_to_strong:
+    name: "弱转强策略"
+    description: "寻找前一日弱势、今日转强的机会"
+
+    filters:
+      liquidity:
+        turnover_min: 8.0
+        amount_min: 2.0
+        volume_ratio_min: 2.0
+
+      price:
+        change_min: 3.0          # 今日涨幅至少3%
+        change_max: 8.0
+        price_min: 3.0
+
+      board:
+        allow_cyb: true
+        allow_kcb: true
+        allow_st: false
+        min_list_days: 60
+
+    signals:
+      momentum:
+        weight: 30               # 最看重动能变化
+        metrics:
+          - name: momentum_acceleration
+            enabled: true        # 动能加速
+            score: 15
+
+          - name: relative_strength
+            min: 1.5
+            score: 15
+
+      technical:
+        weight: 15
+        metrics:
+          - name: ma_position
+            min: -5
+            max: 15
+            score: 15
+
+      capital_flow:
+        weight: 30               # 资金流入是关键
+        metrics:
+          - name: main_force_flow
+            min: 1000
+            score: 20
+
+          - name: outer_ratio
+            min: 0.60
+            score: 10
+
+      volume:
+        weight: 25               # 成交量突然放大
+        metrics:
+          - name: volume_expansion
+            enabled: true
+            threshold: 2.0
+            score: 25
+
+    risk:
+      deduct:
+        - name: consecutive_up_days
+          threshold: 3           # 已经连续上涨的不算"弱转强"
+          penalty: -30
+
+    output:
+      min_score: 60
+      top_n: 30
+      group_by_sector: true
+      max_per_sector: 4
+      sort_by: score
