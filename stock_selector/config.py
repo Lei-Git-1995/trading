@@ -6,6 +6,17 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 OUTPUT_DIR = PROJECT_ROOT / 'output'
 CACHE_DIR = PROJECT_ROOT / 'data' / '.cache'
 
+# 技术形态选股默认参数，供 strategies/technical_selection.py 使用。
+SELECTION_CONFIG = {
+    'accumulation_window': 10,
+    'accumulation_consecutive_days': 3,
+    'accumulation_daily_gain_min': 1.0,
+    'accumulation_daily_gain_max': 3.0,
+    'breakout_lookback': 20,
+    'volume_surge_ratio': 1.5,
+    'recent_signal_days': 3,
+}
+
 
 @dataclass
 class ScreenerConfig:

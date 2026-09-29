@@ -6,6 +6,7 @@ Desc: 东方财富网-行情首页-沪深京 A 股
 """
 import random
 import time
+import datetime
 
 import pandas as pd
 import math
@@ -46,28 +47,68 @@ def _tencent_spot_fallback():
     })
 
 
-def _tencent_hist_fallback(symbol, start_date, end_date, adjust="qfq"):
-    import akshare as ak
-    market_symbol = ("sh" if str(symbol).startswith(("6", "9")) else "sz") + str(symbol)
-    src = ak.stock_zh_a_hist_tx(symbol=market_symbol, start_date=start_date, end_date=end_date, adjust=adjust)
-    if src is None or src.empty:
-        return pd.DataFrame()
+def _to_lots(volume, amount, close):
+    """把不同通道返回的成交量统一换算成“手”。
+
+    InStock 的 fetch_stock_hist 会把成交量再乘 100（手 -> 股），所以本函数
+    必须返回“手”。腾讯/新浪的 volume 字段单位并不一致（腾讯对部分深市股票
+    返回“手”，其余返回“股”），用 amount/close 反推真实股数来判断实际单位。
+    """
+    volume = pd.to_numeric(volume, errors="coerce")
+    implied = pd.to_numeric(amount, errors="coerce") / pd.to_numeric(close, errors="coerce")
+    with np.errstate(divide="ignore", invalid="ignore"):
+        ratio = volume / implied
+    # ratio 约等于 1 说明通道已给“股”；约等于 0.01 说明通道给的是“手”。
+    is_shares = ratio.between(0.9, 1.1).fillna(False)
+    return np.where(is_shares, volume / 100.0, volume)
+
+
+def _finalize_hist(date, open_, high, low, close, volume, amount, turnover):
+    """补齐 InStock 需要的 11 列，并派生振幅/涨跌幅/涨跌额。"""
     out = pd.DataFrame({
-        "date": pd.to_datetime(src["date"], errors="coerce").dt.strftime("%Y-%m-%d"),
-        "open": pd.to_numeric(src["open"], errors="coerce"),
-        "close": pd.to_numeric(src["close"], errors="coerce"),
-        "high": pd.to_numeric(src["high"], errors="coerce"),
-        "low": pd.to_numeric(src["low"], errors="coerce"),
-        # Tencent returns shares; InStock later multiplies volume by 100.
-        "volume": pd.to_numeric(src["volume"], errors="coerce") / 100,
-        "amount": pd.to_numeric(src["amount"], errors="coerce"),
+        "date": pd.to_datetime(date, errors="coerce").dt.strftime("%Y-%m-%d"),
+        "open": pd.to_numeric(open_, errors="coerce"),
+        "close": pd.to_numeric(close, errors="coerce"),
+        "high": pd.to_numeric(high, errors="coerce"),
+        "low": pd.to_numeric(low, errors="coerce"),
+        "volume": volume,
+        "amount": pd.to_numeric(amount, errors="coerce"),
         "amplitude": np.nan, "quote_change": np.nan, "ups_downs": np.nan,
-        "turnover": pd.to_numeric(src["turnover"], errors="coerce") * 100,
+        "turnover": pd.to_numeric(turnover, errors="coerce") * 100,
     })
     out["ups_downs"] = out["close"].diff().fillna(0.0)
     out["quote_change"] = out["close"].pct_change().mul(100).fillna(0.0)
     out["amplitude"] = (out["high"] - out["low"]).div(out["close"].shift(1)).mul(100).fillna(0.0)
     return out
+
+
+def _market_symbol(symbol):
+    return ("sh" if str(symbol).startswith(("6", "9")) else "sz") + str(symbol)
+
+
+def _sina_hist_fallback(symbol, start_date, end_date, adjust="qfq"):
+    """新浪日 K。volume 单位在全部样本上一致为“股”，是当前最可靠的替代通道。"""
+    import akshare as ak
+    end_date = end_date or datetime.date.today().strftime("%Y%m%d")
+    src = ak.stock_zh_a_daily(symbol=_market_symbol(symbol), start_date=start_date,
+                              end_date=end_date, adjust=adjust)
+    if src is None or src.empty:
+        return pd.DataFrame()
+    lots = _to_lots(src["volume"], src["amount"], src["close"])
+    return _finalize_hist(src["date"], src["open"], src["high"], src["low"], src["close"],
+                          lots, src["amount"], src.get("turnover"))
+
+
+def _tencent_hist_fallback(symbol, start_date, end_date, adjust="qfq"):
+    import akshare as ak
+    src = ak.stock_zh_a_hist_tx(symbol=_market_symbol(symbol), start_date=start_date,
+                                end_date=end_date, adjust=adjust)
+    if src is None or src.empty:
+        return pd.DataFrame()
+    lots = _to_lots(src["volume"], src["amount"], src["close"])
+    return _finalize_hist(src["date"], src["open"], src["high"], src["low"], src["close"],
+                          lots, src["amount"], src.get("turnover"))
+
 
 def stock_zh_a_spot_em() -> pd.DataFrame:
     """
@@ -393,11 +434,16 @@ def stock_zh_a_hist(
     :return: 每日行情
     :rtype: pandas.DataFrame
     """
-    # Prefer Tencent; EastMoney remains a fallback for compatibility.
-    try:
-        return _tencent_hist_fallback(symbol, start_date, end_date, adjust)
-    except Exception as exc:
-        logging.warning("Tencent history unavailable for %s, trying EastMoney: %s", symbol, exc)
+    # 优先新浪（单位最稳定），其次腾讯，最后东财。
+    for fetcher_fn in (_sina_hist_fallback, _tencent_hist_fallback):
+        try:
+            out = fetcher_fn(symbol, start_date, end_date, adjust)
+            if out is not None and not out.empty:
+                return out
+        except Exception as exc:
+            logging.warning("%s unavailable for %s: %s", fetcher_fn.__name__, symbol, exc)
+    if period != "daily":
+        logging.warning("non-daily period %s unsupported without EastMoney, using daily", period)
     adjust_dict = {"qfq": "1", "hfq": "2", "": "0"}
     period_dict = {"daily": "101", "weekly": "102", "monthly": "103"}
     url = "http://push2his.eastmoney.com/api/qt/stock/kline/get"

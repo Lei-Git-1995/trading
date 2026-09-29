@@ -4,25 +4,19 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="80e5262d-bf5f-448f-913c-7e19aa05266a" name="Changes" comment="docs(stock_selector): 添加v2架构实施报告和交付文档&#10;&#10;- 添加DELIVERY.md项目交付文档，包含执行摘要、架构图、功能清单&#10;- 添加IMPLEMENTATION_REPORT.md v2架构实施报告，详述17个新增文件功能&#10;- 添加intraday_client.py分时数据客户端，支持1/5/15/30分钟K线数据获取&#10;- 更新eastmoney_fetcher.py网络请求重试机制，增加指数退避算法绕开风控&#10;- 增加分时数据客户端包含集合竞价、盘中强度、日内高低点距离分析功能">
-      <change afterPath="$PROJECT_DIR$/stock_analysis/SELECTION_STRATEGIES.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/stock_analysis/core/selection.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/stock_analysis/select_stocks.py" afterDir="false" />
+    <list default="true" id="80e5262d-bf5f-448f-913c-7e19aa05266a" name="Changes" comment="docs: 移除过时的文档并添加新的选股脚本&#10;&#10;- 删除了 MIGRATION.md、QUICKSTART.md、docs/README.md 和 legacy/README.md&#10;- 新增 select_stocks.py">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/MIGRATION.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/QUICKSTART.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/REFACTORING_SUMMARY.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/analyze_stock.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/demo.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/docs/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/legacy/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/legacy/analyze_stock.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/legacy/csv_stock_analyzer.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/legacy/eastmoney_stock_analyzer.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/legacy/sina_stock_analyzer.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/legacy/stock_analyzer.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/legacy/stock_analyzer_akshare.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/test_framework.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project/stock/instock/core/crawling/stock_hist_em.py" beforeDir="false" afterPath="$PROJECT_DIR$/project/stock/instock/core/crawling/stock_hist_em.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_analysis/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/stock_analysis/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_analysis/SELECTION_STRATEGIES.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_analysis/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_analysis/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_analysis/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_analysis/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_analysis/core/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_analysis/core/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_analysis/core/indicators.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_analysis/core/indicators.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_analysis/core/selection.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_analysis/select_stocks.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_analysis/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_analysis/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/config.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -100,7 +94,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="config(database): 更新数据库配置和启用更多数据处理任务&#10;&#10;- 将数据库主机从 localhost 更改为 192.168.201.62&#10;- 将数据库名称从 instockdb 更改为 instock&#10;- 启用股票指标数据表创建任务 (gdj.main)&#10;- 启用股票k" />
     <MESSAGE value="docs(stock_selector): 添加v2架构实施报告和交付文档&#10;&#10;- 添加DELIVERY.md项目交付文档，包含执行摘要、架构图、功能清单&#10;- 添加IMPLEMENTATION_REPORT.md v2架构实施报告，详述17个新增文件功能&#10;- 添加intraday_client.py分时数据客户端，支持1/5/15/30分钟K线数据获取&#10;- 更新eastmoney_fetcher.py网络请求重试机制，增加指数退避算法绕开风控&#10;- 增加分时数据客户端包含集合竞价、盘中强度、日内高低点距离分析功能" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs(stock_selector): 添加v2架构实施报告和交付文档&#10;&#10;- 添加DELIVERY.md项目交付文档，包含执行摘要、架构图、功能清单&#10;- 添加IMPLEMENTATION_REPORT.md v2架构实施报告，详述17个新增文件功能&#10;- 添加intraday_client.py分时数据客户端，支持1/5/15/30分钟K线数据获取&#10;- 更新eastmoney_fetcher.py网络请求重试机制，增加指数退避算法绕开风控&#10;- 增加分时数据客户端包含集合竞价、盘中强度、日内高低点距离分析功能" />
+    <MESSAGE value="docs: 移除过时的文档并添加新的选股脚本&#10;&#10;- 删除了 MIGRATION.md、QUICKSTART.md、docs/README.md 和 legacy/README.md&#10;- 新增 select_stocks.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs: 移除过时的文档并添加新的选股脚本&#10;&#10;- 删除了 MIGRATION.md、QUICKSTART.md、docs/README.md 和 legacy/README.md&#10;- 新增 select_stocks.py" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
