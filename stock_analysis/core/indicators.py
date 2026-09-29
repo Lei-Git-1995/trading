@@ -31,6 +31,65 @@ class TechnicalIndicators:
         return df
 
     @staticmethod
+    def calculate_ema(df: pd.DataFrame, periods: List[int] = None) -> pd.DataFrame:
+        """计算指数移动平均线。"""
+        if periods is None:
+            periods = INDICATOR_PARAMS.get('ema_periods', [12, 26, 50])
+        for period in periods:
+            df['EMA%s' % period] = df['收盘'].ewm(span=period, adjust=False).mean()
+        return df
+
+    @staticmethod
+    def calculate_volume(df: pd.DataFrame, periods: List[int] = None) -> pd.DataFrame:
+        """计算成交量均线和量比。"""
+        if periods is None:
+            periods = INDICATOR_PARAMS.get('volume_ma_periods', [5, 20])
+        for period in periods:
+            df['VOL_MA%s' % period] = df['成交量'].rolling(window=period, min_periods=1).mean()
+        base = df.get('VOL_MA20', df['成交量'].rolling(window=20, min_periods=1).mean())
+        df['VOLUME_RATIO'] = df['成交量'] / base.replace(0, np.nan)
+        return df
+
+    @staticmethod
+    def calculate_atr(df: pd.DataFrame, period: int = None) -> pd.DataFrame:
+        """计算平均真实波幅 ATR。"""
+        period = period or INDICATOR_PARAMS.get('atr_period', 14)
+        previous_close = df['收盘'].shift(1)
+        tr = pd.concat([
+            df['最高'] - df['最低'],
+            (df['最高'] - previous_close).abs(),
+            (df['最低'] - previous_close).abs(),
+        ], axis=1).max(axis=1)
+        df['ATR%s' % period] = tr.rolling(window=period, min_periods=1).mean()
+        return df
+
+    @staticmethod
+    def calculate_obv(df: pd.DataFrame) -> pd.DataFrame:
+        """计算能量潮 OBV 及其20日均线。"""
+        direction = df['收盘'].diff().fillna(0).apply(lambda x: 1 if x > 0 else (-1 if x < 0 else 0))
+        df['OBV'] = (direction * df['成交量']).cumsum()
+        df['OBV_MA20'] = df['OBV'].rolling(window=20, min_periods=1).mean()
+        return df
+
+    @staticmethod
+    def calculate_adx(df: pd.DataFrame, period: int = None) -> pd.DataFrame:
+        """计算简化版 ADX，用于趋势强度过滤。"""
+        period = period or INDICATOR_PARAMS.get('adx_period', 14)
+        up = df['最高'].diff()
+        down = -df['最低'].diff()
+        plus_dm = up.where((up > down) & (up > 0), 0.0)
+        minus_dm = down.where((down > up) & (down > 0), 0.0)
+        previous_close = df['收盘'].shift(1)
+        tr = pd.concat([df['最高'] - df['最低'], (df['最高'] - previous_close).abs(),
+                        (df['最低'] - previous_close).abs()], axis=1).max(axis=1)
+        atr = tr.rolling(window=period, min_periods=1).mean().replace(0, np.nan)
+        plus_di = 100 * plus_dm.rolling(window=period, min_periods=1).mean() / atr
+        minus_di = 100 * minus_dm.rolling(window=period, min_periods=1).mean() / atr
+        dx = (plus_di - minus_di).abs() / (plus_di + minus_di).replace(0, np.nan) * 100
+        df['ADX%s' % period] = dx.rolling(window=period, min_periods=1).mean().fillna(0)
+        return df
+
+    @staticmethod
     def calculate_macd(df: pd.DataFrame, fast: int = None, slow: int = None,
                        signal: int = None) -> pd.DataFrame:
         """
@@ -133,10 +192,15 @@ class TechnicalIndicators:
         :return: 添加了所有指标的DataFrame
         """
         df = cls.calculate_ma(df)
+        df = cls.calculate_ema(df)
         df = cls.calculate_macd(df)
         df = cls.calculate_kdj(df)
         df = cls.calculate_rsi(df)
         df = cls.calculate_boll(df)
+        df = cls.calculate_volume(df)
+        df = cls.calculate_atr(df)
+        df = cls.calculate_obv(df)
+        df = cls.calculate_adx(df)
         return df
 
     @staticmethod

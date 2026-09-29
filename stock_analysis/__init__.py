@@ -10,5 +10,6 @@ __author__ = "Stock Analysis Framework"
 
 from .analyzer import StockAnalyzer
 from .datasources import DataSourceFactory
+from .core import StockSelector
 
-__all__ = ['StockAnalyzer', 'DataSourceFactory']
+__all__ = ['StockAnalyzer', 'DataSourceFactory', 'StockSelector']

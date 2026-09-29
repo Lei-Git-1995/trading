@@ -28,6 +28,7 @@ setup(
     entry_points={
         'console_scripts': [
             'stock-analysis=stock_analysis.__main__:main',
+            'stock-select=stock_analysis.select_stocks:main',
         ],
     },
     classifiers=[

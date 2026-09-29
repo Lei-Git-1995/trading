@@ -7,5 +7,6 @@
 from .indicators import TechnicalIndicators
 from .report import ReportGenerator
 from .validator import DataValidator
+from .selection import StockSelector, STRATEGIES
 
-__all__ = ['TechnicalIndicators', 'ReportGenerator', 'DataValidator']
+__all__ = ['TechnicalIndicators', 'ReportGenerator', 'DataValidator', 'StockSelector', 'STRATEGIES']

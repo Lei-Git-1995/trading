@@ -53,11 +53,17 @@ DATASOURCE_CONFIG = {
 
 # 技术指标默认参数
 INDICATOR_PARAMS = {
-    'ma_periods': [5, 10, 20, 60],
+    # 趋势均线：120日均线用于中长期趋势过滤
+    'ma_periods': [5, 10, 20, 60, 120],
+    'ema_periods': [12, 26, 50],
     'macd': {'fast': 12, 'slow': 26, 'signal': 9},
     'kdj': {'n': 9, 'm1': 3, 'm2': 3},
     'rsi_periods': [6, 12, 24],
     'boll': {'n': 20, 'k': 2},
+    # 选股需要的量价、波动率和趋势强度指标
+    'volume_ma_periods': [5, 20],
+    'atr_period': 14,
+    'adx_period': 14,
 }
 
 # 分析参数
@@ -65,6 +71,17 @@ ANALYSIS_CONFIG = {
     'kline_days': 60,
     'recent_days': 10,
     'support_resistance_lookback': 20,
+}
+
+# 周期选股默认参数。数值集中在配置中，便于回测时统一调整。
+SELECTION_CONFIG = {
+    'accumulation_window': 10,
+    'accumulation_consecutive_days': 3,
+    'accumulation_daily_gain_min': 1.0,
+    'accumulation_daily_gain_max': 3.0,
+    'breakout_lookback': 20,
+    'volume_surge_ratio': 1.5,
+    'recent_signal_days': 3,
 }
 
 # HTTP请求配置

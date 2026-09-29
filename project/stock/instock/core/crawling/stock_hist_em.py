@@ -10,6 +10,8 @@ import time
 import pandas as pd
 import math
 from functools import lru_cache
+import logging
+import numpy as np
 from instock.core.eastmoney_fetcher import eastmoney_fetcher
 
 __author__ = 'myh '
@@ -18,6 +20,55 @@ __date__ = '2025/12/31 '
 # 创建全局实例，供所有函数使用
 fetcher = eastmoney_fetcher()
 
+# 东方财富不可用时使用腾讯（经 AkShare）作为备用数据源。
+def _tencent_spot_fallback():
+    import akshare as ak
+    src = ak.stock_zh_a_spot_tx()
+    if src is None or src.empty:
+        return pd.DataFrame()
+    src = src.copy()
+    code = src["code"].astype(str).str.replace(r"^(sh|sz|bj)", "", regex=True)
+    def num(name):
+        return pd.to_numeric(src[name], errors="coerce") if name in src else np.nan
+    return pd.DataFrame({
+        "code": code, "name": src["name"].astype(str),
+        "new_price": num("zxj"), "change_rate": num("zdf"), "ups_downs": num("zd"),
+        "volume": num("volume"), "deal_amount": num("turnover"), "amplitude": num("zf"),
+        "turnoverrate": num("hsl"), "volume_ratio": num("lb"),
+        "open_price": np.nan, "high_price": np.nan, "low_price": np.nan, "pre_close_price": np.nan,
+        "speed_increase": np.nan, "speed_increase_5": num("zdf_d5"), "speed_increase_60": num("zdf_d60"),
+        "speed_increase_all": num("zdf_y"), "dtsyl": np.nan, "pe9": np.nan, "pe": num("pe_ttm"),
+        "pbnewmrq": np.nan, "basic_eps": np.nan, "bvps": np.nan, "per_capital_reserve": np.nan,
+        "per_unassign_profit": np.nan, "roe_weight": np.nan, "sale_gpr": np.nan, "debt_asset_ratio": np.nan,
+        "total_operate_income": np.nan, "toi_yoy_ratio": np.nan, "parent_netprofit": np.nan,
+        "netprofit_yoy_ratio": np.nan, "report_date": pd.NaT, "total_shares": np.nan, "free_shares": np.nan,
+        "total_market_cap": num("zsz"), "free_cap": num("ltsz"), "industry": np.nan, "listing_date": pd.NaT,
+    })
+
+
+def _tencent_hist_fallback(symbol, start_date, end_date, adjust="qfq"):
+    import akshare as ak
+    market_symbol = ("sh" if str(symbol).startswith(("6", "9")) else "sz") + str(symbol)
+    src = ak.stock_zh_a_hist_tx(symbol=market_symbol, start_date=start_date, end_date=end_date, adjust=adjust)
+    if src is None or src.empty:
+        return pd.DataFrame()
+    out = pd.DataFrame({
+        "date": pd.to_datetime(src["date"], errors="coerce").dt.strftime("%Y-%m-%d"),
+        "open": pd.to_numeric(src["open"], errors="coerce"),
+        "close": pd.to_numeric(src["close"], errors="coerce"),
+        "high": pd.to_numeric(src["high"], errors="coerce"),
+        "low": pd.to_numeric(src["low"], errors="coerce"),
+        # Tencent returns shares; InStock later multiplies volume by 100.
+        "volume": pd.to_numeric(src["volume"], errors="coerce") / 100,
+        "amount": pd.to_numeric(src["amount"], errors="coerce"),
+        "amplitude": np.nan, "quote_change": np.nan, "ups_downs": np.nan,
+        "turnover": pd.to_numeric(src["turnover"], errors="coerce") * 100,
+    })
+    out["ups_downs"] = out["close"].diff().fillna(0.0)
+    out["quote_change"] = out["close"].pct_change().mul(100).fillna(0.0)
+    out["amplitude"] = (out["high"] - out["low"]).div(out["close"].shift(1)).mul(100).fillna(0.0)
+    return out
+
 def stock_zh_a_spot_em() -> pd.DataFrame:
     """
     东方财富网-沪深京 A 股-实时行情
@@ -25,6 +76,11 @@ def stock_zh_a_spot_em() -> pd.DataFrame:
     :return: 实时行情
     :rtype: pandas.DataFrame
     """
+    # Prefer Tencent; EastMoney remains a fallback for compatibility.
+    try:
+        return _tencent_spot_fallback()
+    except Exception as exc:
+        logging.warning("Tencent spot unavailable, trying EastMoney: %s", exc)
     url = "https://82.push2.eastmoney.com/api/qt/clist/get"
     page_size = 50
     page_current = 1
@@ -41,8 +97,12 @@ def stock_zh_a_spot_em() -> pd.DataFrame:
         "fields": "f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f14,f15,f16,f17,f18,f20,f21,f22,f23,f24,f25,f26,f37,f38,f39,f40,f41,f45,f46,f48,f49,f57,f61,f100,f112,f113,f114,f115,f221",
         "_": str(int(time.time() * 1000)),
     }
-    r =  fetcher.make_request(url, params=params)
-    data_json = r.json()
+    try:
+        r = fetcher.make_request(url, params=params)
+        data_json = r.json()
+    except Exception as exc:
+        logging.warning("EastMoney spot unavailable, falling back to Tencent: %s", exc)
+        return _tencent_spot_fallback()
     data = data_json["data"]["diff"]
     if not data:
         return pd.DataFrame()
@@ -333,7 +393,11 @@ def stock_zh_a_hist(
     :return: 每日行情
     :rtype: pandas.DataFrame
     """
-    code_id_dict = code_id_map_em()
+    # Prefer Tencent; EastMoney remains a fallback for compatibility.
+    try:
+        return _tencent_hist_fallback(symbol, start_date, end_date, adjust)
+    except Exception as exc:
+        logging.warning("Tencent history unavailable for %s, trying EastMoney: %s", symbol, exc)
     adjust_dict = {"qfq": "1", "hfq": "2", "": "0"}
     period_dict = {"daily": "101", "weekly": "102", "monthly": "103"}
     url = "http://push2his.eastmoney.com/api/qt/stock/kline/get"
@@ -348,10 +412,14 @@ def stock_zh_a_hist(
         "end": end_date,
         "_": "1623766962675",
     }
-    r =  fetcher.make_request(url, params=params)
-    data_json = r.json()
-    if not (data_json["data"] and data_json["data"]["klines"]):
-        return pd.DataFrame()
+    try:
+        r = fetcher.make_request(url, params=params)
+        data_json = r.json()
+        if not (data_json["data"] and data_json["data"]["klines"]):
+            return pd.DataFrame()
+    except Exception as exc:
+        logging.warning("EastMoney history unavailable for %s, falling back to Tencent: %s", symbol, exc)
+        return _tencent_hist_fallback(symbol, start_date, end_date, adjust)
     temp_df = pd.DataFrame(
         [item.split(",") for item in data_json["data"]["klines"]]
     )
@@ -408,7 +476,6 @@ def stock_zh_a_hist_min_em(
     :return: 每日分时行情
     :rtype: pandas.DataFrame
     """
-    code_id_dict = code_id_map_em()
     adjust_map = {
         "": "0",
         "qfq": "1",
@@ -532,7 +599,6 @@ def stock_zh_a_hist_pre_min_em(
     :return: 每日分时行情包含盘前数据
     :rtype: pandas.DataFrame
     """
-    code_id_dict = code_id_map_em()
     url = "https://push2.eastmoney.com/api/qt/stock/trends2/get"
     params = {
         "fields1": "f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13",

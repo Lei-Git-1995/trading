@@ -171,6 +171,21 @@ python -m stock_analysis --help
 
 ## 🔧 配置说明
 
+## 选股策略
+
+项目提供独立的固定指标和周期形态选股工具，完整规则见 `SELECTION_STRATEGIES.md`。启动交互式选股：
+
+```bash
+python -m stock_analysis.select_stocks
+```
+
+也可以直接指定 CSV 股票池或股票代码：
+
+```bash
+python -m stock_analysis.select_stocks --input data --strategy all
+python -m stock_analysis.select_stocks --codes 600519,600036 --strategy accumulation_3of10
+```
+
 编辑 `config.py` 自定义配置：
 
 ### 路径配置
