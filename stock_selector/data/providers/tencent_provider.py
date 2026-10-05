@@ -3,6 +3,7 @@
 - 日K线:  stock_zh_a_hist_tx  (含当日数据与换手率)
 缺失字段: 外盘/内盘、行业板块 -> 外盘占比默认 50%，板块降级为按代码推断的市场类别
 """
+from __future__ import annotations
 from datetime import datetime, timedelta
 
 import numpy as np

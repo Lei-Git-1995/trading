@@ -15,6 +15,12 @@ SELECTION_CONFIG = {
     'breakout_lookback': 20,
     'volume_surge_ratio': 1.5,
     'recent_signal_days': 3,
+    # 横盘后连续上涨策略：横盘窗口不含最近的上涨确认窗口
+    'sideways_window': 30,
+    'sideways_up_days': 3,
+    'sideways_max_range_pct': 12.0,
+    'sideways_max_slope_pct': 6.0,
+    'sideways_max_volatility_pct': 3.5,
 }
 
 

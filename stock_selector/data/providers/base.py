@@ -1,4 +1,5 @@
 """数据提供者抽象基类与注册/工厂"""
+from __future__ import annotations
 import time
 from abc import ABC, abstractmethod
 

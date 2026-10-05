@@ -155,6 +155,43 @@ def _accumulation(df):
     return _result(ok, '近10日连续3天上涨且单日1%-3%' if ok else '连续温和上涨或趋势过滤未满足', best_consecutive=best_run)
 
 
+def _sideways_then_up_3(df):
+    """横盘整理后，最新连续 N 个交易日收盘价逐日上涨。
+
+    横盘段与上涨确认段分开，避免把上涨本身算进横盘振幅。
+    range 使用最高/最低价，slope 使用首尾收盘价，volatility 使用日收益标准差。
+    """
+    window = int(SELECTION_CONFIG['sideways_window'])
+    up_days = int(SELECTION_CONFIG['sideways_up_days'])
+    max_range = float(SELECTION_CONFIG['sideways_max_range_pct'])
+    max_slope = float(SELECTION_CONFIG['sideways_max_slope_pct'])
+    max_vol = float(SELECTION_CONFIG['sideways_max_volatility_pct'])
+    if len(df) < window + up_days:
+        return _result(False, '历史数据不足横盘和上涨确认窗口', sideways_days=window, up_days=up_days)
+
+    prices = pd.to_numeric(df['收盘'], errors='coerce')
+    segment = df.iloc[-(window + up_days):-up_days]
+    closes = pd.to_numeric(segment['收盘'], errors='coerce').dropna()
+    highs = pd.to_numeric(segment['最高'], errors='coerce').dropna()
+    lows = pd.to_numeric(segment['最低'], errors='coerce').dropna()
+    if len(closes) < window or highs.empty or lows.empty or closes.iloc[0] <= 0:
+        return _result(False, '横盘窗口存在无效价格数据')
+
+    range_pct = (highs.max() - lows.min()) / closes.mean() * 100
+    slope_pct = (closes.iloc[-1] / closes.iloc[0] - 1) * 100
+    volatility_pct = closes.pct_change().dropna().std() * 100
+    recent = prices.tail(up_days)
+    consecutive_up = bool(recent.notna().all() and (recent.diff().iloc[1:] > 0).all())
+    ok = (consecutive_up and range_pct <= max_range and abs(slope_pct) <= max_slope
+          and volatility_pct <= max_vol)
+    return _result(
+        ok,
+        '横盘后最新%d日收盘连续上涨' % up_days if ok else '横盘幅度、波动率或连续上涨条件未满足',
+        sideways_range_pct=range_pct, sideways_slope_pct=slope_pct,
+        sideways_volatility_pct=volatility_pct, consecutive_up_days=up_days,
+    )
+
+
 def _pullback_rebound(df):
     if len(df) < 20:
         return _result(False, '历史数据不足20个交易日')
@@ -182,6 +219,7 @@ STRATEGIES = [
     {'id': 'boll_breakout', 'name': '布林上轨突破', 'description': '收盘突破布林上轨，量比至少1.2', 'func': _boll_breakout},
     {'id': 'volume_breakout', 'name': '放量突破', 'description': '收盘突破近20日高点，量比至少1.5', 'func': _volume_breakout},
     {'id': 'accumulation_3of10', 'name': '温和连续上涨吸筹', 'description': '近10日连续3天上涨，每天涨幅1%-3%', 'func': _accumulation},
+    {'id': 'sideways_then_up_3', 'name': '横盘后连续上涨', 'description': '先横盘整理，再出现最新连续3日收盘上涨', 'func': _sideways_then_up_3},
     {'id': 'pullback_rebound', 'name': '回撤后反弹', 'description': '近10日先回撤至少5%，随后站回MA5反弹', 'func': _pullback_rebound},
     {'id': 'multi_factor', 'name': '多因子综合', 'description': '趋势、MACD、量价、RSI、布林五项至少满足三项', 'func': _multi_factor},
 ]
@@ -203,7 +241,17 @@ class TechnicalSelector:
 
     @classmethod
     def screen(cls, stock_list: pd.DataFrame, provider, strategy_id: str, days: int = 150, limit: int = 0):
-        rows = []
+        return cls.screen_many(stock_list, provider, [strategy_id], days=days, limit=limit)[strategy_id]
+
+    @classmethod
+    def screen_many(cls, stock_list: pd.DataFrame, provider, strategy_ids: List[str],
+                    days: int = 150, limit: int = 0):
+        """每只股票只获取一次历史 K 线，再执行所有指定策略。"""
+        for strategy_id in strategy_ids:
+            if strategy_id not in STRATEGY_MAP:
+                raise ValueError('未知策略: %s' % strategy_id)
+
+        results = {strategy_id: [] for strategy_id in strategy_ids}
         stocks = stock_list if not limit else stock_list.head(limit)
         for _, stock in stocks.iterrows():
             code = str(stock.get('code', '')).zfill(6)
@@ -211,12 +259,15 @@ class TechnicalSelector:
                 hist = provider.get_stock_history(code, days=days)
                 if hist is None or hist.empty:
                     continue
-                result = cls.evaluate(hist, strategy_id)
-                if result['matched']:
-                    rows.append({'code': code, 'name': stock.get('name', code),
-                                 'price': stock.get('price'), 'change_pct': stock.get('change_pct'),
-                                 'sector': stock.get('sector', ''), 'latest_date': result['latest_date'],
-                                 'reason': result['reason'], 'metrics': result['metrics']})
+                for strategy_id in strategy_ids:
+                    result = cls.evaluate(hist, strategy_id)
+                    if result['matched']:
+                        results[strategy_id].append({
+                            'code': code, 'name': stock.get('name', code),
+                            'price': stock.get('price'), 'change_pct': stock.get('change_pct'),
+                            'sector': stock.get('sector', ''), 'latest_date': result['latest_date'],
+                            'reason': result['reason'], 'metrics': result['metrics'],
+                        })
             except Exception:
                 continue
-        return rows
+        return results

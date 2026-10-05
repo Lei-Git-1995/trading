@@ -8,8 +8,13 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+# 支持两种启动方式：
+#   python -m stock_selector.strategy_runner   （在 E:\trading 下）
+#   python strategy_runner.py                  （直接进入 stock_selector 目录）
+if __package__ in (None, ''):
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from stock_selector.config import OUTPUT_DIR
-from stock_selector.data.providers import list_providers
 from stock_selector.data.smart_provider_manager import SmartProviderManager
 from stock_selector.strategies.technical_selection import STRATEGIES, STRATEGY_MAP, TechnicalSelector
 
@@ -87,11 +92,12 @@ def main(argv=None):
             wanted = set(x.strip().zfill(6) for x in args.codes.split(',') if x.strip())
             stocks = stocks[stocks['code'].astype(str).isin(wanted)]
         print('数据源：%s，待处理股票：%d' % (manager.current_provider_name, len(stocks)))
-        results = {}
         for strategy_id in strategy_ids:
             print('执行：%s' % STRATEGY_MAP[strategy_id]['name'])
-            results[strategy_id] = TechnicalSelector.screen(provider=provider, stock_list=stocks,
-                                                            strategy_id=strategy_id, days=args.days, limit=args.limit)
+        results = TechnicalSelector.screen_many(stock_list=stocks, provider=provider,
+                                                 strategy_ids=strategy_ids, days=args.days,
+                                                 limit=args.limit)
+        for strategy_id in strategy_ids:
             print('  匹配：%d 只' % len(results[strategy_id]))
         output = args.output or str(OUTPUT_DIR / ('technical_%s.md' % datetime.now().strftime('%Y-%m-%d_%H%M%S')))
         write_report(results, output)

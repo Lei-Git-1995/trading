@@ -5,18 +5,32 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="80e5262d-bf5f-448f-913c-7e19aa05266a" name="Changes" comment="docs: 移除过时的文档并添加新的选股脚本&#10;&#10;- 删除了 MIGRATION.md、QUICKSTART.md、docs/README.md 和 legacy/README.md&#10;- 新增 select_stocks.py">
+      <change afterPath="$PROJECT_DIR$/stock_analysis/SELECTION_STRATEGIES.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stock_analysis/core/selection.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stock_analysis/select_stocks.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/stock/instock/core/crawling/stock_hist_em.py" beforeDir="false" afterPath="$PROJECT_DIR$/project/stock/instock/core/crawling/stock_hist_em.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/stock_analysis/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/SELECTION_STRATEGIES.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_analysis/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_analysis/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/core/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_analysis/core/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/core/indicators.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_analysis/core/indicators.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/core/selection.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/select_stocks.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_analysis/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_analysis/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/QUICK_START.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stock_selector/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/providers/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/data/providers/base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/providers/tencent_provider.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/data/providers/tencent_provider.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/smart_provider_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/data/smart_provider_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/docs/DELIVERY.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/docs/IMPLEMENTATION_REPORT.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/docs/MAINBOARD_FILTER.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/docs/OPTIMIZATION.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/docs/OPTIMIZATION_SUMMARY.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/docs/QUICK_START.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/docs/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/docs/ROADMAP.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/docs/TECHNICAL_SELECTION_STRATEGIES.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/docs/TODO.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/docs/V2_GUIDE.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/docs/技术架构说明.md" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/docs/技术架构说明.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/strategies/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/strategies/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/strategies/scoring_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/strategies/scoring_engine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/strategies/technical_selection.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/strategies/technical_selection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/strategy_runner.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/strategy_runner.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

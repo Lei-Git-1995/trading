@@ -6,6 +6,7 @@
 2. 失败时自动切换到备用源
 3. 健康检查和容灾
 """
+from __future__ import annotations
 
 import time
 from typing import Optional, List, Tuple

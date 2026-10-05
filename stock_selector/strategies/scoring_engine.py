@@ -2,6 +2,7 @@
 
 从"硬过滤"升级到"多维度评分+风险控制"
 """
+from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Any
 import pandas as pd
