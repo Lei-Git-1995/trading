@@ -84,6 +84,12 @@ def parse_args():
     # 输出相关
     parser.add_argument('--show-stats', action='store_true',
                         help='显示详细的执行统计（默认已开启）')
+    parser.add_argument('--excel', action='store_true',
+                        help='同时生成 Excel 报告')
+    parser.add_argument('--excel-output', type=str, default=None,
+                        help='Excel 报告路径（指定后自动启用 Excel 输出）')
+    parser.add_argument('--notify-webhook', type=str, default=None,
+                        help='选股完成后发送文本通知的 Webhook URL')
 
     return parser.parse_args()
 
@@ -231,6 +237,14 @@ def main():
                 from stock_selector.reports.markdown_report_v2 import generate_v2_report
                 generate_v2_report(results, data_date, output_file, adapter.strategy_config)
 
+            excel_file = None
+            if args.excel or args.excel_output:
+                from stock_selector.reports.excel_report import generate as generate_excel
+                excel_file = args.excel_output or str(
+                    OUTPUT_DIR / f'{datetime.now().strftime("%Y-%m-%d")}_v2_{args.preset_v2}.xlsx')
+                Path(excel_file).parent.mkdir(parents=True, exist_ok=True)
+                generate_excel(results, data_date, excel_file, adapter.strategy_config)
+
             logger.info('\n' + '=' * 70)
             logger.info(f'完成: 选出 {len(results)} 只')
             for i, s in enumerate(results[:5], 1):
@@ -240,6 +254,16 @@ def main():
                 if s.get('signals'):
                     logger.info(f'      信号: {", ".join(s["signals"][:2])}')
             logger.info(f'报告: {output_file}')
+            if excel_file:
+                logger.info(f'Excel报告: {excel_file}')
+            if args.notify_webhook:
+                from stock_selector.notification import WebhookNotifier, format_stock_summary
+                try:
+                    sent = WebhookNotifier(args.notify_webhook).send_text(
+                        format_stock_summary(results, title=f'{data_date} v2选股报告'))
+                    logger.info(f'通知发送: {"成功" if sent else "失败"}')
+                except Exception as exc:
+                    logger.warning(f'通知发送失败: {exc}')
             logger.info('=' * 70)
 
             # 显示性能统计
@@ -392,6 +416,15 @@ def main():
     with timeit('生成报告'):
         generate(results, data_date, output_file, config)
 
+    excel_file = None
+    if args.excel or args.excel_output:
+        from stock_selector.reports.excel_report import generate as generate_excel
+        excel_file = args.excel_output or str(
+            OUTPUT_DIR / f'{datetime.now().strftime("%Y-%m-%d")}.xlsx')
+        Path(excel_file).parent.mkdir(parents=True, exist_ok=True)
+        with timeit('生成 Excel 报告'):
+            generate_excel(results, data_date, excel_file, config)
+
     logger.info('\n' + '=' * 70)
     logger.info(f'完成: 选出 {len(results)} 只')
     for i, s in enumerate(results[:5], 1):
@@ -399,6 +432,16 @@ def main():
                     f'涨{s["change_pct"]:.2f}%  换手{s["turnover"]:.1f}%  '
                     f'量比{s["volume_ratio"]:.2f}  {s["score"]}分')
     logger.info(f'报告: {output_file}')
+    if excel_file:
+        logger.info(f'Excel报告: {excel_file}')
+    if args.notify_webhook:
+        from stock_selector.notification import WebhookNotifier, format_stock_summary
+        try:
+            sent = WebhookNotifier(args.notify_webhook).send_text(
+                format_stock_summary(results, title=f'{data_date} A股选股报告'))
+            logger.info(f'通知发送: {"成功" if sent else "失败"}')
+        except Exception as exc:
+            logger.warning(f'通知发送失败: {exc}')
     logger.info('=' * 70)
 
     # 显示性能统计

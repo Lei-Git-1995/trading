@@ -53,6 +53,11 @@ def generate(stocks: list, target_date: str, path: str, config) -> str:
 
 
 def _write_summary(wb, stocks, target_date, config):
+    def cfg(name, default=''):
+        if isinstance(config, dict):
+            return config.get(name, default)
+        return getattr(config, name, default)
+
     ws = wb.active
     ws.title = '报告说明'
     ws.cell(1, 1, '短线选股报告').font = Font(bold=True, size=14)
@@ -62,13 +67,13 @@ def _write_summary(wb, stocks, target_date, config):
     ws['A6'] = '筛选条件'
     for i, cond in enumerate(
         [
-            f'换手率 > {config.turnover_min}%',
-            f'涨幅在 {config.change_min}% 到 {config.change_max}% 之间',
-            f'量能比前两日平均放量 > {config.volume_ratio}倍',
+            f'换手率 > {cfg("turnover_min", cfg("filters", {}).get("liquidity", {}).get("turnover_min", "未设置") if isinstance(config, dict) else "未设置") }%',
+            f'涨幅在 {cfg("change_min", "未设置")}% 到 {cfg("change_max", "未设置")}% 之间',
+            f'量能比前两日平均放量 > {cfg("volume_ratio", cfg("filters", {}).get("liquidity", {}).get("volume_ratio_min", "未设置") if isinstance(config, dict) else "未设置")}倍',
             '外盘 > 内盘（资金净流入，主动买入 > 主动卖出）',
             'KDJ_K < 80（未超买）',
             'RSI6 < 70（未超买）',
-            f'每个板块最多 {config.top_per_sector} 只（0 表示不限制）',
+            f'每个板块最多 {cfg("top_per_sector", "未设置")} 只（0 表示不限制）',
         ],
         start=6,
     ):
@@ -84,15 +89,15 @@ def _write_picks(wb, stocks):
     rows = [
         [
             i,
-            s['code'],
-            s['name'],
-            s['sector'],
-            round(s['price'], 2),
-            round(s['change_pct'], 2),
-            round(s['turnover'], 2),
-            round(s['volume_ratio'], 2),
-            round(s['outer_ratio'], 1),
-            s['score'],
+            s.get('code', ''),
+            s.get('name', ''),
+            s.get('sector', ''),
+            round(float(s.get('price') or 0), 2),
+            round(float(s.get('change_pct') or 0), 2),
+            round(float(s.get('turnover') or 0), 2),
+            round(float(s.get('volume_ratio') or 0), 2),
+            round(float(s.get('outer_ratio') or 0), 1),
+            s.get('score', ''),
         ]
         for i, s in enumerate(stocks[:20], 1)
     ]
@@ -105,15 +110,15 @@ def _write_picks(wb, stocks):
         r2 = [
             [
                 i,
-                s['code'],
-                s['name'],
-                s['sector'],
-                round(s['price'], 2),
-                round(s['change_pct'], 2),
-                round(s['turnover'], 2),
-                round(s['volume_ratio'], 2),
-                round(s['outer_ratio'], 1),
-                s['score'],
+                s.get('code', ''),
+                s.get('name', ''),
+                s.get('sector', ''),
+                round(float(s.get('price') or 0), 2),
+                round(float(s.get('change_pct') or 0), 2),
+                round(float(s.get('turnover') or 0), 2),
+                round(float(s.get('volume_ratio') or 0), 2),
+                round(float(s.get('outer_ratio') or 0), 1),
+                s.get('score', ''),
             ]
             for i, s in enumerate(stocks, 1)
         ]
@@ -126,19 +131,19 @@ def _write_top5(wb, stocks):
     ws = wb.create_sheet('Top5分析')
     row = 1
     for i, s in enumerate(stocks[:5], 1):
-        ws.cell(row, 1, f'{i}. {s["name"]}（{s["code"]}）— {s["score"]}/80 分').font = TITLE_FONT
+        ws.cell(row, 1, f'{i}. {s.get("name", "")}（{s.get("code", "")}）— {s.get("score", "")}/80 分').font = TITLE_FONT
         row += 1
 
         info = [
-            ('最新价', f'{s["price"]:.2f} 元'),
-            ('涨跌幅', f'{s["change_pct"]:.2f}%'),
-            ('换手率', f'{s["turnover"]:.2f}%'),
-            ('量比', f'{s["volume_ratio"]:.2f} 倍'),
-            ('外盘占比', f'{s["outer_ratio"]:.1f}%（内盘 {s["inner_ratio"]:.1f}%）'),
-            ('资金流向', '净流入' if s['outer_ratio'] > 50 else '净流出'),
-            ('KDJ_K', f'{s["kdj_k"]:.1f}'),
-            ('RSI(6)', f'{s["rsi6"]:.1f}'),
-            ('近3日累计涨幅', f'{s["recent_3day_change"]:.2f}%'),
+            ('最新价', f'{float(s.get("price") or 0):.2f} 元'),
+            ('涨跌幅', f'{float(s.get("change_pct") or 0):.2f}%'),
+            ('换手率', f'{float(s.get("turnover") or 0):.2f}%'),
+            ('量比', f'{float(s.get("volume_ratio") or 0):.2f} 倍'),
+            ('外盘占比', f'{float(s.get("outer_ratio") or 0):.1f}%（内盘 {float(s.get("inner_ratio") or 0):.1f}%）'),
+            ('资金流向', '净流入' if float(s.get('outer_ratio') or 0) > 50 else '净流出'),
+            ('KDJ_K', f'{float(s.get("kdj_k") or 0):.1f}'),
+            ('RSI(6)', f'{float(s.get("rsi6") or 0):.1f}'),
+            ('近3日累计涨幅', f'{float(s.get("recent_3day_change") or 0):.2f}%'),
         ]
         for name, val in info:
             ws.cell(row, 1, name).font = SECTION_FONT
@@ -154,7 +159,9 @@ def _write_history(wb, stocks):
     headers = ['名称', '代码', '日期', '收盘价', '涨跌幅%', '换手率%', '成交量(手)']
     rows = []
     for s in stocks[:20]:
-        hist = s['hist_data']
+        hist = s.get('hist_data')
+        if hist is None or not hasattr(hist, 'iterrows'):
+            continue
         for _, r in hist.iterrows():
             rows.append([
                 s['name'],

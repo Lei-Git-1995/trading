@@ -36,4 +36,21 @@ py -3.11 -m stock_selector.strategy_runner --list-strategies
 py -3.11 -m stock_selector.strategy_runner --strategy ma_trend --limit 100
 ```
 
+常规选股如需同时生成 Excel 报告：
+
+```powershell
+py -3.11 -m stock_selector.main --preset conservative --excel
+```
+
+历史技术策略回测（输入为标准化日线 CSV，列名使用项目约定的中文字段）：
+
+```powershell
+py -3.11 -m stock_selector.backtest_runner `
+  --input data\sample_history.csv `
+  --strategy sideways_then_up_3 `
+  --holding-days 1
+```
+
+技术形态检测 API 位于 `stock_selector.indicators.pattern_recognition`，支持双底、双顶、头肩顶、三角形和矩形整理。通用机器人通知可通过 `--notify-webhook URL` 启用；Webhook 地址由用户自行提供。
+
 完整使用说明请查看 [文档目录](docs/文档目录.md)。

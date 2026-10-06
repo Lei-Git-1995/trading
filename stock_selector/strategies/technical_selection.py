@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 
 from stock_selector.config import SELECTION_CONFIG
+from stock_selector.indicators.pattern_recognition import detect_pattern
 
 
 def _num(value, default=0.0):
@@ -192,6 +193,16 @@ def _sideways_then_up_3(df):
     )
 
 
+def _classic_pattern(df):
+    """识别适合作为候选信号的双底、三角形或矩形整理。"""
+    matches = {}
+    for pattern in ('double_bottom', 'triangle', 'rectangle'):
+        result = detect_pattern(df, pattern, order=2, min_separation=4)
+        matches[pattern] = result['matched']
+    matched = any(matches.values())
+    return _result(matched, '检测到经典整理/反转形态' if matched else '未检测到符合条件的经典形态', patterns=matches)
+
+
 def _pullback_rebound(df):
     if len(df) < 20:
         return _result(False, '历史数据不足20个交易日')
@@ -220,6 +231,7 @@ STRATEGIES = [
     {'id': 'volume_breakout', 'name': '放量突破', 'description': '收盘突破近20日高点，量比至少1.5', 'func': _volume_breakout},
     {'id': 'accumulation_3of10', 'name': '温和连续上涨吸筹', 'description': '近10日连续3天上涨，每天涨幅1%-3%', 'func': _accumulation},
     {'id': 'sideways_then_up_3', 'name': '横盘后连续上涨', 'description': '先横盘整理，再出现最新连续3日收盘上涨', 'func': _sideways_then_up_3},
+    {'id': 'classic_pattern', 'name': '经典价格形态', 'description': '识别双底、三角形或矩形整理候选', 'func': _classic_pattern},
     {'id': 'pullback_rebound', 'name': '回撤后反弹', 'description': '近10日先回撤至少5%，随后站回MA5反弹', 'func': _pullback_rebound},
     {'id': 'multi_factor', 'name': '多因子综合', 'description': '趋势、MACD、量价、RSI、布林五项至少满足三项', 'func': _multi_factor},
 ]

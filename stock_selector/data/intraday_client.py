@@ -210,10 +210,11 @@ class IntradayClient:
 
     def get_auction_data(self, code: str) -> Optional[Dict]:
         """
-        获取集合竞价数据（9:20-9:25）
+        获取集合竞价数据。
 
-        注意: 此功能需要在竞价时段实时获取，盘后无法获取
-        这里提供接口框架，实际需要在交易时段调用
+        当前可用的东方财富实时行情接口返回的是连续竞价快照，不能可靠区分
+        集合竞价撮合价与普通最新价，因此本方法暂不伪造集合竞价结果，返回 None。
+        接入具备明确集合竞价字段的数据源后再实现。
 
         Args:
             code: 股票代码
@@ -228,42 +229,7 @@ class IntradayClient:
                 'is_strong_auction': 是否强势竞价,
             }
         """
-        # TODO: 实现集合竞价数据获取
-        # 东方财富集合竞价API: http://push2.eastmoney.com/api/qt/stock/get
-        # 参数: secid, fields=f43,f44,f45,f46,f47,f48,f49,f50
-
-        symbol = self._convert_code_for_eastmoney(code)
-
-        params = {
-            'secid': symbol,
-            'fields': 'f43,f44,f45,f46,f47,f48,f49,f50,f51,f52',
-        }
-
-        try:
-            r = self.session.get(
-                'http://push2.eastmoney.com/api/qt/stock/get',
-                params=params,
-                timeout=self.timeout
-            )
-            data = r.json()
-            info = (data.get('data') or {})
-
-            if not info:
-                return None
-
-            # 解析竞价数据
-            return {
-                'auction_price': float(info.get('f43', 0)),  # 最新价
-                'auction_volume': float(info.get('f47', 0)),  # 总手
-                'auction_change': float(info.get('f170', 0)),  # 涨跌幅
-                'buy_orders': float(info.get('f49', 0)),  # 买一量
-                'sell_orders': float(info.get('f50', 0)),  # 卖一量
-                'is_strong_auction': float(info.get('f49', 0)) > float(info.get('f50', 0)),
-            }
-
-        except Exception as e:
-            print(f'  获取集合竞价数据失败({code}): {e}')
-            return None
+        return None
 
     def analyze_opening_strength(
         self,
