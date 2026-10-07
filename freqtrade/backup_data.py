@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import shutil
 import sqlite3
@@ -13,8 +14,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 DB_NAMES = ("tradesv3-demo.sqlite", "market_data.sqlite")
 STATIC_FILES = (
-    "docker-compose.demo.yml", "docker-compose.recorder.yml", "demo_guard.py",
-    "market_recorder.py", "demo_report.py", "README_OKX模拟盘合约.md",
+    "docker-compose.demo.yml", "docker-compose.recorder.yml",
+    "demo_guard.py", "market_recorder.py", "network_probe.py",
+    "demo_report.py", "backup_data.py",
+    "README_OKX模拟盘合约.md", "README_Linux部署与数据记录.md",
     "user_data/config_okx_demo.json", "user_data/config_okx_futures_backtest.json",
     "user_data/strategies/OKXDemoFuturesStrategy.py",
 )
@@ -31,6 +34,18 @@ def backup_sqlite(source: Path, target: Path) -> None:
             write_db.close()
     finally:
         read_db.close()
+
+
+def copy_static(source: Path, target: Path, relative: str) -> None:
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if relative == "user_data/config_okx_demo.json":
+        data = json.loads(source.read_text(encoding="utf-8-sig"))
+        for field in ("api_key", "key", "secret", "password"):
+            if field in data.get("exchange", {}):
+                data["exchange"][field] = ""
+        target.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    else:
+        shutil.copy2(source, target)
 
 
 def create_backup(output_dir: Path, keep_days: int) -> Path:
@@ -50,9 +65,7 @@ def create_backup(output_dir: Path, keep_days: int) -> Path:
         for relative in STATIC_FILES:
             source = ROOT / relative
             if source.is_file():
-                target = stage / relative
-                target.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(source, target)
+                copy_static(source, stage / relative, relative)
         logs = ROOT / "user_data" / "logs"
         if logs.is_dir():
             for source in logs.glob("*.log"):
@@ -80,11 +93,9 @@ def main() -> int:
     args = parser.parse_args()
     archive = create_backup(args.output_dir, args.keep_days)
     print(f"Backup: {archive} ({archive.stat().st_size} bytes)")
-    print("API keys and .env.demo are excluded.")
+    print(".env.demo excluded and config API fields redacted; review logs before sharing.")
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
-

@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import os
 
 import requests
 from websockets.sync.client import connect
@@ -71,7 +72,7 @@ async def check_ccxt_pro(proxy: str | None) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--proxy", help="Optional local HTTP proxy URL, e.g. http://127.0.0.1:7897")
+    parser.add_argument("--proxy", default=os.environ.get("OKX_PROXY_URL") or None, help="Optional local HTTP proxy URL, e.g. http://127.0.0.1:7897")
     parser.add_argument("--ccxt-pro", action="store_true", help="also validate the CCXT Pro feed used by Freqtrade")
     args = parser.parse_args()
     check_rest(args.proxy)
@@ -84,5 +85,6 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 
 

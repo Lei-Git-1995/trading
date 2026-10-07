@@ -6,9 +6,15 @@ services:
     volumes:
       - ./user_data:/freqtrade/user_data
       - ./market_recorder.py:/freqtrade/market_recorder.py:ro
+      - ./network_probe.py:/freqtrade/network_probe.py:ro
     entrypoint: ["python", "/freqtrade/market_recorder.py"]
+    environment:
+      OKX_PROXY_URL: ${OKX_PROXY_URL:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
+

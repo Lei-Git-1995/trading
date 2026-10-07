@@ -90,7 +90,15 @@ def latest_ts(db: sqlite3.Connection, inst_id: str) -> int | None:
     return row[0] if row else None
 
 
-def backfill(db: sqlite3.Connection, proxy: str | None, initial_days: int) -> None:
+
+def backfill_start(last: int | None, end_ms: int, initial_days: int, force_initial: bool) -> int:
+    initial_start = end_ms - initial_days * 86_400_000
+    if last is None:
+        return initial_start
+    recent_start = max(0, last - 86_400_000)
+    return min(recent_start, initial_start) if force_initial else recent_start
+def backfill(db: sqlite3.Connection, proxy: str | None, initial_days: int,
+             force_initial: bool = False) -> None:
     config = {
         "hostname": REST_HOST,
         "urls": {"api": {"rest": "https://openapi.okx.com"}},
@@ -107,7 +115,7 @@ def backfill(db: sqlite3.Connection, proxy: str | None, initial_days: int) -> No
         end_ms = int(time.time() * 1000) - INTERVAL_MS
         for inst_id, symbol in PAIR_MAP.items():
             last = latest_ts(db, inst_id)
-            start_ms = max(0, last - 86_400_000) if last else end_ms - initial_days * 86_400_000
+            start_ms = backfill_start(last, end_ms, initial_days, force_initial)
             count = 0
             while start_ms <= end_ms:
                 batch = exchange.fetch_ohlcv(symbol, timeframe=TIMEFRAME, since=start_ms, limit=300)
@@ -191,7 +199,7 @@ def main() -> int:
             status(db)
             return 0
         if args.once:
-            backfill(db, args.proxy, args.initial_days)
+            backfill(db, args.proxy, args.initial_days, force_initial=True)
             status(db)
             return 0
         while True:
@@ -209,6 +217,8 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
 
 
 

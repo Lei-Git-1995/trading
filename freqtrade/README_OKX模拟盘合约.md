@@ -2,6 +2,8 @@
 
 更新时间：2026-10-07。目标是先在 OKX 自己的模拟盘运行 1～2 个月，之后再独立审查实盘配置。当前方案为 **USDT 永续合约、逐仓、只做多、BTC/ETH、15m**。
 
+Linux 长期部署、数据记录和备份见 [Linux 部署与数据记录](README_Linux部署与数据记录.md)。
+
 ## 关键区别
 
 `user_data/config.json` 是 Freqtrade 本地 Dry-run：不会向交易所发订单。
@@ -152,6 +154,8 @@ cd E:\trading\freqtrade
 - Freqtrade OKX 支持范围：https://www.freqtrade.io/en/stable/exchanges/#okx
 - Freqtrade 合约与杠杆：https://www.freqtrade.io/en/stable/leverage/
 - Freqtrade 策略杠杆回调：https://www.freqtrade.io/en/stable/strategy-callbacks/#leverage-callback
+
+
 
 
 
