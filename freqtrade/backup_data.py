@@ -22,9 +22,15 @@ STATIC_FILES = (
 
 def backup_sqlite(source: Path, target: Path) -> None:
     target.parent.mkdir(parents=True, exist_ok=True)
-    with sqlite3.connect(f"file:{source.as_posix()}?mode=ro", uri=True) as read_db:
-        with sqlite3.connect(target) as write_db:
+    read_db = sqlite3.connect(f"file:{source.as_posix()}?mode=ro", uri=True)
+    try:
+        write_db = sqlite3.connect(target)
+        try:
             read_db.backup(write_db)
+        finally:
+            write_db.close()
+    finally:
+        read_db.close()
 
 
 def create_backup(output_dir: Path, keep_days: int) -> Path:
@@ -49,7 +55,7 @@ def create_backup(output_dir: Path, keep_days: int) -> Path:
                 shutil.copy2(source, target)
         logs = ROOT / "user_data" / "logs"
         if logs.is_dir():
-            for source in logs.glob("*.log*"):
+            for source in logs.glob("*.log"):
                 if source.is_file():
                     target = stage / "user_data" / "logs" / source.name
                     target.parent.mkdir(parents=True, exist_ok=True)
@@ -80,3 +86,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+

@@ -9,4 +9,9 @@ services:
       - ./user_data:/freqtrade/user_data
       - ./demo_guard.py:/freqtrade/demo_guard.py:ro
     entrypoint: ["python", "/freqtrade/demo_guard.py"]
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
 

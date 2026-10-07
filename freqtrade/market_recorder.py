@@ -106,8 +106,8 @@ def backfill(db: sqlite3.Connection, proxy: str | None, initial_days: int) -> No
         exchange.load_markets()
         end_ms = int(time.time() * 1000) - INTERVAL_MS
         for inst_id, symbol in PAIR_MAP.items():
-            start_ms = latest_ts(db, inst_id)
-            start_ms = start_ms + INTERVAL_MS if start_ms else end_ms - initial_days * 86_400_000
+            last = latest_ts(db, inst_id)
+            start_ms = max(0, last - 86_400_000) if last else end_ms - initial_days * 86_400_000
             count = 0
             while start_ms <= end_ms:
                 batch = exchange.fetch_ohlcv(symbol, timeframe=TIMEFRAME, since=start_ms, limit=300)
@@ -127,6 +127,20 @@ def backfill(db: sqlite3.Connection, proxy: str | None, initial_days: int) -> No
         exchange.close()
 
 
+
+def process_ws_message(db: sqlite3.Connection, message: dict) -> int:
+    if message.get("event") == "error":
+        raise RuntimeError(f"WS subscription error: {message}")
+    inst_id = message.get("arg", {}).get("instId")
+    saved = 0
+    for candle in message.get("data", []):
+        if inst_id in PAIR_MAP and len(candle) >= 9 and str(candle[-1]) == "1":
+            if save_candle(db, inst_id, candle, "WS"):
+                LOG.info("Saved %s closed candle %s", inst_id, candle[0])
+                saved += 1
+    return saved
+
+
 def stream(db: sqlite3.Connection, proxy: str | None) -> None:
     with connect(WS_URL, proxy=proxy, open_timeout=15, close_timeout=5, ping_interval=None) as ws:
         args = [{"channel": "candle15m", "instId": inst_id} for inst_id in PAIR_MAP]
@@ -140,14 +154,7 @@ def stream(db: sqlite3.Connection, proxy: str | None) -> None:
                 continue
             if payload == "pong":
                 continue
-            message = json.loads(payload)
-            if message.get("event") == "error":
-                raise RuntimeError(f"WS subscription error: {message}")
-            inst_id = message.get("arg", {}).get("instId")
-            for candle in message.get("data", []):
-                if inst_id in PAIR_MAP and len(candle) >= 9 and str(candle[-1]) == "1":
-                    if save_candle(db, inst_id, candle, "WS"):
-                        LOG.info("Saved %s closed candle %s", inst_id, candle[0])
+            process_ws_message(db, json.loads(payload))
 
 
 def status(db: sqlite3.Connection) -> None:
@@ -157,7 +164,15 @@ def status(db: sqlite3.Connection) -> None:
         count, first, last = row
         first_text = datetime.fromtimestamp(first / 1000, timezone.utc).isoformat() if first else "-"
         last_text = datetime.fromtimestamp(last / 1000, timezone.utc).isoformat() if last else "-"
-        print(f"{inst_id}: {count} candles; first={first_text}; last={last_text}")
+        timestamps = [item[0] for item in db.execute(
+            "SELECT ts_ms FROM candles WHERE inst_id=? AND timeframe=? ORDER BY ts_ms",
+            (inst_id, TIMEFRAME),
+        )]
+        missing = sum(max(0, (right - left) // INTERVAL_MS - 1)
+                      for left, right in zip(timestamps, timestamps[1:]))
+        lag_min = round((time.time() * 1000 - last - INTERVAL_MS) / 60000, 1) if last else None
+        print(f"{inst_id}: {count} candles; first={first_text}; last={last_text}; "
+              f"missing_intervals={missing}; lag_minutes={lag_min}")
 
 
 def main() -> int:
@@ -170,7 +185,8 @@ def main() -> int:
     if args.initial_days < 1 or args.initial_days > 90:
         parser.error("--initial-days must be between 1 and 90")
     setup_logging()
-    with connect_db() as db:
+    db = connect_db()
+    try:
         if args.status:
             status(db)
             return 0
@@ -187,7 +203,12 @@ def main() -> int:
             except Exception as exc:
                 LOG.warning("Recorder disconnected: %s; retry in 10 seconds", exc)
                 time.sleep(10)
+    finally:
+        db.close()
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+
