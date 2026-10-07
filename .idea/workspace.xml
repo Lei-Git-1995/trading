@@ -4,17 +4,8 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="80e5262d-bf5f-448f-913c-7e19aa05266a" name="Changes" comment="docs: 删除过时的项目文档&#10;&#10;- 移除 DELIVERY.md 交付文档&#10;- 移除 IMPLEMENTATION_REPORT.md 实施报告&#10;- 移除 MAINBOARD_FILTER.md 主板过滤功能文档&#10;- 移除 OPTIMIZATION.md 优化说明文档&#10;- 移除 OPTIMIZATION_SUMMARY.md 优化总结文档">
+    <list default="true" id="80e5262d-bf5f-448f-913c-7e19aa05266a" name="Changes" comment="feat(core): 添加回测引擎和形态识别功能&#10;&#10;- 新增 backtest 模块，包含回测引擎和报告生成功能&#10;- 实现滚动历史评估和策略回测功能&#10;- 添加技术形态识别，支持双底、双顶、头肩顶、三角形和矩形整理&#10;- 集成 Excel 报告生成和 Webhook 通知功能&#10;- 添加集合竞价数据接口并优化 Excel 报告容错性&#10;- 在主程序中集成回测和通知选项&#10;- 添加 2026 年 A 股主线推演文档&#10;- 实现经典价格形态识别策略并添加测试用例">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_selector/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_selector/data/intraday_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/data/intraday_client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_selector/docs/开发路线图.md" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/docs/开发路线图.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_selector/docs/待办事项.md" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/docs/待办事项.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_selector/docs/文档目录.md" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/docs/文档目录.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_selector/indicators/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/indicators/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_selector/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_selector/reports/excel_report.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/reports/excel_report.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_selector/strategies/technical_selection.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/strategies/technical_selection.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,7 +85,8 @@
     <MESSAGE value="docs(stock_selector): 添加v2架构实施报告和交付文档&#10;&#10;- 添加DELIVERY.md项目交付文档，包含执行摘要、架构图、功能清单&#10;- 添加IMPLEMENTATION_REPORT.md v2架构实施报告，详述17个新增文件功能&#10;- 添加intraday_client.py分时数据客户端，支持1/5/15/30分钟K线数据获取&#10;- 更新eastmoney_fetcher.py网络请求重试机制，增加指数退避算法绕开风控&#10;- 增加分时数据客户端包含集合竞价、盘中强度、日内高低点距离分析功能" />
     <MESSAGE value="docs: 移除过时的文档并添加新的选股脚本&#10;&#10;- 删除了 MIGRATION.md、QUICKSTART.md、docs/README.md 和 legacy/README.md&#10;- 新增 select_stocks.py" />
     <MESSAGE value="docs: 删除过时的项目文档&#10;&#10;- 移除 DELIVERY.md 交付文档&#10;- 移除 IMPLEMENTATION_REPORT.md 实施报告&#10;- 移除 MAINBOARD_FILTER.md 主板过滤功能文档&#10;- 移除 OPTIMIZATION.md 优化说明文档&#10;- 移除 OPTIMIZATION_SUMMARY.md 优化总结文档" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs: 删除过时的项目文档&#10;&#10;- 移除 DELIVERY.md 交付文档&#10;- 移除 IMPLEMENTATION_REPORT.md 实施报告&#10;- 移除 MAINBOARD_FILTER.md 主板过滤功能文档&#10;- 移除 OPTIMIZATION.md 优化说明文档&#10;- 移除 OPTIMIZATION_SUMMARY.md 优化总结文档" />
+    <MESSAGE value="feat(core): 添加回测引擎和形态识别功能&#10;&#10;- 新增 backtest 模块，包含回测引擎和报告生成功能&#10;- 实现滚动历史评估和策略回测功能&#10;- 添加技术形态识别，支持双底、双顶、头肩顶、三角形和矩形整理&#10;- 集成 Excel 报告生成和 Webhook 通知功能&#10;- 添加集合竞价数据接口并优化 Excel 报告容错性&#10;- 在主程序中集成回测和通知选项&#10;- 添加 2026 年 A 股主线推演文档&#10;- 实现经典价格形态识别策略并添加测试用例" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(core): 添加回测引擎和形态识别功能&#10;&#10;- 新增 backtest 模块，包含回测引擎和报告生成功能&#10;- 实现滚动历史评估和策略回测功能&#10;- 添加技术形态识别，支持双底、双顶、头肩顶、三角形和矩形整理&#10;- 集成 Excel 报告生成和 Webhook 通知功能&#10;- 添加集合竞价数据接口并优化 Excel 报告容错性&#10;- 在主程序中集成回测和通知选项&#10;- 添加 2026 年 A 股主线推演文档&#10;- 实现经典价格形态识别策略并添加测试用例" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

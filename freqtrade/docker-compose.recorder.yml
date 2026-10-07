@@ -1,0 +1,14 @@
+services:
+  okx-market-recorder:
+    image: freqtradeorg/freqtrade:2026.9
+    container_name: okx-market-recorder
+    restart: unless-stopped
+    volumes:
+      - ./user_data:/freqtrade/user_data
+      - ./market_recorder.py:/freqtrade/market_recorder.py:ro
+    entrypoint: ["python", "/freqtrade/market_recorder.py"]
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
