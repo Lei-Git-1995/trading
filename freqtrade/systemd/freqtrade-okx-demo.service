@@ -1,0 +1,18 @@
+[Unit]
+Description=Freqtrade OKX Demo trading (guarded Docker Compose)
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/freqtrade
+ExecStart=/usr/bin/env docker compose -f docker-compose.demo.yml up
+ExecStop=/usr/bin/env docker compose -f docker-compose.demo.yml down
+Restart=on-failure
+RestartSec=30
+TimeoutStopSec=60
+KillMode=control-group
+
+[Install]
+WantedBy=multi-user.target

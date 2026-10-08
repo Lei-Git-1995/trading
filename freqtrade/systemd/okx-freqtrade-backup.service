@@ -1,0 +1,8 @@
+[Unit]
+Description=Backup Freqtrade OKX Demo SQLite data
+After=local-fs.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/freqtrade
+ExecStart=/usr/bin/env python3 /opt/freqtrade/backup_data.py --keep-days 30

@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily Freqtrade OKX Demo data backup timer
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+Persistent=true
+RandomizedDelaySec=15m
+Unit=okx-freqtrade-backup.service
+
+[Install]
+WantedBy=timers.target

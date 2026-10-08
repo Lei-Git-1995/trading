@@ -1,0 +1,18 @@
+[Unit]
+Description=OKX Demo market recorder (Docker Compose)
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/freqtrade
+ExecStart=/usr/bin/env docker compose -f docker-compose.recorder.yml up
+ExecStop=/usr/bin/env docker compose -f docker-compose.recorder.yml down
+Restart=on-failure
+RestartSec=15
+TimeoutStopSec=45
+KillMode=control-group
+
+[Install]
+WantedBy=multi-user.target
