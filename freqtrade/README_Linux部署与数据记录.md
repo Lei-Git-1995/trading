@@ -37,7 +37,7 @@ docker compose version
 docker info
 ```
 
-安装 `unzip` 与 Python 3（备份脚本只依赖 Python 标准库），将 [freqtrade-transfer.zip](freqtrade-transfer.zip) 复制到服务器后：
+安装 `unzip` 与 Python 3（备份脚本只依赖 Python 标准库），将 [freqtrade-transfer.zip](freqtrade-transfer.zip) 复制到服务器后。迁移包只含代码、配置模板和公开历史行情，**不含运行期 SQLite、日志或密钥**；若需迁移已有记录，另复制 `backups/` 中的备份归档并按恢复章节操作：
 
 ```bash
 sudo mkdir -p /opt/freqtrade
@@ -84,7 +84,7 @@ cd /opt/freqtrade
 docker compose -f docker-compose.recorder.yml run --rm okx-market-recorder --status
 ```
 
-`missing_intervals=0` 且 `lag_minutes` 大致小于 30 分钟，说明记录持续跟上最新 15m K 线。网络中断后记录器会重连并通过 REST 补录；如果最新时间长期不更新，先看容器日志。
+`missing_intervals=0` 且 `lag_minutes` 大致小于 30 分钟，说明记录持续跟上最新 15m K 线。Compose 每 5 分钟做一次只读健康检查；最新 K 线滞后超过 45 分钟时，`docker compose -f docker-compose.recorder.yml ps` 会显示 `unhealthy`。Docker 不会仅因 unhealthy 自动重启容器，应接入目标服务器的监控/告警并检查日志。网络中断后记录器会重连并通过 REST 补录；如果最新时间长期不更新，先看容器日志。
 
 ## 4. 回测与模拟盘自动交易
 
@@ -147,7 +147,7 @@ python3 backup_data.py --keep-days 30
 ls -lh backups/
 ```
 
-备份脚本用 SQLite 的在线备份 API 快照 `tradesv3-demo.sqlite` 和 `market_data.sqlite`，并归档配置、策略及当前日志；不包含 `.env.demo` 或 API Key。归档默认保留 30 天。可以在宿主机 `crontab -e` 中加一行，每天 03:00 备份：
+备份脚本用 SQLite 的在线备份 API 快照 `tradesv3-demo.sqlite` 和 `market_data.sqlite`，并归档配置、策略及当前日志；不包含 `.env.demo`，配置中的 API/Telegram/Web UI 密钥字段会清空；日志可能含敏感信息，向外部传送备份前应检查。归档默认保留 30 天。可以在宿主机 `crontab -e` 中加一行，每天 03:00 备份：
 
 ```cron
 0 3 * * * cd /opt/freqtrade && /usr/bin/python3 backup_data.py --keep-days 30 >> /opt/freqtrade/user_data/logs/backup.log 2>&1
@@ -192,4 +192,34 @@ docker compose -f docker-compose.recorder.yml up -d
 - [Docker Compose Linux 安装](https://docs.docker.com/compose/install/linux/)
 - [Freqtrade Docker 快速开始](https://www.freqtrade.io/en/stable/docker_quickstart/)
 - [OKX 模拟盘与 WS 接口](https://www.okx.com/docs-v5/en/#overview-demo-trading-services)
+## 8. systemd 自启动与每日备份
+
+迁移包提供 4 个 systemd 模板。确认目录已经放在 `/opt/freqtrade` 后执行：
+
+```bash
+sudo install -m 0644 systemd/okx-market-recorder.service /etc/systemd/system/
+sudo install -m 0644 systemd/freqtrade-okx-demo.service /etc/systemd/system/
+sudo install -m 0644 systemd/okx-freqtrade-backup.service /etc/systemd/system/
+sudo install -m 0644 systemd/okx-freqtrade-backup.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now okx-market-recorder.service
+sudo systemctl enable --now okx-freqtrade-backup.timer
+```
+
+先不要启用 `freqtrade-okx-demo.service`。完成 `.env.demo`、Docker 镜像、模拟盘签名预检和首笔订单核对后再执行：
+
+```bash
+sudo systemctl enable --now freqtrade-okx-demo.service
+sudo systemctl status okx-market-recorder.service freqtrade-okx-demo.service okx-freqtrade-backup.timer
+```
+
+查看 systemd 日志：
+
+```bash
+sudo journalctl -u okx-market-recorder.service -f
+sudo journalctl -u freqtrade-okx-demo.service -f
+sudo journalctl -u okx-freqtrade-backup.service --since today
+```
+
+Docker 容器本身也设置了 `restart: unless-stopped`；systemd 和 Docker 双层恢复时只保留一份 Compose 管理入口，不要同时手动 `docker compose up` 和 `systemctl start`。
 

@@ -5,9 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="80e5262d-bf5f-448f-913c-7e19aa05266a" name="Changes" comment="feat(core): 添加回测引擎和形态识别功能&#10;&#10;- 新增 backtest 模块，包含回测引擎和报告生成功能&#10;- 实现滚动历史评估和策略回测功能&#10;- 添加技术形态识别，支持双底、双顶、头肩顶、三角形和矩形整理&#10;- 集成 Excel 报告生成和 Webhook 通知功能&#10;- 添加集合竞价数据接口并优化 Excel 报告容错性&#10;- 在主程序中集成回测和通知选项&#10;- 添加 2026 年 A 股主线推演文档&#10;- 实现经典价格形态识别策略并添加测试用例">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/freqtrade/README_Linux部署与数据记录.md" beforeDir="false" afterPath="$PROJECT_DIR$/freqtrade/README_Linux部署与数据记录.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/freqtrade/backup_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/freqtrade/backup_data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/freqtrade/docker-compose.demo.yml" beforeDir="false" afterPath="$PROJECT_DIR$/freqtrade/docker-compose.demo.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/freqtrade/docker-compose.recorder.yml" beforeDir="false" afterPath="$PROJECT_DIR$/freqtrade/docker-compose.recorder.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/freqtrade/market_recorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/freqtrade/market_recorder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/freqtrade/package_transfer.py" beforeDir="false" afterPath="$PROJECT_DIR$/freqtrade/package_transfer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/freqtrade/test_market_recorder.py" beforeDir="false" afterPath="$PROJECT_DIR$/freqtrade/test_market_recorder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

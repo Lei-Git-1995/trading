@@ -16,7 +16,7 @@ DB_NAMES = ("tradesv3-demo.sqlite", "market_data.sqlite")
 STATIC_FILES = (
     "docker-compose.demo.yml", "docker-compose.recorder.yml",
     "demo_guard.py", "market_recorder.py", "network_probe.py",
-    "demo_report.py", "backup_data.py",
+    "demo_report.py", "backup_data.py", "package_transfer.py",
     "README_OKX模拟盘合约.md", "README_Linux部署与数据记录.md",
     "user_data/config_okx_demo.json", "user_data/config_okx_futures_backtest.json",
     "user_data/strategies/OKXDemoFuturesStrategy.py",
@@ -38,12 +38,9 @@ def backup_sqlite(source: Path, target: Path) -> None:
 
 def copy_static(source: Path, target: Path, relative: str) -> None:
     target.parent.mkdir(parents=True, exist_ok=True)
-    if relative == "user_data/config_okx_demo.json":
-        data = json.loads(source.read_text(encoding="utf-8-sig"))
-        for field in ("api_key", "key", "secret", "password"):
-            if field in data.get("exchange", {}):
-                data["exchange"][field] = ""
-        target.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    if relative.startswith("user_data/config") and relative.endswith(".json"):
+        from package_transfer import sanitized_config
+        target.write_bytes(sanitized_config(source))
     else:
         shutil.copy2(source, target)
 
@@ -99,3 +96,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

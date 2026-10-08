@@ -17,4 +17,10 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    healthcheck:
+      test: ['CMD', 'python', '/freqtrade/market_recorder.py', '--healthcheck']
+      interval: 5m
+      timeout: 30s
+      retries: 3
+      start_period: 10m
 

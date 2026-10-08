@@ -183,15 +183,40 @@ def status(db: sqlite3.Connection) -> None:
               f"missing_intervals={missing}; lag_minutes={lag_min}")
 
 
+
+def health_status(path: Path = DB_PATH, max_lag_minutes: float = 45.0) -> tuple[bool, str]:
+    if not path.is_file():
+        return False, "market database missing"
+    db = sqlite3.connect(f"file:{path.as_posix()}?mode=ro", uri=True)
+    try:
+        stale = []
+        for inst_id in PAIR_MAP:
+            row = db.execute("SELECT MAX(ts_ms) FROM candles WHERE inst_id=? AND timeframe=?",
+                             (inst_id, TIMEFRAME)).fetchone()
+            last = row[0] if row else None
+            if last is None:
+                stale.append(f"{inst_id}: no candles")
+                continue
+            lag = (time.time() * 1000 - last - INTERVAL_MS) / 60000
+            if lag > max_lag_minutes:
+                stale.append(f"{inst_id}: {lag:.1f} minutes behind")
+        return (False, "; ".join(stale)) if stale else (True, "both pairs current")
+    finally:
+        db.close()
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--once", action="store_true", help="REST backfill once, then exit")
     parser.add_argument("--status", action="store_true", help="show stored candle counts without network")
+    parser.add_argument("--healthcheck", action="store_true", help="exit nonzero when candles are stale")
     parser.add_argument("--initial-days", type=int, default=3)
     parser.add_argument("--proxy", default=os.environ.get("OKX_PROXY_URL") or None)
     args = parser.parse_args()
     if args.initial_days < 1 or args.initial_days > 90:
         parser.error("--initial-days must be between 1 and 90")
+    if args.healthcheck:
+        ok, message = health_status()
+        print(message)
+        return 0 if ok else 1
     setup_logging()
     db = connect_db()
     try:
@@ -217,6 +242,7 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 
 
 

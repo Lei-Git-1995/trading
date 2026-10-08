@@ -5,7 +5,7 @@ import time
 import unittest
 from pathlib import Path
 
-from market_recorder import INTERVAL_MS, backfill_start, connect_db, process_ws_message, save_candle
+from market_recorder import INTERVAL_MS, backfill_start, connect_db, health_status, process_ws_message, save_candle
 
 
 class MarketRecorderTests(unittest.TestCase):
@@ -31,6 +31,18 @@ class MarketRecorderTests(unittest.TestCase):
         self.assertEqual(backfill_start(last_ms, end_ms, 7, False), last_ms - 86_400_000)
         self.assertEqual(backfill_start(last_ms, end_ms, 7, True), end_ms - 7 * 86_400_000)
 
+    def test_healthcheck_rejects_stale_candles(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "candles.sqlite"
+            db = connect_db(path)
+            try:
+                old = ((int(time.time() * 1000) // INTERVAL_MS) - 10) * INTERVAL_MS
+                for pair in ("BTC-USDT-SWAP", "ETH-USDT-SWAP"):
+                    save_candle(db, pair, [old, 100, 101, 99, 100, 5], "REST")
+            finally:
+                db.close()
+            self.assertFalse(health_status(path, max_lag_minutes=45)[0])
+
     def test_current_rest_candle_is_ignored(self):
         with tempfile.TemporaryDirectory() as temp:
             db = connect_db(Path(temp) / "candles.sqlite")
@@ -44,4 +56,5 @@ class MarketRecorderTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
 
