@@ -194,7 +194,7 @@ docker compose -f docker-compose.recorder.yml up -d
 - [OKX 模拟盘与 WS 接口](https://www.okx.com/docs-v5/en/#overview-demo-trading-services)
 ## 8. systemd 自启动与每日备份
 
-迁移包提供 4 个 systemd 模板。确认目录已经放在 `/opt/freqtrade` 后执行：
+迁移包提供 4 个 systemd 模板。确认目录已经放在 `/opt/freqtrade` 后执行。如果 Docker 不在 `/usr/bin/docker`，先运行 `command -v docker`，再修改两个 Compose service 的 `ExecStart/ExecStop` 路径。
 
 ```bash
 sudo install -m 0644 systemd/okx-market-recorder.service /etc/systemd/system/
@@ -222,4 +222,5 @@ sudo journalctl -u okx-freqtrade-backup.service --since today
 ```
 
 Docker 容器本身也设置了 `restart: unless-stopped`；systemd 和 Docker 双层恢复时只保留一份 Compose 管理入口，不要同时手动 `docker compose up` 和 `systemctl start`。
+
 
