@@ -1,0 +1,229 @@
+[2026-10-09 14:17:41] [OK] learn_slot/afternoon  模型:deepseek-v4-pro
+  摘要: 午后高潮期，聚焦回封弱转强与二波攻击，严格参照进场参考价，不追高，尾盘前严守不开新仓纪律。
+  偏向: risk_on
+  战法版本: 5
+  教训:
+    - 高潮日午后启动应偏向回封确认而非早盘冲高，避免高位接力尾盘风险
+    - 尾盘前30分钟关闭新开仓想法，仅处理持有仓位，强制留现金过夜
+  调参:
+    - LLM战法调参 min_buy_score: 82.0 → 79.0（高潮期积极试错，放宽3分门槛捕获更多午后的回封/二波信号）
+  风险: 午后尾盘风险升温，严格执行不开新仓、不追高，已持仓品种破结构需果断止损，不加仓摊平。
+  其它: hold_advice_n=0; watchlist_hints_n=0; total_pnl=0.0
+[2026-10-09 14:18:18] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal":"确认当前时段与实时涨停/炸板池，判断在偏高潮相位下是否存在可介入的回封弱转强机会（或应遵守尾盘纪律空仓）","steps":[{"tool":"get_session_window","args":{}},{"tool":"get_emotion","args":{}},{"tool":"hunt_boards","args":{}}]}
+  其它: elapsed=9.46; mode=free; role=trade
+[2026-10-09 14:18:24] [OK] agent_free_r1  模型:deepseek-v4.1-flash
+  摘要: {"goal":"尾盘谨慎窗口 + 情绪偏高潮 + 候选全部贴板死封，无可介入攻击带标的，决定空仓过夜","steps":[{"tool":"update_memory","args":{"thesis":"20261009尾盘谨慎窗口，情绪偏高潮(涨停57/回封21/炸板15)。涨停池25只候选全部已封板或回封，live_pct≥9.9贴板，无未贴板攻击带标的；尾盘不开新仓纪律优先，空仓过夜。"
+  其它: elapsed=6.53; mode=free; role=trade
+[2026-10-09 14:19:57] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "确认当前时间窗口与是否存在未贴板的攻击带标的；全候选均贴板死封，按尾盘纪律倾向空仓过夜", "steps": [{"tool": "get_session_window", "args": {}}, {"tool": "hunt_boards", "args": {"pool": "limit_up"}}, {"tool": "get_emotion", "args": {}}
+  其它: elapsed=5.46; mode=free; role=trade
+[2026-10-09 14:20:03] [OK] agent_free_r1  模型:deepseek-v4.1-flash
+  摘要: {"goal": "尾盘谨慎窗口，涨停池25只全部贴板死封(live_pct≈10%)或回封贴板，无未贴板攻击带标的；维持空仓过夜纪律，不做贴板追高", "steps": [{"tool": "update_memory", "args": {"thesis": "20261009尾盘谨慎窗口，情绪偏高潮(涨停59/回封23/炸板15)。hunt_boards涨停池25只全部sealed/rese
+  其它: elapsed=5.94; mode=free; role=trade
+[2026-10-09 14:21:39] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal":"高潮尾盘窗口确认无攻击带标的，保持空仓过夜，不追贴板死封","steps":[{"tool":"hunt_boards","args":{"pool":"limit_up","limit":30}},{"tool":"skip","args":{"reason":"情绪偏高潮(涨停58/回封22/炸板16)，候选池15只全部sealed/resealed且live_pct≈9.9
+  其它: elapsed=9.4; mode=free; role=trade
+[2026-10-09 14:23:18] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal":"高潮尾盘窗口复核：确认是否仍有攻击带标的可介入；若无则严守尾盘不开新仓、空仓过夜","steps":[{"tool":"get_session_window","args":{}},{"tool":"hunt_boards","args":{"pool":"limit_up"}},{"tool":"get_emotion","args":{}}]}
+  其它: elapsed=7.77; mode=free; role=trade
+[2026-10-09 14:23:23] [OK] agent_free_r1  模型:deepseek-v4.1-flash
+  摘要: {"goal":"高潮尾盘复核完成：涨停/回封池全部贴板封死，无攻击带标的，坚守尾盘不开新仓、空仓过夜","steps":[{"tool":"update_memory","args":{"thesis":"20261009尾盘谨慎窗口(climax)。hunt_boards涨停/回封池25只全部sealed/resealed，live_pct≈9.94~10.13贴死涨停，无一落在攻击带(4%~
+  其它: elapsed=4.41; mode=free; role=trade
+[2026-10-09 14:24:40] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "高潮日尾盘复核：确认涨停/回封池是否出现落在攻击带(4%~8.8%)的非死封标的，否则严守尾盘不开新仓、空仓过夜", "steps": [{"tool": "hunt_boards", "args": {}}, {"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "climax高潮期且
+  其它: elapsed=5.81; mode=free; role=trade
+[2026-10-09 14:25:52] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal":"高潮日尾盘复核：确认是否存在落在攻击带(4%~8.8%)的非死封标的（炸板回封/弱转强），否则严守尾盘不开新仓、空仓过夜","steps":[{"tool":"get_session_window","args":{}},{"tool":"get_emotion","args":{}},{"tool":"hunt_boards","args":{"kind":"limit_up"
+  其它: elapsed=7.5; mode=free; role=trade
+[2026-10-09 14:25:59] [OK] agent_free_r1  模型:deepseek-v4.1-flash
+  摘要: {"goal":"高潮日尾盘复核：狩猎池25只全部sealed/resealed且live_pct≈9.94~20%贴死涨停，无一落入攻击带(4%~8.8%)，无回封未封可打，严守尾盘不开新仓、空仓过夜","steps":[{"tool":"skip","args":{"reason":"climax高潮+尾盘谨慎窗口：涨停/回封池全部贴死涨停(sealed/resealed)，live_pct 
+  其它: elapsed=6.58; mode=free; role=trade
+[2026-10-09 14:27:05] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal":"高潮日尾盘复核：确认是否存在落入攻击带(4%~8.8%)的未贴板/弱转强标的，若无则严守尾盘不开新仓、空仓过夜","steps":[{"tool":"get_session_window","args":{}},{"tool":"hunt_boards","args":{"pool":"broken"}},{"tool":"hunt_boards","args":{"pool":
+  其它: elapsed=4.16; mode=free; role=trade
+[2026-10-09 14:27:14] [OK] agent_free_r1  模型:deepseek-v4.1-flash
+  摘要: {"goal":"高潮日尾盘确认：池内标的全部贴死涨停/回封，无攻击带(4%~8.8%)可打标的，严守尾盘不开新仓、空仓过夜","steps":[{"tool":"update_memory","args":{"thesis":"20261009尾盘谨慎窗口(climax)。hunt_boards涨停/回封池25只全部sealed或resealed，seal_state无broken_open可打
+  其它: elapsed=8.89; mode=free; role=trade
+[2026-10-09 14:28:20] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal":"高潮日尾盘复核：确认是否仍有落入攻击带(4%~8.8%)的弱转强/回封可打，否则严守尾盘不开新仓、空仓过夜","steps":[{"tool":"get_session_window","args":{}},{"tool":"hunt_boards","args":{"kind":"broken_open"}},{"tool":"hunt_boards","args":{"kin
+  其它: elapsed=7.92; mode=free; role=trade
+[2026-10-09 14:28:28] [OK] agent_free_r1  模型:deepseek-v4.1-flash
+  摘要: {"goal":"尾盘谨慎窗口复核完成：候选池全部贴死涨停/回封(live_pct 9.94~20.02)，无一落入攻击带(4%~8.8%)，无炸板未封弱转强可低吸；严守尾盘不开新仓，空仓过夜","steps":[{"tool":"update_memory","args":{"thesis":"20261009尾盘谨慎窗口(climax)。hunt_boards 25只涨停/回封票全部seale
+  其它: elapsed=8.35; mode=free; role=trade
+[2026-10-09 14:29:55] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal":"高潮相位尾盘窗口：候选池全部贴死涨停(9.94~10.04)无一落入攻击带(4%~8.8%)，需现场复核炸板/回封弱转强是否有低吸机会，否则严守尾盘不开新仓纪律空仓过夜","steps":[{"tool":"get_session_window","args":{}},{"tool":"hunt_boards","args":{}},{"tool":"get_emotion","
+  其它: elapsed=7.2; mode=free; role=trade
+[2026-10-09 14:30:07] [OK] agent_free_r1  模型:deepseek-v4.1-flash
+  摘要: {"goal":"尾盘谨慎窗口最终决策：涨停/回封池25只标的live_pct全部9.94~20.02贴死涨停，无一落入攻击带(4%~8.8%)，且均为sealed/resealed不可追；无炸板未封弱转强低吸标的，严守尾盘不开新仓，空仓过夜","steps":[{"tool":"skip","args":{"reason":"尾盘谨慎窗口，climax高潮期。hunt_boards 25只涨停/
+  其它: elapsed=11.8; mode=free; role=trade
+[2026-10-09 14:31:31] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal":"确认当前交易时段与涨停/炸板池最新状态，判断是否存在落入攻击带(4%~8.8%)的可低吸/回封弱转强标的；若全为贴死涨停或已到尾盘窗口则严守空仓","steps":[{"tool":"get_session_window","args":{}},{"tool":"hunt_boards","args":{"pool":"limit_up"}},{"tool":"hunt_boar
+  其它: elapsed=6.59; mode=free; role=trade
+[2026-10-09 14:31:37] [OK] agent_free_r1  模型:deepseek-v4.1-flash
+  摘要: {"goal":"尾盘谨慎窗口最终决策：涨停/回封池25只标的live_pct全部9.94~20.02，无一落入攻击带(4%~8.8%)，且全为sealed/resealed贴死涨停不可追；无炸板未封弱转强低吸标的，严守尾盘不开新仓，空仓过夜并写入记忆","steps":[{"tool":"update_memory","args":{"thesis":"20261009尾盘谨慎窗口(climax
+  其它: elapsed=5.93; mode=free; role=trade
+[2026-10-09 14:32:28] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal":"确认当前时间窗口与盘中是否有炸板未封/弱转强低吸标的；若无攻击带内可买标的则空仓过夜","steps":[{"tool":"get_session_window","args":{}},{"tool":"hunt_boards","args":{"status":"broken_open"}},{"tool":"hunt_boards","args":{"status":"res
+  其它: elapsed=6.08; mode=free; role=trade
+[2026-10-09 14:32:35] [OK] agent_free_r1  模型:deepseek-v4.1-flash
+  摘要: {"goal":"尾盘谨慎窗口：涨停/回封池全部贴死涨停(sealed/resealed)，无炸板未封弱转强低吸标的，严守尾盘不开新仓，空仓过夜并写入记忆","steps":[{"tool":"update_memory","args":{"thesis":"20261009尾盘谨慎窗口(climax, late_caution)。hunt_boards 25票全为limit_up且live_pc
+  其它: elapsed=6.83; mode=free; role=trade
+[2026-10-09 14:34:10] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal":"尾盘高潮窗口：确认涨停/回封池是否有炸板未封、弱转强可低吸标的；若全部贴死涨停则严守尾盘不开新仓，空仓过夜","steps":[{"tool":"get_session_window","args":{}},{"tool":"hunt_boards","args":{"pool":"all"}},{"tool":"skip","args":{"reason":"climax偏高潮
+  其它: elapsed=9.42; mode=free; role=trade
+[2026-10-09 14:35:46] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal":"尾盘高潮窗口：核实是否存在炸板未封/弱转强且处于攻击带(4%~8.8%)的低吸标的；若候选全为贴死涨停则严守尾盘不开新仓，空仓过夜","steps":[{"tool":"get_session_window","args":{}},{"tool":"hunt_boards","args":{"types":["broken_open","weak_to_strong","rese
+  其它: elapsed=8.31; mode=free; role=trade
+[2026-10-09 14:36:07] [OK] agent_free_r1  模型:deepseek-v4.1-flash
+  摘要: {"goal":"尾盘谨慎窗口(climax)：hunt_boards 25票全部贴死涨停(live_pct 9.94~20.02，sealed/resealed)，无 broken_open / 攻击带(4%~8.8%)可低吸标的。规则禁追贴死封、尾盘不开新仓，故把2只低位回封弱转强票纳入观察池供明日跟踪，本轮空仓过夜","steps":[{"tool":"update_watchlist","
+  其它: elapsed=20.35; mode=free; role=trade
+[2026-10-09 14:37:28] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "确认当前交易时段与盘中真实封板/炸板结构，判断climax相位下是否存在符合攻击带(4%~8.8%)的非死封低吸标的；若全为贴死涨停且处尾盘窗口，则严守纪律空仓过夜，仅将低位回封弱转强票纳入观察池备明日跟踪。", "steps": [{"tool": "get_session_window", "args": {}}, {"tool": "hunt_boards", "args
+  其它: elapsed=9.38; mode=free; role=trade
+[2026-10-09 14:37:39] [OK] agent_free_r1  模型:deepseek-v4.1-flash
+  摘要: {"goal": "尾盘谨慎窗口(climax)：hunt_boards 25票全为贴死涨停(sealed/resealed, live_pct 9.94~20.02)，无 broken_open/攻击带(4%~8.8%)可低吸标的。规则禁追贴死封、尾盘不开新仓，本轮空仓过夜；将低位回封弱转强票纳入观察池备明日跟踪。", "steps": [{"tool": "update_watchlist",
+  其它: elapsed=10.46; mode=free; role=trade
+[2026-10-09 14:39:04] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal":"高潮相位尾盘窗口(20261009)：候选池15票全为 sealed/resealed 且 live_pct 9.94~10.04 贴死涨停，无攻击带(4%~8.8%)可低吸标的；遵守尾盘不开新仓、禁追贴死封纪律，本轮空仓过夜，仅将低位弱转强回封票纳入观察池备明日跟踪。","steps":[{"tool":"get_session_window","args":{}},{"too
+  其它: elapsed=12.08; mode=free; role=trade
+[2026-10-09 14:39:16] [OK] agent_free_r1  模型:deepseek-v4.1-flash
+  摘要: {"goal":"高潮相位尾盘谨慎窗口：hunt_boards 25票全为 limit_up 且 sealed/resealed、live_pct 9.94~20.02 贴死涨停，无 broken_open 或攻击带(4%~8.8%)可低吸标的。遵守禁追贴死封+尾盘不开新仓纪律，本轮空仓过夜，仅纳低位弱转强回封票入观察池备明日跟踪。","steps":[{"tool":"update_watchl
+  其它: elapsed=11.95; mode=free; role=trade
+[2026-10-09 14:41:14] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal":"确认当前交易时段与涨停池状态，高潮相位尾盘窗口下判断是否有可低吸的攻击带标的；若无则空仓过夜并维护观察池。","steps":[{"tool":"get_session_window","args":{}},{"tool":"hunt_boards","args":{"pool":"all"}},{"tool":"list_watchlist","args":{}}]}
+  其它: elapsed=14.79; mode=free; role=trade
+[2026-10-09 14:41:23] [OK] agent_free_r1  模型:deepseek-v4.1-flash
+  摘要: {"goal":"尾盘谨慎窗口(climax)：hunt_boards 25票全为 limit_up/sealed/resealed，live_pct 9.94~20.02 贴死涨停，无 broken_open 攻击带(4%~8.8%)标的；遵守禁追贴死封+尾盘不开新仓纪律，本轮空仓过夜，仅将低位弱转强回封票纳入观察池备明日二板/弱转强跟踪。","steps":[{"tool":"update_w
+  其它: elapsed=9.77; mode=free; role=trade
+[2026-10-09 14:42:25] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal":"确认当前是否尾盘谨慎窗口，扫描实时涨停/炸板池是否存在攻击带(4%~8.8%)可低吸标的，若无则遵守纪律空仓过夜并维护观察池","steps":[{"tool":"get_session_window","args":{}},{"tool":"hunt_boards","args":{}},{"tool":"get_emotion","args":{}}]}
+  其它: elapsed=9.39; mode=free; role=trade
+[2026-10-09 14:42:36] [OK] agent_free_r1  模型:deepseek-v4.1-flash
+  摘要: {"goal":"尾盘谨慎窗口(climax)：hunt_boards 25票全为 limit_up 且 sealed/resealed，live_pct 9.94~20.02 贴死涨停，无 broken_open 攻击带(4%~8.8%)可低吸标的；遵守禁追贴死封+尾盘不开新仓纪律，本轮空仓过夜，仅将低位弱转强回封票纳入观察池备明日二板/弱转强跟踪。","steps":[{"tool":"upd
+  其它: elapsed=10.84; mode=free; role=trade
+[2026-10-09 14:43:50] [OK] watchlist_learn  模型:deepseek-v4-pro
+  摘要: 提升自选与买入门槛，聚焦联环药业等高分领涨股，剔除启动特征模糊的中广天择，为起步保本阶段攒胜率。
+  偏向: risk_on
+  教训:
+    - 低分观察票若无量价与攻击配合，容易干扰定力，尤其自选池未满时也要果断清理，避免凑数心态。
+  调参:
+    - LLM战法调参 min_buy_score: 79.0 → 82.0（当前自选高分集中在85+，将买入分水岭提至82可过滤均值附近的信号，集中资金在强票确认点。）
+    - LLM战法调参 startup_min_score: 80.0 → 82.0（准入与买入门槛统一，防止低分品种进入观察池稀释注意力，契合宁缺毋滥原则。）
+  其它: total_pnl=0.0; watchlist_n=6; hints_n=6
+[2026-10-09 14:44:13] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal":"确认当前是否处于尾盘禁开仓窗口，并核实自选攻击带（4%~8.8%）非封板票的实时状态，决定是否弱转强试错或继续空仓过夜。","steps":[{"tool":"get_session_window","args":{}},{"tool":"get_quotes","args":{"codes":["002029","600313","603721","600513","60003
+  其它: elapsed=19.6; mode=free; role=trade
+[2026-10-09 14:44:36] [OK] agent_free_r1  模型:deepseek-v4.1-flash
+  摘要: {"goal":"尾盘谨慎窗口(climax)，纪律优先：观察池攻击带票虽达标但均为近涨停追高，遵守尾盘不开新仓过夜，仅记录明日弱转强跟踪标的。","steps":[{"tool":"skip","args":{"reason":"late_caution尾盘窗口+climax高潮末端：七匹狼8.38%、农发种业6.69%均属冲板带近涨停追高，且七匹狼board_potential仅66中等、中广
+  其它: elapsed=22.7; mode=free; role=trade
+[2026-10-09 14:49:31] [OK] watchlist_learn  模型:deepseek-v4-pro
+  摘要: 起步阶段，空仓观察。自选质量尚可，联环药业为强制主线龙头，优先关注；部分动量票缺乏启动确认，适当提高入选与买入门槛，严控追高，等待攻击信号。
+  偏向: neutral
+  教训:
+    - 无交易，暂无教训，继续保持空仓耐心。
+  调参:
+    - LLM战法调参 startup_min_score: 82.0 → 84.0（自选池最低分82.9，提升至84可淘汰无强制主线标记的过渡票，保证只跟踪最强势启动特征。）
+    - LLM战法调参 max_chase_vs_watch: 0.015 → 0.01（起步保本阶段，收紧对自选参考价的向上追涨幅度，防止盘中情绪追高。）
+    - LLM战法调参 min_live_pct_buy: 4.0 → 3.0（略放宽盘中涨幅下限至3%，在非危险区捕捉较早的启动确认，提高进场安全性。）
+  其它: total_pnl=0.0; watchlist_n=7; hints_n=7
+[2026-10-09 14:56:50] [OK] watchlist_learn  模型:deepseek-v4-pro
+  摘要: 起步保本阶段，收紧买入门槛并提升盘中确认要求，专注自选高分票，保持轻仓试探。
+  偏向: neutral
+  教训:
+    - 自选池宁缺毋滥，分数低于启动门槛的观察票应立即剔除，避免分散注意力。
+  调参:
+    - LLM战法调参 max_chase_vs_watch: 0.01 → 0.015（从1%放宽至1.5%，给予启动点小幅追价空间，避免因过分刻板而错过强势秒板或高量突破。）
+  其它: total_pnl=0.0; watchlist_n=7; hints_n=7
+[2026-10-09 15:35:29] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:35:29] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:35:29] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:35:29] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:35:29] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:35:29] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:35:29] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:35:29] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:35:29] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:35:29] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:35:29] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:35:29] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:37:06] [FAIL] learn_slot/close  模型:deepseek-v4-pro
+  错误: 模型未返回可解析 JSON
+[2026-10-09 15:42:10] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:42:10] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:42:10] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:42:10] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:42:10] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:42:10] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:42:10] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:42:10] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:42:10] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:42:10] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:42:10] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:42:10] [OK] agent_free  模型:deepseek-v4.1-flash
+  摘要: {"goal": "录制回放健康检查", "steps": [{"tool": "get_emotion", "args": {}}, {"tool": "skip", "args": {"reason": "recorded_eval"}}]}
+  其它: elapsed=0.0; mode=free; role=trade
+[2026-10-09 15:42:49] [OK] learn_slot/close  模型:deepseek-v4-pro
+  摘要: 今日无交易，外盘risk_off压制开仓，情绪高潮但隔夜风险高，坚持不开新仓原则，观望等待转机。
+  偏向: risk_off
+  战法版本: 6
+  教训:
+    - 外盘risk_off信号已触发，应完全遵守投降规则，不因A股微涨而动摇
+    - 高潮期虽可打板，但联动外部风险时更应降低仓位或空仓
+  调参:
+    - LLM战法调参 min_buy_score: 82.0 → 85.0（外盘risk_off叠加高潮，提高入场门槛过滤杂音，仅做最强确认信号）
+  风险: 外盘risk_off真信号，叠加A股涨停高潮，次日极易高开低走，务必空仓或仅保留避险仓。
+  其它: hold_advice_n=0; watchlist_hints_n=3; total_pnl=0.0
+[2026-10-09 16:38:20] [OK] watchlist_learn  模型:deepseek-v4-pro
+  摘要: 自选池质量较高，但买入规则参数与当前覆盖存在不一致，统一收紧控制起步风险。
+  调参:
+    - LLM战法调参 min_live_pct_buy: 3.0 → 4.0（与短线连板买入规则的最小盘中涨幅保持一致，避免过早介入非强势确认信号。）
+    - LLM战法调参 max_chase_vs_watch: 0.015 → 0.01（与策略买入规则设定的最大追涨比例对齐，防止买入成本偏离入场参考过多。）
+    - LLM战法调参 startup_min_score: 84.0 → 85.0（当前自选池最低评分85.91，将入选门槛提高至85，保持宁缺毋滥的精选标准。）
+  其它: total_pnl=0.0; watchlist_n=5; hints_n=3

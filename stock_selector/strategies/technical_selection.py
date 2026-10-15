@@ -296,11 +296,17 @@ class TechnicalSelector:
                     result = cls.evaluate(hist, strategy_id)
                     if result['matched']:
                         latest = hist.iloc[-1]
+                        # 成交额（亿元）：K线成交额原始单位为元
+                        amt_raw = latest.get('成交额')
+                        try:
+                            amount_yi = float(amt_raw) / 1e8 if pd.notna(amt_raw) else None
+                        except (TypeError, ValueError):
+                            amount_yi = None
                         matched.append((strategy_id, {
                             'code': code, 'name': stock.get('name', code),
                             'price': stock.get('price'), 'change_pct': stock.get('change_pct'),
                             'turnover': stock.get('turnover'), 'volume': stock.get('volume'),
-                            'amount': latest.get('成交额'),
+                            'amount': amount_yi,
                             'outer_ratio': stock.get('outer_ratio'),
                             'sector': stock.get('sector', ''), 'latest_date': result['latest_date'],
                             'reason': result['reason'], 'metrics': dict(result.get('metrics') or {}),

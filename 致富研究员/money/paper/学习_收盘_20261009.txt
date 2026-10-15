@@ -1,0 +1,78 @@
+【收盘学习】 2026-10-09 15:42:49
+模型: deepseek-v4-pro
+摘要: 今日无交易，外盘risk_off压制开仓，情绪高潮但隔夜风险高，坚持不开新仓原则，观望等待转机。
+市场偏向: risk_off
+教训:
+  - 外盘risk_off信号已触发，应完全遵守投降规则，不因A股微涨而动摇
+  - 高潮期虽可打板，但联动外部风险时更应降低仓位或空仓
+参数:
+  - LLM战法调参 min_buy_score: 82.0 → 85.0（外盘risk_off叠加高潮，提高入场门槛过滤杂音，仅做最强确认信号）
+风险: 外盘risk_off真信号，叠加A股涨停高潮，次日极易高开低走，务必空仓或仅保留避险仓。
+买入规则: {"min_score": 85.0, "min_live_pct": 4.0, "max_live_pct": 8.8, "min_confidence": 55.0, "require_attack": true, "forbid_risk_off": true, "max_chase": 0.01}
+
+原始回复:
+{
+  "summary": "今日无交易，外盘risk_off压制开仓，情绪高潮但隔夜风险高，坚持不开新仓原则，观望等待转机。",
+  "lessons": [
+    "外盘risk_off信号已触发，应完全遵守投降规则，不因A股微涨而动摇",
+    "高潮期虽可打板，但联动外部风险时更应降低仓位或空仓"
+  ],
+  "playbook": {
+    "principles": [
+      "外盘risk_off日坚决不开新仓，不幻想逆势独立",
+      "高潮+外盘risk_off叠加，隔夜风险不可控，轻仓/空仓保本",
+      "先发现启动再动手：趋势+吸筹+攻击/破高齐备，不做马后炮追高",
+      "买点看「攻击带」：现价相对进场参考不追飞；盘中涨幅确认但未贴死涨停",
+      "量价先行：股价增速转强、量比扩张、大单/超大单净流入与主力吸筹作旁证",
+      "卖看结构破坏：破板急跌/弱转/外盘risk_off/掉出精选池，快走不纠结"
+    ],
+    "buy_rules": {
+      "min_score": 85,
+      "min_live_pct": 4.0,
+      "max_live_pct": 8.8,
+      "min_confidence": 60,
+      "require_attack": true,
+      "forbid_risk_off": true,
+      "max_chase": 0.01
+    },
+    "tactics": [
+      {
+        "name": "冲板确认",
+        "desc": "盘中涨幅达标、未贴板且外盘未risk_off才允许开仓",
+        "status": "active"
+      },
+      {
+        "name": "隔夜风控",
+        "desc": "外盘risk_off日不开新仓，已持仓须评估避险",
+        "status": "active"
+      }
+    ]
+  },
+  "param_changes": [
+    {
+      "key": "min_buy_score",
+      "value": 85,
+      "why": "外盘risk_off叠加高潮，提高入场门槛过滤杂音，仅做最强确认信号"
+    }
+  ],
+  "hold_advice": [],
+  "watchlist_hints": [
+    {
+      "code": "000975",
+      "action": "PRIORITY",
+      "why": "黄金防御属性，外盘risk_off下可能避险受益，观察先"
+    },
+    {
+      "code": "600513",
+      "action": "DROP",
+      "why": "虽主线强势，但外盘risk_off压制，明日高开易折返，等risk_on日再入"
+    },
+    {
+      "code": "600313",
+      "action": "DROP",
+      "why": "种子板块情绪退潮难持续，外盘风险下弃弱留强"
+    }
+  ],
+  "risk_note": "外盘risk_off真信号，叠加A股涨停高潮，次日极易高开低走，务必空仓或仅保留避险仓。",
+  "market_bias": "risk_off"
+}

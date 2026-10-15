@@ -1,0 +1,110 @@
+{
+  "pick_date": "20261014",
+  "screen_time": "2026-10-14 11:38:30",
+  "asof_trade_date": "",
+  "count": 0,
+  "meta": {
+    "phase": "auto_screen",
+    "schedule_slot": "auto",
+    "note": "由模拟盘监控自动触发选股",
+    "global_risk_off": false,
+    "passed": 0,
+    "scanned": 1724,
+    "screen_mode": "board_setup",
+    "auto": true
+  },
+  "boards": [
+    {
+      "rank": 1,
+      "board_name": "其他数字媒体",
+      "pct_chg": 11.94,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 2,
+      "board_name": "印制电路板",
+      "pct_chg": 6.08,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 3,
+      "board_name": "纺织化学制品",
+      "pct_chg": 5.43,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 4,
+      "board_name": "元件",
+      "pct_chg": 4.77,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 5,
+      "board_name": "地面兵装Ⅲ",
+      "pct_chg": 4.54,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 6,
+      "board_name": "地面兵装Ⅱ",
+      "pct_chg": 4.54,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 7,
+      "board_name": "航海装备Ⅲ",
+      "pct_chg": 4.36,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 8,
+      "board_name": "航海装备Ⅱ",
+      "pct_chg": 4.36,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 9,
+      "board_name": "防水材料",
+      "pct_chg": 4.28,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 10,
+      "board_name": "电商服务",
+      "pct_chg": 4.22,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 999,
+      "board_name": "创新药",
+      "pct_chg": 0.0,
+      "board_type": "concept",
+      "forced_mainline": true
+    },
+    {
+      "rank": 999,
+      "board_name": "CRO",
+      "pct_chg": 0.0,
+      "board_type": "concept",
+      "forced_mainline": true
+    },
+    {
+      "rank": 999,
+      "board_name": "医疗器械",
+      "pct_chg": 0.0,
+      "board_type": "concept",
+      "forced_mainline": true
+    }
+  ],
+  "picks": []
+}

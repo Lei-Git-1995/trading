@@ -135,8 +135,18 @@ class ShortTermSelector:
 
             recent_3day = float(hist['涨跌幅'].iloc[-3:].sum())
 
+            # 成交额（亿元）：取最新交易日 K 线成交额（原始单位为元）
+            amount_yi = None
+            try:
+                amt_val = ind['成交额'].iloc[-1]
+                if pd.notna(amt_val):
+                    amount_yi = float(amt_val) / 1e8
+            except (KeyError, IndexError, TypeError, ValueError):
+                amount_yi = None
+
             qualified.append({
                 **cand,
+                'amount': amount_yi,
                 'volume_ratio': vol_ratio,
                 'kdj_k': float(kdj_val) if pd.notna(kdj_val) else None,
                 'rsi6': float(rsi_val) if pd.notna(rsi_val) else None,

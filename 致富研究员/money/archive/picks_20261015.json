@@ -1,0 +1,110 @@
+{
+  "pick_date": "20261015",
+  "screen_time": "2026-10-15 10:43:06",
+  "asof_trade_date": "",
+  "count": 0,
+  "meta": {
+    "phase": "auto_screen",
+    "schedule_slot": "auto",
+    "note": "由模拟盘监控自动触发选股",
+    "global_risk_off": true,
+    "passed": 0,
+    "scanned": 1734,
+    "screen_mode": "board_setup",
+    "auto": true
+  },
+  "boards": [
+    {
+      "rank": 1,
+      "board_name": "卫浴电器",
+      "pct_chg": 3.55,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 2,
+      "board_name": "文字媒体",
+      "pct_chg": 2.72,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 3,
+      "board_name": "诊断服务",
+      "pct_chg": 2.71,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 4,
+      "board_name": "大众出版",
+      "pct_chg": 1.38,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 5,
+      "board_name": "纺织鞋类制造",
+      "pct_chg": 1.32,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 6,
+      "board_name": "游戏Ⅲ",
+      "pct_chg": 1.17,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 7,
+      "board_name": "游戏Ⅱ",
+      "pct_chg": 1.17,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 8,
+      "board_name": "水产饲料",
+      "pct_chg": 1.02,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 9,
+      "board_name": "图片媒体",
+      "pct_chg": 0.9,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 10,
+      "board_name": "白酒Ⅲ",
+      "pct_chg": 0.89,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 7,
+      "board_name": "CRO",
+      "pct_chg": -0.04,
+      "board_type": "concept",
+      "forced_mainline": true
+    },
+    {
+      "rank": 21,
+      "board_name": "创新药",
+      "pct_chg": -0.34,
+      "board_type": "concept",
+      "forced_mainline": true
+    },
+    {
+      "rank": 999,
+      "board_name": "医疗器械",
+      "pct_chg": 0.0,
+      "board_type": "concept",
+      "forced_mainline": true
+    }
+  ],
+  "picks": []
+}

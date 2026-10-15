@@ -178,6 +178,13 @@ class StrategyAdapter:
 
         data['hist_data'] = hist
 
+        # 成交额（亿元）：优先用K线成交额，原始单位为元；缺失则保持原值
+        try:
+            amt_raw = hist['成交额'].iloc[-1]
+            data['amount'] = float(amt_raw) / 1e8 if pd.notna(amt_raw) else data.get('amount')
+        except (KeyError, IndexError, TypeError, ValueError):
+            pass
+
         # 计算基础指标
         from stock_selector.indicators.kdj import kdj_k
         from stock_selector.indicators.rsi import rsi6

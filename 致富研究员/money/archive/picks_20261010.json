@@ -1,0 +1,110 @@
+{
+  "pick_date": "20261010",
+  "screen_time": "2026-10-10 18:18:49",
+  "asof_trade_date": "",
+  "count": 0,
+  "meta": {
+    "phase": "auto_screen",
+    "schedule_slot": "auto",
+    "note": "由模拟盘监控自动触发选股",
+    "global_risk_off": false,
+    "passed": 0,
+    "scanned": 1668,
+    "screen_mode": "board_setup",
+    "auto": true
+  },
+  "boards": [
+    {
+      "rank": 1,
+      "board_name": "视频媒体",
+      "pct_chg": 18.94,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 2,
+      "board_name": "文字媒体",
+      "pct_chg": 15.0,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 3,
+      "board_name": "种子",
+      "pct_chg": 7.15,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 4,
+      "board_name": "影视动漫制作",
+      "pct_chg": 6.82,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 5,
+      "board_name": "有机硅",
+      "pct_chg": 6.72,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 6,
+      "board_name": "电视广播Ⅲ",
+      "pct_chg": 6.68,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 7,
+      "board_name": "电视广播Ⅱ",
+      "pct_chg": 6.68,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 8,
+      "board_name": "数字媒体",
+      "pct_chg": 6.58,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 9,
+      "board_name": "影视院线",
+      "pct_chg": 6.31,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 10,
+      "board_name": "黄金",
+      "pct_chg": 6.22,
+      "board_type": "industry",
+      "forced_mainline": false
+    },
+    {
+      "rank": 999,
+      "board_name": "创新药",
+      "pct_chg": 0.0,
+      "board_type": "concept",
+      "forced_mainline": true
+    },
+    {
+      "rank": 999,
+      "board_name": "CRO",
+      "pct_chg": 0.0,
+      "board_type": "concept",
+      "forced_mainline": true
+    },
+    {
+      "rank": 999,
+      "board_name": "医疗器械",
+      "pct_chg": 0.0,
+      "board_type": "concept",
+      "forced_mainline": true
+    }
+  ],
+  "picks": []
+}
