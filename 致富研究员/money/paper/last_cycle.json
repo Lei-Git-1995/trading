@@ -1,46 +1,45 @@
 {
-  "time": "2026-10-15 10:54:52",
-  "session": "交易中(上午)",
+  "time": "2026-10-15 15:00:02",
+  "session": "交易中(下午)",
   "buys_n": 0,
   "sells_n": 0,
   "cash": 19911.89,
   "equity": 19911.89,
   "floating_pnl": 0.0,
   "agent_plan": {
-    "mode": "free",
+    "mode": null,
     "goal": "",
-    "buys_n": 0,
-    "sells_n": 0,
-    "sell_recs_n": 0,
-    "react_rounds": 1,
-    "watch_ops": 0
+    "buys_n": null,
+    "sells_n": null,
+    "sell_recs_n": null,
+    "react_rounds": null,
+    "watch_ops": null
   },
   "skipped": [
-    "规划JSON解析失败",
-    "agent本轮未买入"
+    "尾盘后禁止开新仓（T+1铁律）"
   ],
   "regime": {
     "risk_off": true,
     "source": "picks_archive",
-    "asof": "2026-10-15 10:54:43"
+    "asof": "2026-10-15 14:59:49"
   },
   "emotion": {
     "phase": "repair",
     "phase_label": "修复",
-    "limit_up_n": 30,
+    "limit_up_n": 36,
     "max_board_height": 5,
     "promotion_rate": 0.1667,
-    "broken_seal_n": 3,
-    "resealed_n": 18,
-    "broken_open_n": 3
+    "broken_seal_n": 7,
+    "resealed_n": 23,
+    "broken_open_n": 7
   },
   "seal_tracker": {
-    "n": 56,
+    "n": 66,
     "open": 3,
-    "sealed": 30,
-    "broken": 5,
+    "sealed": 31,
+    "broken": 7,
     "resealing": 0,
-    "resealed": 18,
+    "resealed": 25,
     "other": 0
   },
   "buy_codes": [],

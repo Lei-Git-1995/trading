@@ -1,4 +1,4 @@
-"""PostgreSQL storage for daily selections and grouped watchlists.
+﻿"""PostgreSQL storage for daily selections and grouped watchlists.
 
 The database is optional at runtime.  Set ``STOCK_SELECTOR_PG_DSN`` or the
 ``STOCK_SELECTOR_PG*`` environment variables before using the persistence
@@ -89,10 +89,34 @@ CREATE INDEX IF NOT EXISTS idx_watchlist_stocks_group
 CREATE TABLE IF NOT EXISTS trading_accounts (
     id BIGSERIAL PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
-    channel TEXT NOT NULL DEFAULT 'manual',
+    channel TEXT NOT NULL DEFAULT 'paper',
+    initial_cash NUMERIC NOT NULL DEFAULT 100000,
+    cash_balance NUMERIC NOT NULL DEFAULT 100000,
     settings JSONB NOT NULL DEFAULT '{}'::jsonb,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE trading_accounts ADD COLUMN IF NOT EXISTS initial_cash NUMERIC NOT NULL DEFAULT 100000;
+ALTER TABLE trading_accounts ADD COLUMN IF NOT EXISTS cash_balance NUMERIC NOT NULL DEFAULT 100000;
+UPDATE trading_accounts SET channel = 'paper' WHERE channel <> 'paper';
+
+CREATE TABLE IF NOT EXISTS paper_positions (
+    account_id BIGINT NOT NULL REFERENCES trading_accounts(id) ON DELETE CASCADE,
+    code VARCHAR(12) NOT NULL,
+    name TEXT NOT NULL DEFAULT '',
+    volume INTEGER NOT NULL DEFAULT 0,
+    avg_cost NUMERIC NOT NULL DEFAULT 0,
+    last_price NUMERIC NOT NULL DEFAULT 0,
+    opened_on DATE NOT NULL DEFAULT CURRENT_DATE,
+    target_price NUMERIC,
+    stop_loss NUMERIC,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (account_id, code)
+);
+
+ALTER TABLE paper_positions ADD COLUMN IF NOT EXISTS opened_on DATE NOT NULL DEFAULT CURRENT_DATE;
+ALTER TABLE paper_positions ADD COLUMN IF NOT EXISTS target_price NUMERIC;
+ALTER TABLE paper_positions ADD COLUMN IF NOT EXISTS stop_loss NUMERIC;
 
 CREATE TABLE IF NOT EXISTS trade_orders (
     id BIGSERIAL PRIMARY KEY,
@@ -317,34 +341,48 @@ class PostgresStore:
 
     # ---------------- AI 交易 ----------------
 
-    def upsert_account(self, name: str, channel: str,
-                       settings: Optional[Dict[str, Any]] = None) -> int:
+    def upsert_account(self, name: str, channel: str = 'paper',
+                       settings: Optional[Dict[str, Any]] = None,
+                       initial_cash: float = 100000) -> int:
         with self.connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    """INSERT INTO trading_accounts (name, channel, settings)
-                    VALUES (%s, %s, %s)
+                    """INSERT INTO trading_accounts
+                    (name, channel, settings, initial_cash, cash_balance)
+                    VALUES (%s, 'paper', %s, %s, %s)
                     ON CONFLICT (name) DO UPDATE
-                    SET channel = EXCLUDED.channel, settings = EXCLUDED.settings
+                    SET channel = 'paper', settings = EXCLUDED.settings
                     RETURNING id""",
-                    (name, channel, Json(_json_safe(settings or {}))))
+                    (name, Json(_json_safe(settings or {})), initial_cash, initial_cash))
                 return cur.fetchone()[0]
 
     def list_accounts(self) -> list[Dict[str, Any]]:
         with self.connection() as conn:
             with conn.cursor() as cur:
-                cur.execute('SELECT id, name, channel, settings FROM trading_accounts ORDER BY id')
-                return [{'id': r[0], 'name': r[1], 'channel': r[2], 'settings': r[3]}
+                cur.execute('SELECT id, name, channel, settings, initial_cash, cash_balance FROM trading_accounts ORDER BY id')
+                return [{'id': r[0], 'name': r[1], 'channel': 'paper', 'settings': r[3],
+                         'initial_cash': float(r[4]), 'cash_balance': float(r[5])}
                         for r in cur.fetchall()]
 
     def get_account(self, name: str) -> Optional[Dict[str, Any]]:
         with self.connection() as conn:
             with conn.cursor() as cur:
-                cur.execute('SELECT id, name, channel, settings FROM trading_accounts WHERE name = %s', (name,))
+                cur.execute('SELECT id, name, settings, initial_cash, cash_balance FROM trading_accounts WHERE name = %s', (name,))
                 row = cur.fetchone()
                 if not row:
                     return None
-                return {'id': row[0], 'name': row[1], 'channel': row[2], 'settings': row[3]}
+                return {'id': row[0], 'name': row[1], 'channel': 'paper', 'settings': row[2],
+                        'initial_cash': float(row[3]), 'cash_balance': float(row[4])}
+
+    def get_account_by_id(self, account_id: int) -> Optional[Dict[str, Any]]:
+        with self.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute('SELECT id, name, settings, initial_cash, cash_balance FROM trading_accounts WHERE id = %s', (account_id,))
+                row = cur.fetchone()
+                if not row:
+                    return None
+                return {'id': row[0], 'name': row[1], 'channel': 'paper', 'settings': row[2],
+                        'initial_cash': float(row[3]), 'cash_balance': float(row[4])}
 
     def save_order(self, account_id: int, *, code: str, name: str, action: str,
                    price: Optional[float], volume: int, reason: str = '') -> int:
@@ -385,6 +423,118 @@ class PostgresStore:
                     SET status = %s, result = %s, updated_at = NOW()
                     WHERE id = %s""",
                     (status, Json(_json_safe(result or {})), order_id))
+
+    def get_paper_positions(self, account_id: int) -> list[Dict[str, Any]]:
+        with self.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute('''SELECT code, name, volume, avg_cost, last_price,
+                               volume * avg_cost, volume * last_price, opened_on,
+                               target_price, stop_loss FROM paper_positions
+                               WHERE account_id = %s AND volume > 0 ORDER BY code''', (account_id,))
+                return [{'code': r[0], 'name': r[1], 'volume': r[2], 'avg_cost': float(r[3]),
+                         'last_price': float(r[4]), 'cost_value': float(r[5]),
+                         'market_value': float(r[6]), 'opened_on': str(r[7]),
+                         'target_price': _number(r[8]), 'stop_loss': _number(r[9])}
+                        for r in cur.fetchall()]
+
+    def execute_paper_order(self, account_id: int, *, code: str, name: str,
+                            action: str, price: float, volume: int, reason: str = '',
+                            max_position_pct: Optional[float] = None,
+                            target_price: Optional[float] = None,
+                            stop_loss: Optional[float] = None,
+                            enforce_t_plus_one: bool = True) -> int:
+        code, action = str(code).strip().zfill(6), str(action).lower()
+        price, volume = float(price), int(volume)
+        if not code.isdigit() or action not in ('buy', 'sell'):
+            raise ValueError('委托信息无效')
+        if price <= 0 or volume <= 0 or volume % 100:
+            raise ValueError('价格必须大于零，股数必须是正的100股整数倍')
+        with self.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute('SELECT cash_balance, initial_cash FROM trading_accounts WHERE id = %s FOR UPDATE', (account_id,))
+                account = cur.fetchone()
+                if not account:
+                    raise ValueError('模拟盘账户不存在')
+                cash, initial_cash = float(account[0]), float(account[1])
+                amount = price * volume
+                cur.execute('''SELECT volume, avg_cost, last_price, opened_on FROM paper_positions
+                               WHERE account_id = %s AND code = %s FOR UPDATE''', (account_id, code))
+                position = cur.fetchone()
+                current_volume = int(position[0]) if position else 0
+                avg_cost = float(position[1]) if position else 0.0
+                if action == 'buy':
+                    if amount > cash:
+                        raise ValueError(f'模拟盘现金不足：需要 {amount:.2f}，可用 {cash:.2f}')
+                    if max_position_pct is not None:
+                        max_pct = float(max_position_pct)
+                        if not 0 < max_pct <= 100:
+                            raise ValueError('单只最大仓位比例必须大于0且不超过100%')
+                        current_value = current_volume * (float(position[2]) if position else price)
+                        max_value = initial_cash * max_pct / 100.0
+                        if current_value + amount > max_value:
+                            raise ValueError(f'超过单只仓位上限：本次后约 {current_value + amount:.2f}，上限 {max_value:.2f}')
+                    new_volume = current_volume + volume
+                    new_avg = (current_volume * avg_cost + amount) / new_volume
+                    cash -= amount
+                    cur.execute('''INSERT INTO paper_positions
+                        (account_id, code, name, volume, avg_cost, last_price, opened_on, target_price, stop_loss)
+                        VALUES (%s, %s, %s, %s, %s, %s, CURRENT_DATE, %s, %s)
+                        ON CONFLICT (account_id, code) DO UPDATE SET name = EXCLUDED.name,
+                        volume = EXCLUDED.volume, avg_cost = EXCLUDED.avg_cost,
+                        last_price = EXCLUDED.last_price,
+                        target_price = COALESCE(EXCLUDED.target_price, paper_positions.target_price),
+                        stop_loss = COALESCE(EXCLUDED.stop_loss, paper_positions.stop_loss), updated_at = NOW()''',
+                        (account_id, code, name or '', new_volume, new_avg, price,
+                         _number(target_price), _number(stop_loss)))
+                else:
+                    if not position or volume > current_volume:
+                        raise ValueError(f'模拟盘持仓不足：持有 {current_volume} 股，不能卖出 {volume} 股')
+                    if enforce_t_plus_one and position[3] >= datetime.now().date():
+                        raise ValueError('A股 T+1：当日买入的持仓需下一个交易日后才能卖出')
+                    cash += amount
+                    remain = current_volume - volume
+                    if remain:
+                        cur.execute('UPDATE paper_positions SET volume=%s,last_price=%s,updated_at=NOW() WHERE account_id=%s AND code=%s',
+                                    (remain, price, account_id, code))
+                    else:
+                        cur.execute('DELETE FROM paper_positions WHERE account_id=%s AND code=%s', (account_id, code))
+                cur.execute('UPDATE trading_accounts SET cash_balance=%s WHERE id=%s', (cash, account_id))
+                cur.execute('''INSERT INTO trade_orders
+                    (account_id, code, name, action, price, volume, reason, status, result)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,'filled',%s) RETURNING id''',
+                    (account_id, code, name or '', action, price, volume, reason,
+                     Json({'filled_amount': amount, 'cash_balance': cash,
+                           'realized_pnl': (price - avg_cost) * volume if action == 'sell' else None,
+                           'fill_mode': 'paper_at_ai_price'})))
+                return int(cur.fetchone()[0])
+
+    def update_paper_prices(self, account_id: int, prices: Dict[str, float]) -> None:
+        if not prices:
+            return
+        with self.connection() as conn:
+            with conn.cursor() as cur:
+                for code, price in prices.items():
+                    if _number(price) and float(price) > 0:
+                        cur.execute('UPDATE paper_positions SET last_price=%s,updated_at=NOW() WHERE account_id=%s AND code=%s',
+                                    (float(price), account_id, str(code).zfill(6)))
+
+    def has_paper_trade_today(self, account_id: int, code: str, action: str) -> bool:
+        with self.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute('''SELECT EXISTS(SELECT 1 FROM trade_orders WHERE account_id=%s
+                    AND code=%s AND action=%s AND status='filled' AND created_at::date=CURRENT_DATE)''',
+                    (account_id, str(code).zfill(6), action))
+                return bool(cur.fetchone()[0])
+
+    def list_paper_trades(self, account_id: int, limit: int = 50) -> list[Dict[str, Any]]:
+        with self.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute('''SELECT code,name,action,price,volume,reason,status,result,created_at
+                    FROM trade_orders WHERE account_id=%s ORDER BY created_at DESC LIMIT %s''',
+                    (account_id, max(1, min(int(limit), 500))))
+                return [{'code': r[0], 'name': r[1], 'action': r[2], 'price': _number(r[3]),
+                         'volume': r[4], 'reason': r[5] or '', 'status': r[6],
+                         'result': r[7], 'created_at': str(r[8])} for r in cur.fetchall()]
 
     # ---------------- 选股批次查询 ----------------
 

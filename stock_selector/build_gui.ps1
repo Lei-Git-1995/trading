@@ -3,7 +3,8 @@
 #   powershell -ExecutionPolicy Bypass -File E:\trading\stock_selector\build_gui.ps1
 # Optional output root lets a new build finish while an older exe is running.
 param(
-    [string]$OutputRoot = 'E:\trading\dist'
+    [string]$OutputRoot = 'E:\trading\dist',
+    [string]$WorkRoot = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -12,6 +13,7 @@ $root = 'E:\trading'
 $spec = Join-Path $root 'StockSelector.spec'
 $name = 'StockSelector'
 $dist = Join-Path $OutputRoot $name
+$work = if ($WorkRoot) { $WorkRoot } else { Join-Path $root 'build' }
 
 $pythonCandidates = @(
     (Join-Path $env:LOCALAPPDATA 'Programs\Python\Python311\python.exe'),
@@ -68,7 +70,7 @@ if (Test-Path -LiteralPath $dist) {
 Write-Host '[3/5] building (this may take several minutes)...'
 & $pythonCommand @pythonArgs -m PyInstaller --noconfirm --clean `
     --distpath $OutputRoot `
-    --workpath (Join-Path $root 'build') `
+    --workpath $work `
     $spec
 if ($LASTEXITCODE -ne 0) { throw 'PyInstaller build failed.' }
 

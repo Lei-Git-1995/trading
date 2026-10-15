@@ -5,6 +5,16 @@ datas = []
 binaries = []
 hiddenimports = []
 hiddenimports += ['psycopg2', 'psycopg2._psycopg']
+hiddenimports += [
+    'stock_selector.agent',
+    'stock_selector.agent.config',
+    'stock_selector.agent.llm',
+    'stock_selector.agent.tools',
+    'stock_selector.agent.loop',
+    'stock_selector.agent.storage',
+    'stock_selector.agent.scheduler',
+    'stock_selector.utils.app_config',
+]
 tmp_ret = collect_all('akshare')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 

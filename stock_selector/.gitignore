@@ -10,3 +10,4 @@ logs/*
 output/*
 !output/.gitkeep
 gui_crash.log
+config.local.json

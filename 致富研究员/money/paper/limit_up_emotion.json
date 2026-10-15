@@ -1,11 +1,11 @@
 {
   "ok": true,
-  "time": "2026-10-15 10:56:42",
+  "time": "2026-10-15 15:14:44",
   "day": "20261015",
-  "limit_up_n": 31,
-  "broken_seal_n": 3,
-  "resealed_n": 18,
-  "broken_open_n": 3,
+  "limit_up_n": 36,
+  "broken_seal_n": 7,
+  "resealed_n": 24,
+  "broken_open_n": 7,
   "max_board_height": 5,
   "promo_n": 6,
   "yest_limit_up_n": 36,
@@ -13,10 +13,10 @@
   "phase": "repair",
   "phase_label": "修复",
   "height_hist": {
-    "1": 25,
+    "1": 30,
     "5": 2,
-    "2": 2,
-    "3": 2
+    "3": 2,
+    "2": 2
   },
   "leaders": [
     {
@@ -27,9 +27,9 @@
       "broken_n": 1,
       "first_seal": 93000,
       "last_seal": 95836,
-      "amount": 753497824,
+      "amount": 781879536,
       "industry": "饲料",
-      "fund": 127565429
+      "fund": 64312830
     },
     {
       "code": "002343",
@@ -39,21 +39,21 @@
       "broken_n": 0,
       "first_seal": 93015,
       "last_seal": 93015,
-      "amount": 646848240,
+      "amount": 681668192,
       "industry": "影视院线",
-      "fund": 216808740
+      "fund": 140313165
     },
     {
       "code": "000530",
       "name": "冰山冷热",
       "pct_chg": 10.0,
       "board_n": 3,
-      "broken_n": 9,
+      "broken_n": 12,
       "first_seal": 93027,
-      "last_seal": 105551,
-      "amount": 1602738656,
+      "last_seal": 142751,
+      "amount": 1697317808,
       "industry": "通用设备",
-      "fund": 388773
+      "fund": 16140656
     },
     {
       "code": "001318",
@@ -63,21 +63,21 @@
       "broken_n": 0,
       "first_seal": 93048,
       "last_seal": 93048,
-      "amount": 278026288,
+      "amount": 300750816,
       "industry": "饮料乳品",
-      "fund": 163146186
+      "fund": 108231266
     },
     {
-      "code": "603258",
-      "name": "电魂网络",
-      "pct_chg": 10.03,
+      "code": "601811",
+      "name": "新华文轩",
+      "pct_chg": 10.02,
       "board_n": 2,
       "broken_n": 1,
-      "first_seal": 93008,
-      "last_seal": 101150,
-      "amount": 357152992,
-      "industry": "游戏Ⅱ",
-      "fund": 77642461
+      "first_seal": 144938,
+      "last_seal": 145020,
+      "amount": 1566969936,
+      "industry": "出版",
+      "fund": 1619214
     },
     {
       "code": "605189",
@@ -87,21 +87,21 @@
       "broken_n": 1,
       "first_seal": 93042,
       "last_seal": 93503,
-      "amount": 693290128,
+      "amount": 724182160,
       "industry": "纺织制造",
-      "fund": 99275381
+      "fund": 7197120
     },
     {
       "code": "300111",
       "name": "向日葵",
       "pct_chg": 20.06,
       "board_n": 1,
-      "broken_n": 1,
+      "broken_n": 6,
       "first_seal": 95636,
-      "last_seal": 95754,
-      "amount": 683907520,
+      "last_seal": 131239,
+      "amount": 852999776,
       "industry": "化学制药",
-      "fund": 262290693
+      "fund": 23410842
     },
     {
       "code": "301282",
@@ -111,9 +111,9 @@
       "broken_n": 0,
       "first_seal": 93306,
       "last_seal": 93306,
-      "amount": 514547888,
+      "amount": 558033200,
       "industry": "元件",
-      "fund": 503256549
+      "fund": 275271909
     }
   ],
   "zt_items": [
@@ -125,9 +125,9 @@
       "broken_n": 0,
       "first_seal": 92500,
       "last_seal": 92500,
-      "amount": 285645216,
+      "amount": 321343280,
       "industry": "元件",
-      "fund": 1124723028
+      "fund": 327134475
     },
     {
       "code": "000626",
@@ -137,9 +137,9 @@
       "broken_n": 1,
       "first_seal": 93000,
       "last_seal": 100212,
-      "amount": 338705696,
+      "amount": 348325760,
       "industry": "物流",
-      "fund": 114610155
+      "fund": 74921352
     },
     {
       "code": "002696",
@@ -149,21 +149,9 @@
       "broken_n": 1,
       "first_seal": 93000,
       "last_seal": 95836,
-      "amount": 753497824,
+      "amount": 781879536,
       "industry": "饲料",
-      "fund": 127565429
-    },
-    {
-      "code": "603258",
-      "name": "电魂网络",
-      "pct_chg": 10.03,
-      "board_n": 2,
-      "broken_n": 1,
-      "first_seal": 93008,
-      "last_seal": 101150,
-      "amount": 357152992,
-      "industry": "游戏Ⅱ",
-      "fund": 77642461
+      "fund": 64312830
     },
     {
       "code": "002343",
@@ -173,21 +161,21 @@
       "broken_n": 0,
       "first_seal": 93015,
       "last_seal": 93015,
-      "amount": 646848240,
+      "amount": 681668192,
       "industry": "影视院线",
-      "fund": 216808740
+      "fund": 140313165
     },
     {
       "code": "000530",
       "name": "冰山冷热",
       "pct_chg": 10.0,
       "board_n": 3,
-      "broken_n": 9,
+      "broken_n": 12,
       "first_seal": 93027,
-      "last_seal": 105551,
-      "amount": 1602738656,
+      "last_seal": 142751,
+      "amount": 1697317808,
       "industry": "通用设备",
-      "fund": 388773
+      "fund": 16140656
     },
     {
       "code": "605189",
@@ -197,9 +185,9 @@
       "broken_n": 1,
       "first_seal": 93042,
       "last_seal": 93503,
-      "amount": 693290128,
+      "amount": 724182160,
       "industry": "纺织制造",
-      "fund": 99275381
+      "fund": 7197120
     },
     {
       "code": "001318",
@@ -209,9 +197,9 @@
       "broken_n": 0,
       "first_seal": 93048,
       "last_seal": 93048,
-      "amount": 278026288,
+      "amount": 300750816,
       "industry": "饮料乳品",
-      "fund": 163146186
+      "fund": 108231266
     },
     {
       "code": "603999",
@@ -221,9 +209,9 @@
       "broken_n": 0,
       "first_seal": 93125,
       "last_seal": 93125,
-      "amount": 107439772,
+      "amount": 140388812,
       "industry": "出版",
-      "fund": 239114838
+      "fund": 7444740
     },
     {
       "code": "001225",
@@ -233,21 +221,9 @@
       "broken_n": 1,
       "first_seal": 93130,
       "last_seal": 93257,
-      "amount": 213378147,
+      "amount": 223733107,
       "industry": "专用设备",
-      "fund": 309623160
-    },
-    {
-      "code": "000710",
-      "name": "贝瑞基因",
-      "pct_chg": 10.04,
-      "board_n": 1,
-      "broken_n": 0,
-      "first_seal": 93306,
-      "last_seal": 93306,
-      "amount": 321200352,
-      "industry": "医疗服务",
-      "fund": 317384171
+      "fund": 262681650
     },
     {
       "code": "301282",
@@ -257,9 +233,9 @@
       "broken_n": 0,
       "first_seal": 93306,
       "last_seal": 93306,
-      "amount": 514547888,
+      "amount": 558033200,
       "industry": "元件",
-      "fund": 503256549
+      "fund": 275271909
     },
     {
       "code": "000722",
@@ -269,9 +245,9 @@
       "broken_n": 0,
       "first_seal": 93309,
       "last_seal": 93309,
-      "amount": 295516000,
+      "amount": 346250992,
       "industry": "电力",
-      "fund": 376232141
+      "fund": 65135744
     },
     {
       "code": "002103",
@@ -281,21 +257,21 @@
       "broken_n": 3,
       "first_seal": 93536,
       "last_seal": 101606,
-      "amount": 248736336,
+      "amount": 295004096,
       "industry": "文娱用品",
-      "fund": 107953207
+      "fund": 38632237
     },
     {
       "code": "002134",
       "name": "天津普林",
       "pct_chg": 9.99,
       "board_n": 1,
-      "broken_n": 1,
+      "broken_n": 2,
       "first_seal": 93557,
-      "last_seal": 100206,
-      "amount": 534856576,
+      "last_seal": 130127,
+      "amount": 647137328,
       "industry": "元件",
-      "fund": 273815264
+      "fund": 15721206
     },
     {
       "code": "000995",
@@ -305,33 +281,21 @@
       "broken_n": 1,
       "first_seal": 93748,
       "last_seal": 93821,
-      "amount": 321544960,
+      "amount": 343211040,
       "industry": "白酒Ⅱ",
-      "fund": 202819263
+      "fund": 89414923
     },
     {
       "code": "002543",
       "name": "万和电气",
       "pct_chg": 10.06,
       "board_n": 1,
-      "broken_n": 1,
+      "broken_n": 2,
       "first_seal": 93800,
-      "last_seal": 93818,
-      "amount": 167285890,
+      "last_seal": 135018,
+      "amount": 287701344,
       "industry": "厨卫电器",
-      "fund": 90899661
-    },
-    {
-      "code": "000892",
-      "name": "欢瑞世纪",
-      "pct_chg": 9.94,
-      "board_n": 1,
-      "broken_n": 5,
-      "first_seal": 93830,
-      "last_seal": 101954,
-      "amount": 1070272480,
-      "industry": "影视院线",
-      "fund": 136975296
+      "fund": 16711462
     },
     {
       "code": "600721",
@@ -341,21 +305,21 @@
       "broken_n": 0,
       "first_seal": 94046,
       "last_seal": 94046,
-      "amount": 511090896,
+      "amount": 677157968,
       "industry": "医疗服务",
-      "fund": 367520180
+      "fund": 6104530
     },
     {
-      "code": "000692",
-      "name": "惠天热电",
-      "pct_chg": 9.96,
+      "code": "603230",
+      "name": "内蒙新华",
+      "pct_chg": 10.0,
       "board_n": 1,
-      "broken_n": 0,
-      "first_seal": 94242,
-      "last_seal": 94242,
-      "amount": 215079943,
-      "industry": "电力",
-      "fund": 116045066
+      "broken_n": 4,
+      "first_seal": 94517,
+      "last_seal": 143529,
+      "amount": 934846576,
+      "industry": "出版",
+      "fund": 2978052
     },
     {
       "code": "003029",
@@ -365,33 +329,33 @@
       "broken_n": 1,
       "first_seal": 94927,
       "last_seal": 94948,
-      "amount": 213049141,
+      "amount": 292119584,
       "industry": "软件开发",
-      "fund": 99824242
+      "fund": 25717135
     },
     {
       "code": "300111",
       "name": "向日葵",
       "pct_chg": 20.06,
       "board_n": 1,
-      "broken_n": 1,
+      "broken_n": 6,
       "first_seal": 95636,
-      "last_seal": 95754,
-      "amount": 683907520,
+      "last_seal": 131239,
+      "amount": 852999776,
       "industry": "化学制药",
-      "fund": 262290693
+      "fund": 23410842
     },
     {
       "code": "603237",
       "name": "五芳斋",
       "pct_chg": 10.02,
       "board_n": 1,
-      "broken_n": 2,
+      "broken_n": 3,
       "first_seal": 95637,
-      "last_seal": 104816,
-      "amount": 110485097,
+      "last_seal": 133610,
+      "amount": 141841182,
       "industry": "食品加工",
-      "fund": 29960511
+      "fund": 1006317
     },
     {
       "code": "603386",
@@ -401,69 +365,69 @@
       "broken_n": 0,
       "first_seal": 95825,
       "last_seal": 95825,
-      "amount": 443205840,
+      "amount": 480281968,
       "industry": "元件",
-      "fund": 188691525
+      "fund": 3604500
     },
     {
       "code": "600281",
       "name": "华阳新材",
       "pct_chg": 9.92,
       "board_n": 1,
-      "broken_n": 1,
+      "broken_n": 4,
       "first_seal": 100046,
-      "last_seal": 104201,
-      "amount": 228155740,
+      "last_seal": 130249,
+      "amount": 276508288,
       "industry": "小金属",
-      "fund": 85851682
+      "fund": 504849
     },
     {
       "code": "600668",
       "name": "尖峰集团",
       "pct_chg": 10.06,
       "board_n": 1,
-      "broken_n": 1,
+      "broken_n": 2,
       "first_seal": 100605,
-      "last_seal": 101402,
-      "amount": 195407411,
+      "last_seal": 112438,
+      "amount": 269210912,
       "industry": "水泥",
-      "fund": 88527753
+      "fund": 1441396
     },
     {
       "code": "603690",
       "name": "至纯科技",
       "pct_chg": 10.0,
       "board_n": 1,
-      "broken_n": 0,
+      "broken_n": 1,
       "first_seal": 100618,
-      "last_seal": 100618,
-      "amount": 674740896,
+      "last_seal": 130001,
+      "amount": 909691472,
       "industry": "半导体",
-      "fund": 276339632
+      "fund": 6943217
     },
     {
       "code": "605058",
       "name": "澳弘电子",
       "pct_chg": 10.0,
       "board_n": 1,
-      "broken_n": 1,
+      "broken_n": 13,
       "first_seal": 100830,
-      "last_seal": 101803,
-      "amount": 1144419088,
+      "last_seal": 143336,
+      "amount": 1488855968,
       "industry": "元件",
-      "fund": 179999457
+      "fund": 2347317
     },
     {
       "code": "600812",
       "name": "华北制药",
       "pct_chg": 10.05,
       "board_n": 1,
-      "broken_n": 1,
+      "broken_n": 3,
       "first_seal": 102258,
-      "last_seal": 103319,
-      "amount": 1611467664,
+      "last_seal": 145428,
+      "amount": 2115357568,
       "industry": "化学制药",
-      "fund": 168140044
+      "fund": 1256841
     },
     {
       "code": "002889",
@@ -473,28 +437,148 @@
       "broken_n": 0,
       "first_seal": 105027,
       "last_seal": 105027,
-      "amount": 108094479,
+      "amount": 158893650,
       "industry": "物流",
-      "fund": 111623731
+      "fund": 17238458
     },
     {
       "code": "002945",
       "name": "华林证券",
       "pct_chg": 10.01,
       "board_n": 1,
-      "broken_n": 0,
+      "broken_n": 6,
       "first_seal": 105612,
-      "last_seal": 105612,
-      "amount": 480227424,
+      "last_seal": 145209,
+      "amount": 1226005808,
       "industry": "证券Ⅱ",
-      "fund": 899377610
+      "fund": 16721235
+    },
+    {
+      "code": "002836",
+      "name": "新宏泽",
+      "pct_chg": 10.03,
+      "board_n": 1,
+      "broken_n": 0,
+      "first_seal": 111000,
+      "last_seal": 111000,
+      "amount": 100617792,
+      "industry": "包装印刷",
+      "fund": 97839003
+    },
+    {
+      "code": "603535",
+      "name": "嘉诚国际",
+      "pct_chg": 9.97,
+      "board_n": 1,
+      "broken_n": 2,
+      "first_seal": 111044,
+      "last_seal": 132541,
+      "amount": 125921716,
+      "industry": "物流",
+      "fund": 1096317
+    },
+    {
+      "code": "605003",
+      "name": "众望布艺",
+      "pct_chg": 10.0,
+      "board_n": 1,
+      "broken_n": 2,
+      "first_seal": 111810,
+      "last_seal": 134404,
+      "amount": 65485334,
+      "industry": "服装家纺",
+      "fund": 890428
+    },
+    {
+      "code": "603329",
+      "name": "上海雅仕",
+      "pct_chg": 10.0,
+      "board_n": 1,
+      "broken_n": 0,
+      "first_seal": 131505,
+      "last_seal": 131505,
+      "amount": 230174353,
+      "industry": "物流",
+      "fund": 874676
+    },
+    {
+      "code": "002748",
+      "name": "世龙实业",
+      "pct_chg": 9.99,
+      "board_n": 1,
+      "broken_n": 1,
+      "first_seal": 133421,
+      "last_seal": 142736,
+      "amount": 404243344,
+      "industry": "化学原料",
+      "fund": 25341225
+    },
+    {
+      "code": "603172",
+      "name": "万丰股份",
+      "pct_chg": 10.02,
+      "board_n": 1,
+      "broken_n": 0,
+      "first_seal": 133913,
+      "last_seal": 133913,
+      "amount": 97926517,
+      "industry": "化学制品",
+      "fund": 839677
+    },
+    {
+      "code": "603200",
+      "name": "上海洗霸",
+      "pct_chg": 10.0,
+      "board_n": 1,
+      "broken_n": 1,
+      "first_seal": 141215,
+      "last_seal": 150000,
+      "amount": 1268184176,
+      "industry": "环境治理",
+      "fund": 432135
+    },
+    {
+      "code": "601811",
+      "name": "新华文轩",
+      "pct_chg": 10.02,
+      "board_n": 2,
+      "broken_n": 1,
+      "first_seal": 144938,
+      "last_seal": 145020,
+      "amount": 1566969936,
+      "industry": "出版",
+      "fund": 1619214
     }
   ],
   "broken_samples": [
     {
+      "code": "603258",
+      "name": "电魂网络",
+      "pct_chg": 4.09,
+      "broken_n": 2,
+      "first_seal": 93008,
+      "industry": "游戏Ⅱ"
+    },
+    {
+      "code": "000710",
+      "name": "贝瑞基因",
+      "pct_chg": 4.17,
+      "broken_n": 1,
+      "first_seal": 93306,
+      "industry": "医疗服务"
+    },
+    {
+      "code": "000892",
+      "name": "欢瑞世纪",
+      "pct_chg": 6.24,
+      "broken_n": 8,
+      "first_seal": 93830,
+      "industry": "影视院线"
+    },
+    {
       "code": "301025",
       "name": "读客文化",
-      "pct_chg": 9.8,
+      "pct_chg": 7.42,
       "broken_n": 1,
       "first_seal": 93912,
       "industry": "出版"
@@ -502,25 +586,57 @@
     {
       "code": "603533",
       "name": "掌阅科技",
-      "pct_chg": 3.64,
+      "pct_chg": -3.04,
       "broken_n": 2,
       "first_seal": 94005,
       "industry": "数字媒体"
     },
     {
-      "code": "603230",
-      "name": "内蒙新华",
-      "pct_chg": 7.5,
+      "code": "000692",
+      "name": "惠天热电",
+      "pct_chg": 4.65,
+      "broken_n": 1,
+      "first_seal": 94242,
+      "industry": "电力"
+    },
+    {
+      "code": "688648",
+      "name": "中邮科技",
+      "pct_chg": 12.78,
       "broken_n": 2,
-      "first_seal": 94517,
-      "industry": "出版"
+      "first_seal": 133640,
+      "industry": "专用设备"
     }
   ],
   "broken_all": [
     {
+      "code": "603258",
+      "name": "电魂网络",
+      "pct_chg": 4.09,
+      "broken_n": 2,
+      "first_seal": 93008,
+      "industry": "游戏Ⅱ"
+    },
+    {
+      "code": "000710",
+      "name": "贝瑞基因",
+      "pct_chg": 4.17,
+      "broken_n": 1,
+      "first_seal": 93306,
+      "industry": "医疗服务"
+    },
+    {
+      "code": "000892",
+      "name": "欢瑞世纪",
+      "pct_chg": 6.24,
+      "broken_n": 8,
+      "first_seal": 93830,
+      "industry": "影视院线"
+    },
+    {
       "code": "301025",
       "name": "读客文化",
-      "pct_chg": 9.8,
+      "pct_chg": 7.42,
       "broken_n": 1,
       "first_seal": 93912,
       "industry": "出版"
@@ -528,29 +644,37 @@
     {
       "code": "603533",
       "name": "掌阅科技",
-      "pct_chg": 3.64,
+      "pct_chg": -3.04,
       "broken_n": 2,
       "first_seal": 94005,
       "industry": "数字媒体"
     },
     {
-      "code": "603230",
-      "name": "内蒙新华",
-      "pct_chg": 7.5,
+      "code": "000692",
+      "name": "惠天热电",
+      "pct_chg": 4.65,
+      "broken_n": 1,
+      "first_seal": 94242,
+      "industry": "电力"
+    },
+    {
+      "code": "688648",
+      "name": "中邮科技",
+      "pct_chg": 12.78,
       "broken_n": 2,
-      "first_seal": 94517,
-      "industry": "出版"
+      "first_seal": 133640,
+      "industry": "专用设备"
     }
   ],
   "yest_boards": {
     "002696": 4,
-    "000530": 2,
-    "002860": 2,
     "000668": 2,
-    "002552": 1,
+    "600202": 2,
+    "002860": 2,
     "000823": 2,
     "001318": 2,
-    "600202": 2,
+    "000530": 2,
+    "002552": 1,
     "605189": 1,
     "002343": 4,
     "601188": 2,

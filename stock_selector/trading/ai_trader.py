@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """AI 交易决策：把选股结果交给大模型，生成结构化买卖订单。"""
 from __future__ import annotations
 
