@@ -37,13 +37,32 @@ class ColoredFormatter(logging.Formatter):
         return super().format(record)
 
 
+class _StdoutHandler(logging.StreamHandler):
+    """始终输出到当前的 sys.stdout（无则 sys.stderr）。
+
+    打包为无控制台窗口程序时，导入阶段 sys.stdout 可能为 None。
+    若在导入期就绑定固定的 stream，GUI 事后重定向 stdout 也不会生效，
+    导致所有日志被静默丢弃。此处理器在每次 emit 时动态解析 stream。
+    """
+
+    def emit(self, record):
+        stream = sys.stdout or sys.stderr
+        if stream is None:
+            return
+        self.stream = stream
+        try:
+            super().emit(record)
+        except Exception:  # noqa: BLE001
+            self.handleError(record)
+
+
 # 全局日志配置
 _initialized = False
 _log_level = logging.INFO
 _log_file = None
 
 
-def setup_logger(level=logging.INFO, log_file=None, enable_color=True):
+def setup_logger(level=logging.INFO, log_file=None, enable_color=True, force=False):
     """
     初始化全局日志配置
 
@@ -51,10 +70,11 @@ def setup_logger(level=logging.INFO, log_file=None, enable_color=True):
         level: 日志级别（logging.DEBUG/INFO/WARNING/ERROR）
         log_file: 日志文件路径（None则不写文件）
         enable_color: 是否启用彩色输出
+        force: 忽略已初始化状态，强制按当前参数重建处理器（GUI 去色时使用）
     """
     global _initialized, _log_level, _log_file
 
-    if _initialized:
+    if _initialized and not force:
         return
 
     _log_level = level
@@ -67,8 +87,8 @@ def setup_logger(level=logging.INFO, log_file=None, enable_color=True):
     # 清除已有的处理器
     root_logger.handlers.clear()
 
-    # 控制台处理器 - 使用UTF-8编码
-    console_handler = logging.StreamHandler(sys.stdout)
+    # 控制台处理器 - 动态解析 sys.stdout（兼容无控制台打包环境）
+    console_handler = _StdoutHandler()
     console_handler.setLevel(level)
 
     # 尝试设置UTF-8编码

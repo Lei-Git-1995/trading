@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="80e5262d-bf5f-448f-913c-7e19aa05266a" name="Changes" comment="feat(core): 添加回测引擎和形态识别功能&#10;&#10;- 新增 backtest 模块，包含回测引擎和报告生成功能&#10;- 实现滚动历史评估和策略回测功能&#10;- 添加技术形态识别，支持双底、双顶、头肩顶、三角形和矩形整理&#10;- 集成 Excel 报告生成和 Webhook 通知功能&#10;- 添加集合竞价数据接口并优化 Excel 报告容错性&#10;- 在主程序中集成回测和通知选项&#10;- 添加 2026 年 A 股主线推演文档&#10;- 实现经典价格形态识别策略并添加测试用例">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/freqtrade/README_Linux部署与数据记录.md" beforeDir="false" afterPath="$PROJECT_DIR$/freqtrade/README_Linux部署与数据记录.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_selector/docs/2026年10-12月A股主线推演.md" beforeDir="false" />
-    </list>
+    <list default="true" id="80e5262d-bf5f-448f-913c-7e19aa05266a" name="Changes" comment="docs(stock-selector): 移除A股主线推演文档&#10;&#10;- 删除 stock_selector/docs 下的2026年10-12月A股主线推演文档&#10;- 更新 freqtrade 部署文档中 systemd 与 Docker 路径说明&#10;- 补充 Docker 不在 /usr/bin/docker 时的排查提示" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -39,22 +35,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
-    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;true&quot;,
-    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
-    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;E:/trading&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;ssh.settings&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "SONARLINT_PRECOMMIT_ANALYSIS": "true",
+    "go.import.settings.migrated": "true",
+    "go.sdk.automatically.set": "true",
+    "last_opened_file_path": "E:/trading",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "ssh.settings"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="E:\trading\project" />
@@ -88,7 +85,8 @@
     <MESSAGE value="docs: 移除过时的文档并添加新的选股脚本&#10;&#10;- 删除了 MIGRATION.md、QUICKSTART.md、docs/README.md 和 legacy/README.md&#10;- 新增 select_stocks.py" />
     <MESSAGE value="docs: 删除过时的项目文档&#10;&#10;- 移除 DELIVERY.md 交付文档&#10;- 移除 IMPLEMENTATION_REPORT.md 实施报告&#10;- 移除 MAINBOARD_FILTER.md 主板过滤功能文档&#10;- 移除 OPTIMIZATION.md 优化说明文档&#10;- 移除 OPTIMIZATION_SUMMARY.md 优化总结文档" />
     <MESSAGE value="feat(core): 添加回测引擎和形态识别功能&#10;&#10;- 新增 backtest 模块，包含回测引擎和报告生成功能&#10;- 实现滚动历史评估和策略回测功能&#10;- 添加技术形态识别，支持双底、双顶、头肩顶、三角形和矩形整理&#10;- 集成 Excel 报告生成和 Webhook 通知功能&#10;- 添加集合竞价数据接口并优化 Excel 报告容错性&#10;- 在主程序中集成回测和通知选项&#10;- 添加 2026 年 A 股主线推演文档&#10;- 实现经典价格形态识别策略并添加测试用例" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(core): 添加回测引擎和形态识别功能&#10;&#10;- 新增 backtest 模块，包含回测引擎和报告生成功能&#10;- 实现滚动历史评估和策略回测功能&#10;- 添加技术形态识别，支持双底、双顶、头肩顶、三角形和矩形整理&#10;- 集成 Excel 报告生成和 Webhook 通知功能&#10;- 添加集合竞价数据接口并优化 Excel 报告容错性&#10;- 在主程序中集成回测和通知选项&#10;- 添加 2026 年 A 股主线推演文档&#10;- 实现经典价格形态识别策略并添加测试用例" />
+    <MESSAGE value="docs(stock-selector): 移除A股主线推演文档&#10;&#10;- 删除 stock_selector/docs 下的2026年10-12月A股主线推演文档&#10;- 更新 freqtrade 部署文档中 systemd 与 Docker 路径说明&#10;- 补充 Docker 不在 /usr/bin/docker 时的排查提示" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(stock-selector): 移除A股主线推演文档&#10;&#10;- 删除 stock_selector/docs 下的2026年10-12月A股主线推演文档&#10;- 更新 freqtrade 部署文档中 systemd 与 Docker 路径说明&#10;- 补充 Docker 不在 /usr/bin/docker 时的排查提示" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

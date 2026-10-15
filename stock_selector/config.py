@@ -1,26 +1,31 @@
 """全局配置：筛选参数与路径"""
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parent
+# 打包为 exe 后，把数据/输出目录放在 exe 同级目录（便于携带与修改预设）
+if getattr(sys, 'frozen', False):
+    PROJECT_ROOT = Path(sys.executable).resolve().parent
+else:
+    PROJECT_ROOT = Path(__file__).resolve().parent
 OUTPUT_DIR = PROJECT_ROOT / 'output'
 CACHE_DIR = PROJECT_ROOT / 'data' / '.cache'
 
 # 技术形态选股默认参数，供 strategies/technical_selection.py 使用。
 SELECTION_CONFIG = {
     'accumulation_window': 10,
-    'accumulation_consecutive_days': 3,
-    'accumulation_daily_gain_min': 1.0,
-    'accumulation_daily_gain_max': 3.0,
-    'breakout_lookback': 20,
-    'volume_surge_ratio': 1.5,
-    'recent_signal_days': 3,
+    'accumulation_consecutive_days': 2,
+    'accumulation_daily_gain_min': -0.5,
+    'accumulation_daily_gain_max': 6.0,
+    'breakout_lookback': 15,
+    'volume_surge_ratio': 1.0,
+    'recent_signal_days': 5,
     # 横盘后连续上涨策略：横盘窗口不含最近的上涨确认窗口
     'sideways_window': 30,
     'sideways_up_days': 3,
-    'sideways_max_range_pct': 12.0,
-    'sideways_max_slope_pct': 6.0,
-    'sideways_max_volatility_pct': 3.5,
+    'sideways_max_range_pct': 20.0,
+    'sideways_max_slope_pct': 12.0,
+    'sideways_max_volatility_pct': 7.0,
 }
 
 
@@ -29,11 +34,11 @@ class ScreenerConfig:
     """短线选股筛选参数（默认值与原 daily_stock_picker.py 一致）"""
 
     # 筛选条件
-    turnover_min: float = 15.0      # 最低换手率（%）
-    change_min: float = 1.0         # 最低涨跌幅（%）
-    change_max: float = 3.0         # 最高涨跌幅（%）
-    volume_ratio: float = 1.3       # 量能放大倍数（相对前两日平均）
-    top_per_sector: int = 20        # 每个板块最多选取数量（0 表示不限制）
+    turnover_min: float = 5.0       # 最低换手率（%）
+    change_min: float = -1.0        # 最低涨跌幅（%）
+    change_max: float = 7.0         # 最高涨跌幅（%）
+    volume_ratio: float = 1.0       # 量能放大倍数（相对前两日平均）
+    top_per_sector: int = 30        # 每个板块最多选取数量（0 表示不限制）
     check_outer_inner: bool = True  # 是否检查外盘>内盘（True=要求外盘>内盘）
     check_kdj: bool = True          # 是否检查KDJ未超买（K<80）
     check_rsi: bool = True          # 是否检查RSI未超买（RSI6<70）

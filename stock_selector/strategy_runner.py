@@ -15,6 +15,7 @@ if __package__ in (None, ''):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from stock_selector.config import OUTPUT_DIR
+from stock_selector.data.cache import KlineCache
 from stock_selector.data.smart_provider_manager import SmartProviderManager
 from stock_selector.strategies.technical_selection import STRATEGIES, STRATEGY_MAP, TechnicalSelector
 
@@ -96,7 +97,9 @@ def main(argv=None):
             print('执行：%s' % STRATEGY_MAP[strategy_id]['name'])
         results = TechnicalSelector.screen_many(stock_list=stocks, provider=provider,
                                                  strategy_ids=strategy_ids, days=args.days,
-                                                 limit=args.limit)
+                                                 limit=args.limit,
+                                                 cache=KlineCache(ttl_hours=8, namespace=manager.current_provider_name),
+                                                 workers=6)
         for strategy_id in strategy_ids:
             print('  匹配：%d 只' % len(results[strategy_id]))
         output = args.output or str(OUTPUT_DIR / ('technical_%s.md' % datetime.now().strftime('%Y-%m-%d_%H%M%S')))

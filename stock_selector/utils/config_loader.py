@@ -118,7 +118,9 @@ def print_preset_info(name: str) -> None:
 
     preset = get_preset(name)
 
-    print(f'\n预设策略: {name}')
+    from stock_selector.utils.strategy_names import strategy_display_name
+    display_name = strategy_display_name(name, preset)
+    print(f'\n预设策略: {display_name}（{name}）')
     print('-' * 50)
 
     # 格式化输出配置项

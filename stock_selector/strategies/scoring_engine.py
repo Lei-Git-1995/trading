@@ -118,7 +118,9 @@ class ScoringEngine:
         # 流动性过滤
         liquidity = filters.get('liquidity', {})
         turnover = stock_data.get('turnover', 0)
-        amount = stock_data.get('amount', 0)  # 亿
+        # 腾讯行情适配器不提供成交额字段。缺失时跳过成交额过滤，
+        # 不能把缺失值当成 0，否则所有 v2 策略都会被误淘汰。
+        amount = stock_data.get('amount')  # 亿
         volume_ratio = stock_data.get('volume_ratio', 0)
 
         if 'turnover_min' in liquidity and turnover < liquidity['turnover_min']:
@@ -127,7 +129,7 @@ class ScoringEngine:
         if 'turnover_max' in liquidity and turnover > liquidity['turnover_max']:
             return False, f"换手率{turnover:.1f}%高于{liquidity['turnover_max']}%"
 
-        if 'amount_min' in liquidity and amount < liquidity['amount_min']:
+        if amount is not None and pd.notna(amount) and amount < liquidity['amount_min']:
             return False, f"成交额{amount:.1f}亿低于{liquidity['amount_min']}亿"
 
         if 'volume_ratio_min' in liquidity and volume_ratio < liquidity['volume_ratio_min']:
@@ -231,6 +233,14 @@ class ScoringEngine:
         if value is None:
             return 0.0, None
 
+        # Boolean signals represent observed conditions, not numeric values.
+        # In particular, False must not receive full points just because no
+        # numeric min/max constraint is configured.
+        if isinstance(value, (bool, np.bool_)):
+            if not metric_config.get('enabled', True) or not value:
+                return 0.0, None
+            return max_score, f'{metric_name}=是'
+
         # 检查最小值
         if 'min' in metric_config and value < metric_config['min']:
             return 0.0, None
@@ -316,6 +326,9 @@ class ScoringEngine:
             parts.append(f"风险: {warnings[0]}")
 
         # 评分亮点
+        if not breakdown:
+            parts.append('基础条件通过')
+            return " | ".join(parts)
         top_category = max(breakdown, key=lambda x: x.actual_score / x.max_score if x.max_score > 0 else 0)
         parts.append(f"{top_category.category}得分{top_category.actual_score}/{top_category.max_score}")
 

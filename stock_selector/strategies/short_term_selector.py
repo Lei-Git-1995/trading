@@ -1,4 +1,5 @@
 """短线选股策略：整合行情、指标与评分"""
+import sys
 import time
 
 import numpy as np
@@ -89,16 +90,17 @@ class ShortTermSelector:
         qualified = []
         total = len(candidates)
 
-        # 使用 tqdm 进度条（如果可用）
-        if HAS_TQDM:
+        # 使用 tqdm 进度条（如果可用，且输出到真实终端时）
+        use_tqdm = HAS_TQDM and getattr(sys.stderr, 'isatty', lambda: False)()
+        if use_tqdm:
             iterator = tqdm(candidates, desc='  分析进度', unit='只', ncols=80)
         else:
             iterator = candidates
 
         for idx, cand in enumerate(iterator, 1):
-            # 无 tqdm 时显示进度
-            if not HAS_TQDM and idx % 10 == 0:
-                logger.info(f'  进度: {idx}/{total}')
+            # 每 10 只记录一次进度（GUI 无终端时这是唯一的进度反馈）
+            if idx % 10 == 0:
+                logger.info(f'  深度分析进度: {idx}/{total}')
 
             code = cand['code']
             hist = self.cache.get(code) if self.cache is not None else None
@@ -123,9 +125,9 @@ class ShortTermSelector:
             # 技术指标不超买（--no-kdj / --no-rsi 可关闭对应检查）
             kdj_val = ind['KDJ_K'].iloc[-1]
             rsi_val = ind['RSI6'].iloc[-1]
-            if c.check_kdj and pd.notna(kdj_val) and kdj_val >= 80:
+            if c.check_kdj and pd.notna(kdj_val) and kdj_val >= 88:
                 continue
-            if c.check_rsi and pd.notna(rsi_val) and rsi_val >= 70:
+            if c.check_rsi and pd.notna(rsi_val) and rsi_val >= 80:
                 continue
 
             # 检查是否炸板(不过滤,只标记)

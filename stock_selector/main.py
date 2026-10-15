@@ -90,6 +90,10 @@ def parse_args():
                         help='Excel 报告路径（指定后自动启用 Excel 输出）')
     parser.add_argument('--notify-webhook', type=str, default=None,
                         help='选股完成后发送文本通知的 Webhook URL')
+    parser.add_argument('--db-dsn', type=str, default=None,
+                        help='PostgreSQL DSN（默认读取 STOCK_SELECTOR_PG_DSN）')
+    parser.add_argument('--no-db', action='store_true',
+                        help='不保存本次选股结果到 PostgreSQL')
 
     return parser.parse_args()
 
@@ -124,6 +128,28 @@ def prompt_params(args) -> None:
     logger.info('-' * 70)
 
 
+def save_selection_to_db(args, data_date, category, strategy_id, strategy_name,
+                         source, rows, parameters=None):
+    """Persist a completed run without making PostgreSQL a hard dependency."""
+    if args.no_db:
+        return
+    from stock_selector.data.postgres_store import PostgresStore
+    try:
+        trade_date = datetime.strptime(str(data_date)[:10], '%Y-%m-%d').date()
+        store = PostgresStore(args.db_dsn)
+        if not store.try_ensure_schema():
+            logger.warning(f'PostgreSQL 未连接，结果未入库: {store.last_error}')
+            return
+        run_id = store.save_selection_run(
+            trade_date=trade_date, category=category, strategy_id=strategy_id,
+            strategy_name=strategy_name, source=source, rows=rows,
+            parameters=parameters or {},
+        )
+        logger.info(f'PostgreSQL 已保存选股结果，批次 ID: {run_id}')
+    except Exception as exc:  # noqa: BLE001
+        logger.warning(f'PostgreSQL 保存失败（不影响报告生成）: {exc}')
+
+
 def main():
     # 确保控制台输出使用UTF-8编码
     import sys
@@ -143,8 +169,7 @@ def main():
             with open(config_path, 'r', encoding='utf-8') as f:
                 v2_config = yaml.safe_load(f)
             for name, config in v2_config['strategies'].items():
-                print(f'\n策略: {name}')
-                print(f'名称: {config["name"]}')
+                print(f'\n策略: {config.get("name", name)}（{name}）')
                 print(f'说明: {config["description"]}')
                 print(f'使用: py -3.11 -m stock_selector.main --preset-v2 {name}')
                 print('-' * 70)
@@ -236,6 +261,12 @@ def main():
                 # 使用 v2 专用报告生成器
                 from stock_selector.reports.markdown_report_v2 import generate_v2_report
                 generate_v2_report(results, data_date, output_file, adapter.strategy_config)
+
+            save_selection_to_db(
+                args, data_date, 'v2', args.preset_v2,
+                adapter.strategy_config.get('name', args.preset_v2), source, results,
+                {'preset_v2': args.preset_v2, 'output_file': output_file},
+            )
 
             excel_file = None
             if args.excel or args.excel_output:
@@ -415,6 +446,14 @@ def main():
 
     with timeit('生成报告'):
         generate(results, data_date, output_file, config)
+
+    from stock_selector.utils.strategy_names import strategy_display_name
+    save_selection_to_db(
+        args, data_date, '常规', args.preset or 'custom',
+        strategy_display_name(args.preset, preset_config) if args.preset else '自定义筛选',
+        source, results,
+        {'preset': args.preset, 'output_file': output_file, 'config': vars(config)},
+    )
 
     excel_file = None
     if args.excel or args.excel_output:

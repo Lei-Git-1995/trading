@@ -39,13 +39,14 @@ class StrategyAdapter:
     4. 转换结果为旧格式（兼容现有报告系统）
     """
 
-    def __init__(self, strategy_name: str, config_path: Optional[Path] = None):
+    def __init__(self, strategy_name: str, config_path: Optional[Path] = None, cache=None):
         """
         Args:
             strategy_name: 策略名称（如 'ultra_short'）
             config_path: 配置文件路径（默认 presets_v2.yaml）
         """
         self.strategy_name = strategy_name
+        self.cache = cache
 
         if config_path is None:
             config_path = Path(__file__).parent.parent / 'presets_v2.yaml'
@@ -121,8 +122,14 @@ class StrategyAdapter:
         logger.info('\n[数据增强] 计算高级指标...')
         enhanced_stocks = []
 
+        import sys
         from tqdm import tqdm
-        for _, stock in tqdm(filtered.iterrows(), total=len(filtered), desc='  增强进度', unit='只'):
+        total = len(filtered)
+        use_tqdm = getattr(sys.stderr, 'isatty', lambda: False)()
+        iterator = tqdm(filtered.iterrows(), total=total, desc='  增强进度', unit='只') if use_tqdm else filtered.iterrows()
+        for idx, (_, stock) in enumerate(iterator, 1):
+            if not use_tqdm and idx % 20 == 0:
+                logger.info(f'  数据增强进度: {idx}/{total}')
             try:
                 enhanced = self._enhance_stock_data(stock, client)
                 if enhanced:
@@ -161,7 +168,11 @@ class StrategyAdapter:
         data = stock.to_dict()
 
         # 获取K线数据
-        hist = client.get_stock_history(code, days=30)
+        hist = self.cache.get(code) if self.cache is not None else None
+        if hist is None:
+            hist = client.get_stock_history(code, days=30)
+            if self.cache is not None:
+                self.cache.set(code, hist)
         if hist is None or len(hist) < 10:
             return None
 
@@ -340,7 +351,7 @@ class StrategyAdapter:
         return converted
 
 
-def load_v2_strategy(strategy_name: str) -> StrategyAdapter:
+def load_v2_strategy(strategy_name: str, cache=None) -> StrategyAdapter:
     """
     加载 v2 格式策略
 
@@ -354,4 +365,4 @@ def load_v2_strategy(strategy_name: str) -> StrategyAdapter:
         >>> adapter = load_v2_strategy('ultra_short')
         >>> results = adapter.run(stock_list, client)
     """
-    return StrategyAdapter(strategy_name)
+    return StrategyAdapter(strategy_name, cache=cache)
