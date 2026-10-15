@@ -26,6 +26,7 @@ from tkinter import font as tkfont
 
 from stock_selector.data.postgres_store import PostgresStore
 from stock_selector.data.market_board import fetch_market_snapshot
+from stock_selector.data.limit_up import fetch_limit_up_emotion
 from stock_selector.utils import app_config
 
 
@@ -140,6 +141,8 @@ class StockSelectorApp:
         self.auto_refresh_job = None
         self.running = False
         self.market_refreshing = False
+        self.board_refreshing = False
+        self._last_emotion = None
 
         # LLM 持续分析 Agent
         self.agent_store = None
@@ -156,6 +159,7 @@ class StockSelectorApp:
         self.root.after(120, self._poll_log)
         self.root.after(300, self._init_database)
         self.root.after(600, self._market_timer)
+        self.root.after(900, self._board_timer)
         self.root.after(800, self._toggle_auto_refresh)
 
     # ---------------- 基础 ----------------
@@ -286,6 +290,7 @@ class StockSelectorApp:
         notebook = ttk.Notebook(self.root)
         notebook.pack(fill='both', expand=True, padx=10, pady=(8, 0))
         self.notebook = notebook
+        notebook.bind('<<NotebookTabChanged>>', self._on_tab_changed)
 
         # 大盘板块
         market_frame = ttk.Frame(notebook, padding=(6, 6))
@@ -295,6 +300,15 @@ class StockSelectorApp:
         # 选股结果
         result_frame = ttk.Frame(notebook, padding=(6, 6))
         notebook.add(result_frame, text='选股结果')
+        result_top = ttk.Frame(result_frame)
+        result_top.pack(fill='x', pady=(0, 4))
+        self.paper_overview_var = tk.StringVar(value='模拟盘：加载中...')
+        ttk.Label(result_top, textvariable=self.paper_overview_var, style='Hint.TLabel').pack(side='left')
+        ttk.Label(result_top, text='数量:').pack(side='left', padx=(12, 2))
+        self.paper_qty_var = tk.StringVar(value='100')
+        ttk.Entry(result_top, textvariable=self.paper_qty_var, width=7).pack(side='left')
+        ttk.Button(result_top, text='模拟买入(选中)', command=self._on_paper_buy).pack(side='left', padx=4)
+        ttk.Button(result_top, text='刷新持仓', command=self._refresh_positions).pack(side='left', padx=2)
         self.tree = ttk.Treeview(result_frame, columns=COLUMNS, show='headings', height=16)
         for col in COLUMNS:
             anchor = 'e' if col in COL_RIGHT else 'w'
@@ -326,7 +340,7 @@ class StockSelectorApp:
         bf_meta.pack(fill='x', pady=(0, 4))
         self.var_board_tab_meta = tk.StringVar(value='猎板/阶梯: 加载中...')
         ttk.Label(bf_meta, textvariable=self.var_board_tab_meta, font=FONT).pack(side='left')
-        ttk.Label(board_frame, text='左：盘中猎板池（涨停/炸板）· 右：跨日阶梯战役与待办 · 随盯盘刷新',
+        ttk.Label(board_frame, text='左：涨停/炸板猎板池 · 右：连板高度梯队 · 随盯盘刷新（东财涨停池）',
                    style='Hint.TLabel').pack(anchor='w', pady=(0, 4))
         bf_panes = ttk.Frame(board_frame)
         bf_panes.pack(fill='both', expand=True)
@@ -335,33 +349,38 @@ class StockSelectorApp:
         bf_panes.rowconfigure(0, weight=1)
         hunt_box = ttk.LabelFrame(bf_panes, text='猎板池（涨停/炸板）', padding=4)
         hunt_box.grid(row=0, column=0, sticky='nsew', padx=(0, 4))
-        lad_box = ttk.LabelFrame(bf_panes, text='阶梯战役', padding=4)
+        lad_box = ttk.LabelFrame(bf_panes, text='连板梯队', padding=4)
         lad_box.grid(row=0, column=1, sticky='nsew', padx=(4, 0))
-        hcols = ('rank', 'code', 'name', 'bn', 'kind', 'seal', 'pct', 'score', 'fund')
+        hcols = ('rank', 'code', 'name', 'bn', 'kind', 'seal', 'pct', 'broken', 'fund')
         self.hunt_tree = ttk.Treeview(hunt_box, columns=hcols, show='headings', height=14)
-        hheaders = {'rank':('#',28),'code':('代码',58),'name':('名称',72),'bn':('板',36),'kind':('类型',70),'seal':('封板',56),'pct':('涨幅',56),'score':('分',44),'fund':('封单亿',56)}
+        hheaders = {'rank':('#',28),'code':('代码',58),'name':('名称',72),'bn':('板',36),'kind':('类型',70),'seal':('封板',56),'pct':('涨幅',56),'broken':('炸板',44),'fund':('封单亿',60)}
         for c,(t,w) in hheaders.items():
             self.hunt_tree.heading(c,text=t); self.hunt_tree.column(c,width=w,anchor='center')
         self.hunt_tree.tag_configure('sealed',foreground=COLOR_UP); self.hunt_tree.tag_configure('broken',foreground=COLOR_DOWN); self.hunt_tree.tag_configure('flat',foreground=COLOR_FLAT)
         hscroll = ttk.Scrollbar(hunt_box, orient='vertical', command=self.hunt_tree.yview); self.hunt_tree.configure(yscrollcommand=hscroll.set)
         self.hunt_tree.pack(side='left', fill='both', expand=True); hscroll.pack(side='right', fill='y')
-        lcols = ('code','name','status','h','tgt','days','plan')
+        lcols = ('h','code','name','industry','seal','pct')
         self.ladder_tree = ttk.Treeview(lad_box, columns=lcols, show='headings', height=14)
-        lheaders = {'code':('代码',58),'name':('备注',72),'status':('状态',64),'h':('高度',44),'tgt':('目标',44),'days':('持有天',52),'plan':('剧本',160)}
+        lheaders = {'h':('高度',50),'code':('代码',58),'name':('名称',72),'industry':('行业',90),'seal':('封板',56),'pct':('涨幅',56)}
         for c,(t,w) in lheaders.items():
-            self.ladder_tree.heading(c,text=t); self.ladder_tree.column(c,width=w,anchor='w' if c=='plan' else 'center')
-        self.ladder_tree.tag_configure('holding',foreground=COLOR_UP); self.ladder_tree.tag_configure('abort',foreground=COLOR_DOWN); self.ladder_tree.tag_configure('flat',foreground=COLOR_FLAT)
+            self.ladder_tree.heading(c,text=t); self.ladder_tree.column(c,width=w,anchor='w' if c=='industry' else 'center')
+        self.ladder_tree.tag_configure('high',foreground=COLOR_UP); self.ladder_tree.tag_configure('low',foreground=COLOR_FLAT)
         lscroll = ttk.Scrollbar(lad_box, orient='vertical', command=self.ladder_tree.yview); self.ladder_tree.configure(yscrollcommand=lscroll.set)
         self.ladder_tree.pack(side='left', fill='both', expand=True); lscroll.pack(side='right', fill='y')
-        pend_box = ttk.LabelFrame(board_frame, text='阶梯待办 / Agent目标', padding=4)
+        pend_box = ttk.LabelFrame(board_frame, text='情绪研判 / 操作偏向', padding=4)
         pend_box.pack(fill='x', pady=(6,0))
         self.var_ladder_pending = tk.StringVar(value='待办: -')
-        ttk.Label(pend_box, textvariable=self.var_ladder_pending, font=FONT).pack(anchor='w')
+        ttk.Label(pend_box, textvariable=self.var_ladder_pending, font=FONT, wraplength=1200, justify='left').pack(anchor='w')
 
 
         # 最近交易
         trade_frame = ttk.Frame(notebook, padding=(6, 6))
         notebook.add(trade_frame, text='最近交易')
+        trade_top = ttk.Frame(trade_frame)
+        trade_top.pack(fill='x', pady=(0, 4))
+        ttk.Label(trade_top, text='模拟盘成交明细（来源：PostgreSQL trade_orders）',
+                  style='Hint.TLabel').pack(side='left')
+        ttk.Button(trade_top, text='刷新交易', command=self._refresh_trades).pack(side='right')
         tcols = ('time','side','code','name','qty','price','amount','pnl','reason')
         self.trade_tree = ttk.Treeview(trade_frame, columns=tcols, show='headings')
         theaders = {'time':('时间',130),'side':('方向',50),'code':('代码',70),'name':('名称',80),'qty':('数量',60),'price':('价格',70),'amount':('金额',80),'pnl':('本次盈亏',80),'reason':('原因',200)}
@@ -375,6 +394,10 @@ class StockSelectorApp:
         # 自动交易记录
         trade_log_frame = ttk.Frame(notebook, padding=(6, 6))
         notebook.add(trade_log_frame, text='自动交易记录')
+        tlog_top = ttk.Frame(trade_log_frame)
+        tlog_top.pack(fill='x', pady=(0, 4))
+        ttk.Label(tlog_top, text='成交流水（含状态 / 余额 / 原因）', style='Hint.TLabel').pack(side='left')
+        ttk.Button(tlog_top, text='刷新记录', command=self._refresh_trades).pack(side='right')
         self.trade_log_text = tk.Text(trade_log_frame, wrap='word', font=FONT_MONO, height=10, state='disabled',
                                        relief='flat', background='#fbfbfb', padx=6, pady=4)
         lscroll = ttk.Scrollbar(trade_log_frame, orient='vertical', command=self.trade_log_text.yview)
@@ -390,6 +413,7 @@ class StockSelectorApp:
         rev_top.pack(fill='x', pady=(0,4))
         self.var_review_meta = tk.StringVar(value='复盘: 加载中...')
         ttk.Label(rev_top, textvariable=self.var_review_meta, font=FONT).pack(side='left')
+        ttk.Button(rev_top, text='刷新复盘', command=self._refresh_review).pack(side='right')
         rev_body = ttk.Frame(review_frame)
         rev_body.pack(fill='both', expand=True)
         self.review_text = tk.Text(rev_body, wrap='word', font=FONT, spacing1=2, spacing3=4, padx=8, pady=8)
@@ -436,6 +460,33 @@ class StockSelectorApp:
             self.watch_tree.heading(col, text=col)
             self.watch_tree.column(col, width=width, anchor='w')
         self.watch_tree.pack(fill='x', expand=True, pady=(4, 0))
+
+        pos_box = ttk.LabelFrame(watch_frame, text='模拟盘持仓', padding=4)
+        pos_box.pack(fill='both', expand=True, pady=(6, 0))
+        pos_top = ttk.Frame(pos_box)
+        pos_top.pack(fill='x')
+        ttk.Label(pos_top, text='数量:').pack(side='left')
+        self.pos_qty_var = tk.StringVar(value='100')
+        ttk.Entry(pos_top, textvariable=self.pos_qty_var, width=7).pack(side='left', padx=2)
+        ttk.Button(pos_top, text='模拟卖出(选中)', command=self._on_paper_sell).pack(side='left', padx=4)
+        ttk.Button(pos_top, text='全部卖出', command=lambda: self._on_paper_sell(all_out=True)).pack(side='left', padx=2)
+        ttk.Button(pos_top, text='刷新持仓', command=self._refresh_positions).pack(side='left', padx=2)
+        self.var_pos_meta = tk.StringVar(value='')
+        ttk.Label(pos_top, textvariable=self.var_pos_meta, style='Hint.TLabel').pack(side='right')
+        pcols = ('code', 'name', 'volume', 'avg_cost', 'last_price', 'profit_pct', 'profit', 'value', 'opened')
+        self.pos_tree = ttk.Treeview(pos_box, columns=pcols, show='headings', height=8)
+        pheaders = {'code': ('代码', 70), 'name': ('名称', 90), 'volume': ('持股', 60),
+                    'avg_cost': ('成本', 70), 'last_price': ('现价', 70), 'profit_pct': ('盈亏%', 70),
+                    'profit': ('盈亏额', 80), 'value': ('市值', 90), 'opened': ('建仓日', 90)}
+        for c, (t, w) in pheaders.items():
+            self.pos_tree.heading(c, text=t)
+            self.pos_tree.column(c, width=w, anchor='w' if c in ('name', 'opened') else 'center')
+        self.pos_tree.tag_configure('profit', foreground=COLOR_UP)
+        self.pos_tree.tag_configure('loss', foreground=COLOR_DOWN)
+        pscroll = ttk.Scrollbar(pos_box, orient='vertical', command=self.pos_tree.yview)
+        self.pos_tree.configure(yscrollcommand=pscroll.set)
+        self.pos_tree.pack(side='left', fill='both', expand=True, pady=(4, 0))
+        pscroll.pack(side='right', fill='y')
 
         # 历史选股查询（PostgreSQL 后端）
         q_controls = ttk.Frame(query_frame)
@@ -568,7 +619,8 @@ class StockSelectorApp:
         }.get(data.get('sort_key'), '主力净流入')
         source = data.get('board_source')
         self.board_sort_var.set(f'按{label}排序 · {source}' if source else f'按{label}排序')
-        self.market_state_var.set(f"更新 {data.get('time', '')}")
+        self.market_state_var.set(
+            f"更新 {data.get('time', '')}" + ('（缓存）' if data.get('stale') else ''))
 
     def _fill_board_tree(self, tree, rows):
         tree.delete(*tree.get_children())
@@ -594,6 +646,87 @@ class StockSelectorApp:
     def _fmt_signed(value):
         return '—' if value is None else f'{value:+.2f}'
 
+    # ---------------- 连板/阶梯 ----------------
+
+    def _board_timer(self):
+        self._refresh_board_async()
+        self.root.after(60000, self._board_timer)
+
+    def _refresh_board_async(self):
+        if self.board_refreshing:
+            return
+        self.board_refreshing = True
+        threading.Thread(target=self._fetch_board_worker, daemon=True).start()
+
+    def _fetch_board_worker(self):
+        try:
+            data = fetch_limit_up_emotion(force=True)
+        except Exception:
+            data = None
+        self.log_queue.put(('ladder', data))
+
+    @staticmethod
+    def _fmt_seal(value):
+        s = str(value or '').strip()
+        if len(s) == 6 and s.isdigit():
+            return f'{s[0:2]}:{s[2:4]}'
+        return s or '—'
+
+    def _render_ladder(self, data):
+        self.board_refreshing = False
+        if not data:
+            self.var_board_tab_meta.set('猎板/阶梯: 数据获取失败')
+            return
+        self._last_emotion = data
+        day = data.get('day', '')
+        stale = ' · 沿用缓存' if data.get('stale') else ''
+        promo = data.get('promotion_rate')
+        self.var_board_tab_meta.set(
+            f"猎板/阶梯 · {day} · 涨停 {data.get('limit_up_n', 0)} · "
+            f"炸板 {data.get('broken_seal_n', 0)} · 高度 {data.get('max_board_height', 0)} · "
+            f"晋级 {('—' if promo is None else f'{promo * 100:.0f}%')} · "
+            f"{data.get('phase_label', '')}{stale}")
+
+        self.hunt_tree.delete(*self.hunt_tree.get_children())
+        roster = []
+        for row in data.get('zt_items', []):
+            roster.append((row, '涨停', 'sealed'))
+        for row in data.get('broken_all', []):
+            roster.append((row, '炸板', 'broken'))
+        for i, (row, kind, tag) in enumerate(roster, 1):
+            fund = row.get('fund')
+            fund_text = '—' if fund in (None, '') else f'{float(fund) / 1e8:.2f}'
+            self.hunt_tree.insert(
+                '', 'end', tags=(tag,),
+                values=(i, row.get('code', ''), row.get('name', ''),
+                        row.get('board_n', '') if kind == '涨停' else '',
+                        kind, self._fmt_seal(row.get('first_seal')),
+                        f"{float(row.get('pct_chg') or 0):+.2f}",
+                        row.get('broken_n', 0), fund_text))
+
+        self.ladder_tree.delete(*self.ladder_tree.get_children())
+        zt = sorted(data.get('zt_items', []),
+                    key=lambda x: (-int(x.get('board_n') or 0), -float(x.get('pct_chg') or 0)))
+        for row in zt:
+            h = int(row.get('board_n') or 0)
+            self.ladder_tree.insert(
+                '', 'end', tags=('high',) if h >= 3 else ('low',),
+                values=(h, row.get('code', ''), row.get('name', ''),
+                        row.get('industry', ''), self._fmt_seal(row.get('first_seal')),
+                        f"{float(row.get('pct_chg') or 0):+.2f}"))
+
+        bias = data.get('buy_bias') or {}
+        hist = data.get('height_hist') or {}
+        hist_text = ' '.join(f'{k}板×{v}' for k, v in sorted(
+            hist.items(), key=lambda kv: -int(kv[0]))) if hist else '—'
+        err = data.get('error')
+        self.var_ladder_pending.set(
+            f"高度分布：{hist_text}    "
+            f"偏向：{bias.get('note', '—')}"
+            + (f"    [提示] {err}" if err else ''))
+        if self.db_ready:
+            self._refresh_review()
+
     # ---------------- 策略列表 ----------------
 
     def _init_database(self):
@@ -602,6 +735,9 @@ class StockSelectorApp:
             print('数据库：PostgreSQL 已连接，选股结果会自动保存。')
             self._sync_paper_account()
             self._refresh_paper_overview()
+            self._refresh_trades()
+            self._refresh_review()
+            self._refresh_positions()
             self._refresh_watch_groups()
             self._refresh_query_sources()
             try:
@@ -621,6 +757,7 @@ class StockSelectorApp:
             print('数据库：PostgreSQL 已连接。')
             self._refresh_watch_groups()
             self._refresh_query_sources()
+            self._refresh_positions()
             return True
         return False
 
@@ -801,7 +938,8 @@ class StockSelectorApp:
                      values=('60', '120', '300', '600')).pack(side='left')
         ttk.Button(top, text='立即分析', command=self._on_agent_once).pack(side='left', padx=(12, 2))
         ttk.Button(top, text='刷新记录', command=self._refresh_agent_analyses).pack(side='left', padx=2)
-        self.paper_overview_var = tk.StringVar(value='模拟盘：读取中')
+        if not hasattr(self, 'paper_overview_var'):
+            self.paper_overview_var = tk.StringVar(value='模拟盘：读取中')
         ttk.Label(top, textvariable=self.paper_overview_var,
                   style='Hint.TLabel').pack(side='left', padx=(12, 0))
         ttk.Button(top, text='刷新模拟盘', command=self._refresh_paper_overview).pack(side='left', padx=4)
@@ -869,6 +1007,300 @@ class StockSelectorApp:
                 f"市值 {market_value:,.2f}｜盈亏 {pnl:+,.2f}")
         except Exception as exc:  # noqa: BLE001
             self.paper_overview_var.set(f'模拟盘读取失败：{exc}')
+
+    def _paper_account(self):
+        account = self.db_store.get_account('模拟盘')
+        if not account:
+            self._sync_paper_account()
+            account = self.db_store.get_account('模拟盘')
+        return account
+
+    @staticmethod
+    def _trade_pnl(result):
+        if isinstance(result, dict):
+            pnl = result.get('realized_pnl')
+            try:
+                return float(pnl) if pnl is not None else None
+            except (TypeError, ValueError):
+                return None
+        return None
+
+    def _refresh_trades(self):
+        if not hasattr(self, 'trade_tree'):
+            return
+        if not self._ensure_db_ready():
+            return
+        try:
+            account = self._paper_account()
+            if not account:
+                return
+            trades = self.db_store.list_paper_trades(account['id'], limit=200)
+        except Exception as exc:  # noqa: BLE001
+            print(f'读取交易记录失败: {exc}')
+            return
+
+        self.trade_tree.delete(*self.trade_tree.get_children())
+        log_lines = []
+        for t in trades:
+            price = t.get('price') or 0.0
+            vol = t.get('volume') or 0
+            amount = float(price) * float(vol)
+            pnl = self._trade_pnl(t.get('result'))
+            side = '买入' if t.get('action') == 'buy' else '卖出'
+            ttag = 'flat'
+            if pnl is not None:
+                ttag = 'profit' if pnl > 0 else ('loss' if pnl < 0 else 'flat')
+            self.trade_tree.insert('', 'end', tags=(ttag,), values=(
+                t.get('created_at', ''), side, t.get('code', ''), t.get('name', ''),
+                vol, f'{float(price):.2f}', f'{amount:,.0f}',
+                '—' if pnl is None else f'{pnl:+,.2f}', t.get('reason', '')))
+            result = t.get('result') or {}
+            cash = result.get('cash_balance') if isinstance(result, dict) else None
+            log_lines.append(
+                f"{t.get('created_at', '')}  {side}  {t.get('code', '')} {t.get('name', '')}  "
+                f"{vol}股 @{float(price):.2f}  金额{amount:,.0f}  [{t.get('status', '')}]  "
+                + (f"盈亏{pnl:+,.2f}  " if pnl is not None else '')
+                + (f"余额{cash:,.2f}  " if cash is not None else '')
+                + f"原因：{t.get('reason', '')}")
+
+        self.trade_log_text.configure(state='normal')
+        self.trade_log_text.delete('1.0', 'end')
+        if log_lines:
+            self.trade_log_text.insert('end', '\n'.join(log_lines))
+        else:
+            self.trade_log_text.insert('end', '暂无交易记录。启用自动交易或经 Agent 下单后，此处显示成交日志。')
+        self.trade_log_text.configure(state='disabled')
+
+    def _refresh_positions(self):
+        if not hasattr(self, 'pos_tree'):
+            return
+        if not self._ensure_db_ready():
+            return
+        try:
+            account = self._paper_account()
+            positions = self.db_store.get_paper_positions(account['id']) if account else []
+        except Exception as exc:  # noqa: BLE001
+            self.var_pos_meta.set(f'读取失败：{exc}')
+            return
+        self.pos_tree.delete(*self.pos_tree.get_children())
+        total_value = 0.0
+        total_pnl = 0.0
+        for p in positions:
+            cost_value = p.get('cost_value') or 0.0
+            market_value = p.get('market_value') or 0.0
+            profit = market_value - cost_value
+            profit_pct = (profit / cost_value * 100) if cost_value else 0.0
+            total_value += market_value
+            total_pnl += profit
+            tag = 'profit' if profit > 0 else ('loss' if profit < 0 else '')
+            self.pos_tree.insert('', 'end', tags=(tag,), values=(
+                p.get('code', ''), p.get('name', ''), p.get('volume', 0),
+                f"{p.get('avg_cost', 0):.3f}", f"{p.get('last_price', 0):.2f}",
+                f"{profit_pct:+.2f}", f"{profit:+,.0f}", f"{market_value:,.0f}",
+                p.get('opened_on', '')))
+        if account:
+            equity = account['cash_balance'] + total_value
+            pnl = equity - account['initial_cash']
+            self.var_pos_meta.set(
+                f"持仓 {len(positions)} 只｜市值 {total_value:,.0f}｜持仓盈亏 {total_pnl:+,.0f}｜"
+                f"总权益 {equity:,.0f}（{pnl:+,.0f}）")
+        else:
+            self.var_pos_meta.set('未配置模拟盘')
+
+    def _selected_result(self):
+        sel = self.tree.selection()
+        if not sel:
+            return None
+        index = self.tree.index(sel[0])
+        if 0 <= index < len(self.result_rows):
+            return self.result_rows[index]
+        return None
+
+    def _on_paper_buy(self):
+        if not self._ensure_db_ready():
+            messagebox.showwarning('模拟买入', '数据库未连接')
+            return
+        row = self._selected_result()
+        if not row:
+            messagebox.showinfo('模拟买入', '请先在选股结果中选中一只股票')
+            return
+        code = str(row.get('代码') or '').strip()
+        name = str(row.get('名称') or '').strip()
+        try:
+            price = float(row.get('价格') or 0)
+        except (TypeError, ValueError):
+            price = 0.0
+        if not code or price <= 0:
+            messagebox.showwarning('模拟买入', '选中的股票缺少有效价格，无法下单')
+            return
+        try:
+            volume = int(self.paper_qty_var.get())
+        except (TypeError, ValueError):
+            messagebox.showwarning('模拟买入', '数量必须是100股的整数倍')
+            return
+        volume = (volume // 100) * 100 or 100
+        self.paper_qty_var.set(str(volume))
+        account = self._paper_account()
+        if not account:
+            messagebox.showerror('模拟买入', '模拟盘账户不可用')
+            return
+        try:
+            order_id = self.db_store.execute_paper_order(
+                account['id'], code=code, name=name, action='buy',
+                price=price, volume=volume, reason='手动模拟买入')
+        except Exception as exc:  # noqa: BLE001
+            messagebox.showerror('模拟买入失败', str(exc))
+            return
+        print(f'模拟买入 #{order_id}: {code} {name} {volume}股 @{price:.2f}')
+        self.status_var.set(f'模拟买入成功：{code} {name} {volume}股 @{price:.2f}')
+        self._after_paper_trade()
+
+    def _on_paper_sell(self, all_out: bool = False):
+        if not self._ensure_db_ready():
+            messagebox.showwarning('模拟卖出', '数据库未连接')
+            return
+        sel = self.pos_tree.selection()
+        if not sel:
+            messagebox.showinfo('模拟卖出', '请先在模拟盘持仓中选中一只股票')
+            return
+        values = self.pos_tree.item(sel[0], 'values')
+        code, name = values[0], values[1]
+        held = int(float(values[2]))
+        try:
+            price = float(values[4])
+        except (TypeError, ValueError):
+            price = 0.0
+        if price <= 0:
+            messagebox.showwarning('模拟卖出', '持仓缺少有效现价，无法下单')
+            return
+        if all_out:
+            volume = held
+        else:
+            try:
+                volume = int(self.pos_qty_var.get())
+            except (TypeError, ValueError):
+                messagebox.showwarning('模拟卖出', '数量必须是100股的整数倍')
+                return
+            volume = (volume // 100) * 100 or 100
+        if volume > held:
+            messagebox.showwarning('模拟卖出', f'持仓不足：持有 {held} 股')
+            return
+        account = self._paper_account()
+        if not account:
+            messagebox.showerror('模拟卖出', '模拟盘账户不可用')
+            return
+        try:
+            order_id = self.db_store.execute_paper_order(
+                account['id'], code=code, name=name, action='sell',
+                price=price, volume=volume, reason='手动模拟卖出')
+        except Exception as exc:  # noqa: BLE001
+            messagebox.showerror('模拟卖出失败', str(exc))
+            return
+        print(f'模拟卖出 #{order_id}: {code} {name} {volume}股 @{price:.2f}')
+        self.status_var.set(f'模拟卖出成功：{code} {name} {volume}股 @{price:.2f}')
+        self._after_paper_trade()
+
+    def _after_paper_trade(self):
+        self._refresh_paper_overview()
+        self._refresh_positions()
+        self._refresh_trades()
+        self._refresh_review()
+
+    def _refresh_review(self):
+        if not hasattr(self, 'review_text'):
+            return
+        if not self._ensure_db_ready():
+            self.var_review_meta.set('复盘：数据库未连接')
+            return
+        try:
+            account = self._paper_account()
+            positions = self.db_store.get_paper_positions(account['id']) if account else []
+            trades = self.db_store.list_paper_trades(account['id'], limit=50) if account else []
+        except Exception as exc:  # noqa: BLE001
+            self.var_review_meta.set(f'复盘读取失败：{exc}')
+            return
+
+        lines = []
+        lines.append(f"复盘时间：{datetime.now():%Y-%m-%d %H:%M:%S}")
+        if account:
+            market_value = sum(p.get('market_value') or 0 for p in positions)
+            equity = account['cash_balance'] + market_value
+            pnl = equity - account['initial_cash']
+            lines.append(
+                f"模拟盘权益 {equity:,.2f}（现金 {account['cash_balance']:,.2f} / 市值 {market_value:,.2f}），"
+                f"累计盈亏 {pnl:+,.2f}（{pnl / account['initial_cash'] * 100:+.2f}%）")
+            lines.append('')
+            lines.append(f"持仓（{len(positions)} 只）：")
+            if positions:
+                for p in positions:
+                    lines.append(
+                        f"  {p.get('code', '')} {p.get('name', '')}  "
+                        f"{p.get('volume', 0)}股  成本{p.get('avg_cost', 0):.2f}  "
+                        f"现价{p.get('last_price', 0):.2f}  市值{p.get('market_value', 0):,.0f}")
+            else:
+                lines.append('  （空仓）')
+            lines.append('')
+        trades = [t for t in trades if str(t.get('created_at', '')).startswith(str(datetime.now().date()))]
+        lines.append(f"今日成交（{len(trades)} 笔）：")
+        if trades:
+            for t in trades:
+                side = '买入' if t.get('action') == 'buy' else '卖出'
+                lines.append(f"  {t.get('created_at', '')}  {side} {t.get('code', '')} {t.get('name', '')}"
+                             f"  {t.get('volume', 0)}股 @{t.get('price', 0):.2f}  {t.get('reason', '')}")
+        else:
+            lines.append('  （无）')
+
+        try:
+            today = str(datetime.now().date())
+            runs = self.db_store.list_runs(trade_date=today, limit=20)
+            if runs:
+                total_picks = sum(int(r.get('selected_count') or 0) for r in runs)
+                lines.append('')
+                lines.append(f"今日选股（{len(runs)} 批 / 共 {total_picks} 只）：")
+                for r in runs[:8]:
+                    lines.append(f"  [{r.get('category')}] {r.get('strategy_name')} "
+                                 f"· {r.get('selected_count')} 只 · {r.get('generated_at')}")
+                top_run = runs[0]
+                picks = self.db_store.fetch_run_rows(top_run['id'])[:10]
+                if picks:
+                    lines.append(f"  最近一批（{top_run.get('strategy_name')}）前 {len(picks)} 只：")
+                    for p in picks:
+                        lines.append(f"    {p.get('code')} {p.get('name')}  "
+                                     f"评分{_fmt(p.get('score'))} 涨跌{_fmt(p.get('change_pct'))}%  {p.get('sector') or ''}")
+        except Exception as exc:  # noqa: BLE001
+            lines.append('')
+            lines.append(f"（选股复盘读取失败：{exc}）")
+
+        emo = getattr(self, '_last_emotion', None)
+        if emo:
+            lines.append('')
+            lines.append(f"涨停情绪：{emo.get('phase_label', '')} · 涨停 {emo.get('limit_up_n', 0)} / "
+                         f"炸板 {emo.get('broken_seal_n', 0)} · 高度 {emo.get('max_board_height', 0)}")
+            bias = emo.get('buy_bias') or {}
+            if bias.get('note'):
+                lines.append(f"操作偏向：{bias['note']}")
+
+        self.var_review_meta.set(f"复盘 · {datetime.now():%Y-%m-%d} · 持仓 {len(positions)} 只")
+        self.review_text.delete('1.0', 'end')
+        self.review_text.insert('end', '\n'.join(lines))
+
+    def _on_tab_changed(self, _event=None):
+        try:
+            tab = self.notebook.tab(self.notebook.select(), 'text')
+        except Exception:  # noqa: BLE001
+            return
+        try:
+            if tab in ('最近交易', '自动交易记录'):
+                self._refresh_trades()
+            elif tab == '今日复盘':
+                self._refresh_review()
+            elif tab == '自选/持仓':
+                self._refresh_watch_groups()
+                self._refresh_positions()
+            elif tab == '历史选股结果':
+                self._refresh_query_sources()
+        except Exception:  # noqa: BLE001
+            pass
 
     def _agent_config(self):
         from stock_selector.agent import config as agent_config
@@ -1002,6 +1434,8 @@ class StockSelectorApp:
         if status == 'error' and result.get('error'):
             print(f"[agent] 分析失败：{result['error']}")
         self._refresh_paper_overview()
+        self._refresh_trades()
+        self._refresh_review()
         self._refresh_agent_analyses()
 
     def _toggle_auto_refresh(self):
@@ -1488,6 +1922,8 @@ class StockSelectorApp:
                             self._finish_error(item[1])
                         elif kind == 'market':
                             self._render_market(item[1])
+                        elif kind == 'ladder':
+                            self._render_ladder(item[1])
                         elif kind == 'agent':
                             self._render_agent_result(item[1])
                         else:

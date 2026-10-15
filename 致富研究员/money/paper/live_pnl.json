@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "time": "2026-10-15 15:29:12",
+  "time": "2026-10-15 16:46:08",
   "session": "已收盘",
   "in_session": false,
   "quote_error": "",
@@ -109,16 +109,31 @@
   ],
   "market": {
     "ok": true,
-    "time": "2026-10-15 15:29:12",
+    "time": "2026-10-15 16:46:03",
     "breadth": {
-      "ok": false,
-      "up": 0,
-      "down": 0,
-      "flat": 0,
-      "total": 0,
-      "up_ratio": null,
-      "down_ratio": null,
-      "parts": []
+      "ok": true,
+      "up": 403,
+      "down": 4856,
+      "flat": 33,
+      "total": 5292,
+      "up_ratio": 0.0762,
+      "down_ratio": 0.9176,
+      "parts": [
+        {
+          "code": "000001",
+          "name": "上证指数",
+          "up": 190,
+          "down": 2148,
+          "flat": 18
+        },
+        {
+          "code": "399001",
+          "name": "深证成指",
+          "up": 213,
+          "down": 2708,
+          "flat": 15
+        }
+      ]
     },
     "industry_up_n": 14,
     "industry_down_n": 186,
@@ -2299,13 +2314,13 @@
         "flow_side": "in"
       }
     ],
-    "error": "涨跌家数: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))；板块: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))；板块暂无新数据，沿用上次",
+    "error": "板块: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))；板块暂无新数据，沿用上次",
     "stale": true,
     "boards_fresh": false
   },
   "emotion": {
     "ok": true,
-    "time": "2026-10-15 15:28:04",
+    "time": "2026-10-15 16:45:11",
     "day": "20261015",
     "limit_up_n": 36,
     "broken_seal_n": 7,
@@ -2382,7 +2397,7 @@
         "last_seal": 145020,
         "amount": 1566969936,
         "industry": "出版",
-        "fund": 1662700
+        "fund": 17059302
       },
       {
         "code": "605189",
@@ -2394,7 +2409,7 @@
         "last_seal": 93503,
         "amount": 724182160,
         "industry": "纺织制造",
-        "fund": 6956145
+        "fund": 64537174
       },
       {
         "code": "300111",
@@ -2492,7 +2507,7 @@
         "last_seal": 93503,
         "amount": 724182160,
         "industry": "纺织制造",
-        "fund": 6956145
+        "fund": 64537174
       },
       {
         "code": "001318",
@@ -2516,7 +2531,7 @@
         "last_seal": 93125,
         "amount": 140388812,
         "industry": "出版",
-        "fund": 7419594
+        "fund": 70862029
       },
       {
         "code": "001225",
@@ -2612,7 +2627,7 @@
         "last_seal": 94046,
         "amount": 677157968,
         "industry": "医疗服务",
-        "fund": 5932215
+        "fund": 57658045
       },
       {
         "code": "603230",
@@ -2624,7 +2639,7 @@
         "last_seal": 143529,
         "amount": 934846576,
         "industry": "出版",
-        "fund": 2950464
+        "fund": 14379156
       },
       {
         "code": "003029",
@@ -2660,7 +2675,7 @@
         "last_seal": 133610,
         "amount": 141841182,
         "industry": "食品加工",
-        "fund": 755973
+        "fund": 19645778
       },
       {
         "code": "603386",
@@ -2672,7 +2687,7 @@
         "last_seal": 95825,
         "amount": 480281968,
         "industry": "元件",
-        "fund": 3582225
+        "fund": 64374750
       },
       {
         "code": "600281",
@@ -2684,7 +2699,7 @@
         "last_seal": 130249,
         "amount": 276508288,
         "industry": "小金属",
-        "fund": 432951
+        "fund": 4835922
       },
       {
         "code": "600668",
@@ -2696,7 +2711,7 @@
         "last_seal": 112438,
         "amount": 269210912,
         "industry": "水泥",
-        "fund": 1219274
+        "fund": 62409706
       },
       {
         "code": "603690",
@@ -2708,7 +2723,7 @@
         "last_seal": 130001,
         "amount": 909691472,
         "industry": "半导体",
-        "fund": 6810105
+        "fund": 66336840
       },
       {
         "code": "605058",
@@ -2720,7 +2735,7 @@
         "last_seal": 143336,
         "amount": 1488855968,
         "industry": "元件",
-        "fund": 1938475
+        "fund": 16290239
       },
       {
         "code": "600812",
@@ -2732,7 +2747,7 @@
         "last_seal": 145428,
         "amount": 2115357568,
         "industry": "化学制药",
-        "fund": 2279790
+        "fund": 9830493
       },
       {
         "code": "002889",
@@ -2780,7 +2795,7 @@
         "last_seal": 132541,
         "amount": 125921716,
         "industry": "物流",
-        "fund": 821060
+        "fund": 12317602
       },
       {
         "code": "605003",
@@ -2792,7 +2807,7 @@
         "last_seal": 134404,
         "amount": 65485334,
         "industry": "服装家纺",
-        "fund": 867064
+        "fund": 29892940
       },
       {
         "code": "603329",
@@ -2804,7 +2819,7 @@
         "last_seal": 131505,
         "amount": 230174353,
         "industry": "物流",
-        "fund": 837287
+        "fund": 11652451
       },
       {
         "code": "002748",
@@ -2828,7 +2843,7 @@
         "last_seal": 133913,
         "amount": 97926517,
         "industry": "化学制品",
-        "fund": 810935
+        "fund": 7101327
       },
       {
         "code": "603200",
@@ -2840,7 +2855,7 @@
         "last_seal": 150000,
         "amount": 1268184176,
         "industry": "环境治理",
-        "fund": 650870
+        "fund": 75099567
       },
       {
         "code": "601811",
@@ -2852,7 +2867,7 @@
         "last_seal": 145020,
         "amount": 1566969936,
         "industry": "出版",
-        "fund": 1662700
+        "fund": 17059302
       }
     ],
     "broken_samples": [
@@ -2977,9 +2992,9 @@
       "600202": 2,
       "002860": 2,
       "000823": 2,
+      "002552": 1,
       "001318": 2,
       "000530": 2,
-      "002552": 1,
       "605189": 1,
       "002343": 4,
       "601188": 2,
@@ -3043,7 +3058,7 @@
   },
   "ladder": {
     "thesis": "20261014买入002639雪人集团800股@15.37，20261015卖出800股@15.28，亏损-72元(-0.59%)。卖出原因：掉出精选池且走弱-2.34%，hold_advice建议SELL，腾仓换更强标的。当前空仓，等待新机会。",
-    "last_goal": "002639雪人集团已平仓，当前空仓。持仓为空，无可执行交易。等待下午开盘或次日重新评估自选池，寻找新的进攻机会。",
+    "last_goal": "录制回放健康检查",
     "ladder_n": 1,
     "ladder_top": [
       {
@@ -3060,12 +3075,12 @@
         "entry_day": "2026-10-14",
         "max_hold_days": 5,
         "hold_days": 1,
-        "status": "watching",
-        "last_review": ""
+        "status": "closed",
+        "last_review": "2026-10-15"
       }
     ],
     "pending": [],
-    "updated_at": "2026-10-15 15:00:13"
+    "updated_at": "2026-10-15 16:33:52"
   },
   "hunt": [
     {
@@ -3307,6 +3322,74 @@
       "trend_label": "连板中"
     },
     {
+      "code": "605189",
+      "name": "富春染织",
+      "score": 78.45,
+      "board_n": 2,
+      "broken_n": 1,
+      "board_role": "weak_to_strong",
+      "hunt_kind": "limit_up",
+      "from_hunt": true,
+      "from_potential": true,
+      "from_watchlist": false,
+      "fund": 64537174,
+      "amount": 724182160,
+      "first_seal": 93042,
+      "last_seal": 93503,
+      "industry": "纺织制造",
+      "live_pct": 9.98,
+      "price": null,
+      "close": null,
+      "entry_watch": null,
+      "seal_state": "resealed",
+      "pick_bucket": "board_hunt",
+      "pick_reasons": [
+        "猎板·2板",
+        "涨停池在列"
+      ],
+      "live_buy_now": false,
+      "soft_warn": [
+        "near_limit",
+        "resealed"
+      ],
+      "board_potential": 78.45,
+      "trend_label": "连板中"
+    },
+    {
+      "code": "601811",
+      "name": "新华文轩",
+      "score": 73.71,
+      "board_n": 2,
+      "broken_n": 1,
+      "board_role": "weak_to_strong",
+      "hunt_kind": "limit_up",
+      "from_hunt": true,
+      "from_potential": true,
+      "from_watchlist": false,
+      "fund": 17059302,
+      "amount": 1566969936,
+      "first_seal": 144938,
+      "last_seal": 145020,
+      "industry": "出版",
+      "live_pct": 10.02,
+      "price": null,
+      "close": null,
+      "entry_watch": null,
+      "seal_state": "resealed",
+      "pick_bucket": "board_hunt",
+      "pick_reasons": [
+        "猎板·2板",
+        "涨停池在列"
+      ],
+      "live_buy_now": false,
+      "soft_warn": [
+        "near_limit",
+        "resealed"
+      ],
+      "board_potential": 73.71,
+      "trend_label": "连板中"
+    },
+    {
       "code": "000995",
       "name": "皇台酒业",
       "score": 72.94,
@@ -3341,29 +3424,29 @@
       "trend_label": "首板猎杀"
     },
     {
-      "code": "605189",
-      "name": "富春染织",
-      "score": 72.7,
-      "board_n": 2,
+      "code": "603200",
+      "name": "上海洗霸",
+      "score": 71.51,
+      "board_n": 1,
       "broken_n": 1,
       "board_role": "weak_to_strong",
       "hunt_kind": "limit_up",
       "from_hunt": true,
       "from_potential": true,
       "from_watchlist": false,
-      "fund": 6956145,
-      "amount": 724182160,
-      "first_seal": 93042,
-      "last_seal": 93503,
-      "industry": "纺织制造",
-      "live_pct": 9.98,
+      "fund": 75099567,
+      "amount": 1268184176,
+      "first_seal": 141215,
+      "last_seal": 150000,
+      "industry": "环境治理",
+      "live_pct": 10.0,
       "price": null,
       "close": null,
       "entry_watch": null,
       "seal_state": "resealed",
       "pick_bucket": "board_hunt",
       "pick_reasons": [
-        "猎板·2板",
+        "猎板·1板",
         "涨停池在列"
       ],
       "live_buy_now": false,
@@ -3371,42 +3454,8 @@
         "near_limit",
         "resealed"
       ],
-      "board_potential": 72.7,
-      "trend_label": "连板中"
-    },
-    {
-      "code": "601811",
-      "name": "新华文轩",
-      "score": 72.17,
-      "board_n": 2,
-      "broken_n": 1,
-      "board_role": "weak_to_strong",
-      "hunt_kind": "limit_up",
-      "from_hunt": true,
-      "from_potential": true,
-      "from_watchlist": false,
-      "fund": 1662700,
-      "amount": 1566969936,
-      "first_seal": 144938,
-      "last_seal": 145020,
-      "industry": "出版",
-      "live_pct": 10.02,
-      "price": null,
-      "close": null,
-      "entry_watch": null,
-      "seal_state": "resealed",
-      "pick_bucket": "board_hunt",
-      "pick_reasons": [
-        "猎板·2板",
-        "涨停池在列"
-      ],
-      "live_buy_now": false,
-      "soft_warn": [
-        "near_limit",
-        "resealed"
-      ],
-      "board_potential": 72.17,
-      "trend_label": "连板中"
+      "board_potential": 71.51,
+      "trend_label": "首板猎杀"
     },
     {
       "code": "000626",
@@ -3440,6 +3489,74 @@
         "resealed"
       ],
       "board_potential": 71.49,
+      "trend_label": "首板猎杀"
+    },
+    {
+      "code": "603690",
+      "name": "至纯科技",
+      "score": 70.63,
+      "board_n": 1,
+      "broken_n": 1,
+      "board_role": "weak_to_strong",
+      "hunt_kind": "limit_up",
+      "from_hunt": true,
+      "from_potential": true,
+      "from_watchlist": false,
+      "fund": 66336840,
+      "amount": 909691472,
+      "first_seal": 100618,
+      "last_seal": 130001,
+      "industry": "半导体",
+      "live_pct": 10.0,
+      "price": null,
+      "close": null,
+      "entry_watch": null,
+      "seal_state": "resealed",
+      "pick_bucket": "board_hunt",
+      "pick_reasons": [
+        "猎板·1板",
+        "涨停池在列"
+      ],
+      "live_buy_now": false,
+      "soft_warn": [
+        "near_limit",
+        "resealed"
+      ],
+      "board_potential": 70.63,
+      "trend_label": "首板猎杀"
+    },
+    {
+      "code": "600668",
+      "name": "尖峰集团",
+      "score": 70.24,
+      "board_n": 1,
+      "broken_n": 2,
+      "board_role": "weak_to_strong",
+      "hunt_kind": "limit_up",
+      "from_hunt": true,
+      "from_potential": true,
+      "from_watchlist": false,
+      "fund": 62409706,
+      "amount": 269210912,
+      "first_seal": 100605,
+      "last_seal": 112438,
+      "industry": "水泥",
+      "live_pct": 10.06,
+      "price": null,
+      "close": null,
+      "entry_watch": null,
+      "seal_state": "resealed",
+      "pick_bucket": "board_hunt",
+      "pick_reasons": [
+        "猎板·1板",
+        "涨停池在列"
+      ],
+      "live_buy_now": false,
+      "soft_warn": [
+        "near_limit",
+        "resealed"
+      ],
+      "board_potential": 70.24,
       "trend_label": "首板猎杀"
     },
     {
@@ -3508,6 +3625,40 @@
         "sealed"
       ],
       "board_potential": 67.78,
+      "trend_label": "首板猎杀"
+    },
+    {
+      "code": "605003",
+      "name": "众望布艺",
+      "score": 66.99,
+      "board_n": 1,
+      "broken_n": 2,
+      "board_role": "weak_to_strong",
+      "hunt_kind": "limit_up",
+      "from_hunt": true,
+      "from_potential": true,
+      "from_watchlist": false,
+      "fund": 29892940,
+      "amount": 65485334,
+      "first_seal": 111810,
+      "last_seal": 134404,
+      "industry": "服装家纺",
+      "live_pct": 10.0,
+      "price": null,
+      "close": null,
+      "entry_watch": null,
+      "seal_state": "resealed",
+      "pick_bucket": "board_hunt",
+      "pick_reasons": [
+        "猎板·1板",
+        "涨停池在列"
+      ],
+      "live_buy_now": false,
+      "soft_warn": [
+        "near_limit",
+        "resealed"
+      ],
+      "board_potential": 66.99,
       "trend_label": "首板猎杀"
     },
     {
@@ -3610,142 +3761,6 @@
         "resealed"
       ],
       "board_potential": 66.34,
-      "trend_label": "首板猎杀"
-    },
-    {
-      "code": "002543",
-      "name": "万和电气",
-      "score": 65.67,
-      "board_n": 1,
-      "broken_n": 2,
-      "board_role": "weak_to_strong",
-      "hunt_kind": "limit_up",
-      "from_hunt": true,
-      "from_potential": true,
-      "from_watchlist": false,
-      "fund": 16711462,
-      "amount": 287701344,
-      "first_seal": 93800,
-      "last_seal": 135018,
-      "industry": "厨卫电器",
-      "live_pct": 10.06,
-      "price": null,
-      "close": null,
-      "entry_watch": null,
-      "seal_state": "resealed",
-      "pick_bucket": "board_hunt",
-      "pick_reasons": [
-        "猎板·1板",
-        "涨停池在列"
-      ],
-      "live_buy_now": false,
-      "soft_warn": [
-        "near_limit",
-        "resealed"
-      ],
-      "board_potential": 65.67,
-      "trend_label": "首板猎杀"
-    },
-    {
-      "code": "002945",
-      "name": "华林证券",
-      "score": 65.67,
-      "board_n": 1,
-      "broken_n": 6,
-      "board_role": "weak_to_strong",
-      "hunt_kind": "limit_up",
-      "from_hunt": true,
-      "from_potential": true,
-      "from_watchlist": false,
-      "fund": 16721235,
-      "amount": 1226005808,
-      "first_seal": 105612,
-      "last_seal": 145209,
-      "industry": "证券Ⅱ",
-      "live_pct": 10.01,
-      "price": null,
-      "close": null,
-      "entry_watch": null,
-      "seal_state": "resealed",
-      "pick_bucket": "board_hunt",
-      "pick_reasons": [
-        "猎板·1板",
-        "涨停池在列"
-      ],
-      "live_buy_now": false,
-      "soft_warn": [
-        "near_limit",
-        "resealed"
-      ],
-      "board_potential": 65.67,
-      "trend_label": "首板猎杀"
-    },
-    {
-      "code": "002134",
-      "name": "天津普林",
-      "score": 65.57,
-      "board_n": 1,
-      "broken_n": 2,
-      "board_role": "weak_to_strong",
-      "hunt_kind": "limit_up",
-      "from_hunt": true,
-      "from_potential": true,
-      "from_watchlist": false,
-      "fund": 15721206,
-      "amount": 647137328,
-      "first_seal": 93557,
-      "last_seal": 130127,
-      "industry": "元件",
-      "live_pct": 9.99,
-      "price": null,
-      "close": null,
-      "entry_watch": null,
-      "seal_state": "resealed",
-      "pick_bucket": "board_hunt",
-      "pick_reasons": [
-        "猎板·1板",
-        "涨停池在列"
-      ],
-      "live_buy_now": false,
-      "soft_warn": [
-        "near_limit",
-        "resealed"
-      ],
-      "board_potential": 65.57,
-      "trend_label": "首板猎杀"
-    },
-    {
-      "code": "603690",
-      "name": "至纯科技",
-      "score": 64.68,
-      "board_n": 1,
-      "broken_n": 1,
-      "board_role": "weak_to_strong",
-      "hunt_kind": "limit_up",
-      "from_hunt": true,
-      "from_potential": true,
-      "from_watchlist": false,
-      "fund": 6810105,
-      "amount": 909691472,
-      "first_seal": 100618,
-      "last_seal": 130001,
-      "industry": "半导体",
-      "live_pct": 10.0,
-      "price": null,
-      "close": null,
-      "entry_watch": null,
-      "seal_state": "resealed",
-      "pick_bucket": "board_hunt",
-      "pick_reasons": [
-        "猎板·1板",
-        "涨停池在列"
-      ],
-      "live_buy_now": false,
-      "soft_warn": [
-        "near_limit",
-        "resealed"
-      ],
-      "board_potential": 64.68,
       "trend_label": "首板猎杀"
     }
   ],

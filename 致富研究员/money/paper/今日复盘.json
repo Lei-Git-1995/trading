@@ -1,11 +1,11 @@
 {
   "ok": true,
-  "time": "2026-10-15 15:29:08",
+  "time": "2026-10-15 16:45:45",
   "day": "2026-10-15",
   "sentiment": "修复·涨停36·高5",
   "emotion": {
     "ok": true,
-    "time": "2026-10-15 15:28:04",
+    "time": "2026-10-15 16:45:13",
     "day": "20261015",
     "limit_up_n": 36,
     "broken_seal_n": 7,
@@ -82,7 +82,7 @@
         "last_seal": 145020,
         "amount": 1566969936,
         "industry": "出版",
-        "fund": 1662700
+        "fund": 17059302
       },
       {
         "code": "605189",
@@ -94,7 +94,7 @@
         "last_seal": 93503,
         "amount": 724182160,
         "industry": "纺织制造",
-        "fund": 6956145
+        "fund": 64537174
       },
       {
         "code": "300111",
@@ -192,7 +192,7 @@
         "last_seal": 93503,
         "amount": 724182160,
         "industry": "纺织制造",
-        "fund": 6956145
+        "fund": 64537174
       },
       {
         "code": "001318",
@@ -216,7 +216,7 @@
         "last_seal": 93125,
         "amount": 140388812,
         "industry": "出版",
-        "fund": 7419594
+        "fund": 70862029
       },
       {
         "code": "001225",
@@ -312,7 +312,7 @@
         "last_seal": 94046,
         "amount": 677157968,
         "industry": "医疗服务",
-        "fund": 5932215
+        "fund": 57658045
       },
       {
         "code": "603230",
@@ -324,7 +324,7 @@
         "last_seal": 143529,
         "amount": 934846576,
         "industry": "出版",
-        "fund": 2950464
+        "fund": 14379156
       },
       {
         "code": "003029",
@@ -360,7 +360,7 @@
         "last_seal": 133610,
         "amount": 141841182,
         "industry": "食品加工",
-        "fund": 755973
+        "fund": 19645778
       },
       {
         "code": "603386",
@@ -372,7 +372,7 @@
         "last_seal": 95825,
         "amount": 480281968,
         "industry": "元件",
-        "fund": 3582225
+        "fund": 64374750
       },
       {
         "code": "600281",
@@ -384,7 +384,7 @@
         "last_seal": 130249,
         "amount": 276508288,
         "industry": "小金属",
-        "fund": 432951
+        "fund": 4835922
       },
       {
         "code": "600668",
@@ -396,7 +396,7 @@
         "last_seal": 112438,
         "amount": 269210912,
         "industry": "水泥",
-        "fund": 1219274
+        "fund": 62409706
       },
       {
         "code": "603690",
@@ -408,7 +408,7 @@
         "last_seal": 130001,
         "amount": 909691472,
         "industry": "半导体",
-        "fund": 6810105
+        "fund": 66336840
       },
       {
         "code": "605058",
@@ -420,7 +420,7 @@
         "last_seal": 143336,
         "amount": 1488855968,
         "industry": "元件",
-        "fund": 1938475
+        "fund": 16290239
       },
       {
         "code": "600812",
@@ -432,7 +432,7 @@
         "last_seal": 145428,
         "amount": 2115357568,
         "industry": "化学制药",
-        "fund": 2279790
+        "fund": 9830493
       },
       {
         "code": "002889",
@@ -480,7 +480,7 @@
         "last_seal": 132541,
         "amount": 125921716,
         "industry": "物流",
-        "fund": 821060
+        "fund": 12317602
       },
       {
         "code": "605003",
@@ -492,7 +492,7 @@
         "last_seal": 134404,
         "amount": 65485334,
         "industry": "服装家纺",
-        "fund": 867064
+        "fund": 29892940
       },
       {
         "code": "603329",
@@ -504,7 +504,7 @@
         "last_seal": 131505,
         "amount": 230174353,
         "industry": "物流",
-        "fund": 837287
+        "fund": 11652451
       },
       {
         "code": "002748",
@@ -528,7 +528,7 @@
         "last_seal": 133913,
         "amount": 97926517,
         "industry": "化学制品",
-        "fund": 810935
+        "fund": 7101327
       },
       {
         "code": "603200",
@@ -540,7 +540,7 @@
         "last_seal": 150000,
         "amount": 1268184176,
         "industry": "环境治理",
-        "fund": 650870
+        "fund": 75099567
       },
       {
         "code": "601811",
@@ -552,7 +552,7 @@
         "last_seal": 145020,
         "amount": 1566969936,
         "industry": "出版",
-        "fund": 1662700
+        "fund": 17059302
       }
     ],
     "broken_samples": [
@@ -677,9 +677,9 @@
       "600202": 2,
       "002860": 2,
       "000823": 2,
+      "002552": 1,
       "001318": 2,
       "000530": 2,
-      "002552": 1,
       "605189": 1,
       "002343": 4,
       "601188": 2,
@@ -753,7 +753,7 @@
       }
     ],
     "positions_n": 0,
-    "watchlist_n": 4
+    "watchlist_n": 3
   },
   "market": {
     "up": 0,
@@ -1117,7 +1117,7 @@
       "rank": 1,
       "code": "603466",
       "name": "风语筑",
-      "score": 94.96,
+      "score": 100.96,
       "entry_watch": 14.52,
       "entry_band_lo": 14.52,
       "entry_band_hi": 14.86,
@@ -1150,13 +1150,13 @@
       "picked_at": "2026-10-15 09:31:54",
       "passed": false,
       "llm_hint": "PRIORITY",
-      "llm_hint_why": "评分91.96最高，数字媒体强势板块，5日动量19.53%偏强"
+      "llm_hint_why": "得分94.96高于85，具备强势板块及5日动量偏强"
     },
     {
       "rank": 2,
       "code": "603386",
       "name": "骏亚科技",
-      "score": 91.69,
+      "score": 94.69,
       "entry_watch": 18.88,
       "entry_band_lo": 18.88,
       "entry_band_hi": 19.13,
@@ -1188,8 +1188,8 @@
       "pick_date": "20261015",
       "picked_at": "2026-10-15 09:26:26",
       "passed": false,
-      "llm_hint": "KEEP",
-      "llm_hint_why": "评分91.69，量比1.59放量确认，5日动量8.51%"
+      "llm_hint": "PRIORITY",
+      "llm_hint_why": "得分91.69且量比1.59放大，符合攻击带条件"
     },
     {
       "rank": 3,
@@ -1228,52 +1228,15 @@
       "picked_at": "2026-10-15 09:31:54",
       "passed": false,
       "llm_hint": "KEEP",
-      "llm_hint_why": "评分86.67，PCB板块，量比1.44，但超额仅2.76%偏弱"
-    },
-    {
-      "rank": 4,
-      "code": "601999",
-      "name": "出版传媒",
-      "score": 80.25,
-      "entry_watch": 7.82,
-      "entry_band_lo": 7.82,
-      "entry_band_hi": 8.0,
-      "entry_attack": null,
-      "close": 7.53,
-      "ret_1d": 0.030096,
-      "vol_ratio": 1.2943,
-      "ret_accel": 0.031462,
-      "open_gap": -0.017784,
-      "board_attack": false,
-      "dist_to_limit": 0.0699,
-      "yest_near_limit": false,
-      "break_prior_high": true,
-      "break_prior_high_10": true,
-      "near_limit": false,
-      "start_confirmed": false,
-      "main_net_yi": 0.1783,
-      "main_net_3d_yi": 0.3484,
-      "large_net_yi": 0.1538,
-      "super_net_yi": 0.0245,
-      "large_net_3d_yi": 0.2858,
-      "super_net_3d_yi": 0.0626,
-      "big_order_share": 1.0,
-      "industry": "大众出版",
-      "industry_pct": 1.38,
-      "best_theme": "大众出版",
-      "pick_bucket": "watch_obs",
-      "reason": "观察·【标记】落在当日强势板块：大众出版；近5日动量偏强（12.39%）；相对沪深300有超额（16.07%）",
-      "pick_date": "20261015",
-      "picked_at": "2026-10-15 10:14:20",
-      "passed": false
+      "llm_hint_why": "得分86.67刚好超过85，可观察但不急于入场"
     }
   ],
   "learn": {
-    "llm": "【开盘学习】 2026-10-15 09:35:58\n模型: auto\n摘要: 大盘全线走弱（上证-1.47%），涨停情绪冰点；雪人集团已掉池走弱须清仓；观察池风语筑/骏亚科技高分待攻击带确认，冰点可小仓试错。\n市场偏向: risk_off\n教训:\n  - 雪人集团买入缺少冲板/攻击确认，掉出精选池后继续走弱，教训：无确认不开仓\n  - 大盘全线下跌时，即使冰点试错也要严格筛选高分+攻击带确认标的\n参数:\n  - LLM战法调参 min_buy_score: 83.0 → 85.0（大盘全线下跌需提高选股门槛，只打高分确认单）\n风险: 大盘全线下跌，涨停情绪冰点，仅小仓试错高分攻击带确认标的，严禁追高与高位接力\n买入规则: {\"min_score\": 85.0, \"min_live_pct\": 4.0, \"max_live_pct\": 8.8, \"min_confidence\": 55.0, \"require_attack\": true, \"forbid_risk_off\": true, \"max_chase\": 0.01}\n\n原始回复:\n{\"summary\":\"大盘全线走弱（上证-1.47%），涨停情绪冰点；雪人集团已掉池走弱须清仓；观察池风语筑/骏亚科技高分待攻击带确认，冰点可小仓试错。\",\"lessons\":[\"雪人集团买入缺少冲板/攻击确认，掉出精选池后继续走弱，教训：无确认不开仓\",\"大盘全线下跌时，即使冰点试错也要严格筛选高分+攻击带确认标的\"],\"playbook\":{\"principles\":[\"外盘risk_off日坚决不开新仓，不幻想逆势独立\",\"高潮期打确认板/回封弱转强，不追高位接力\",\"先发现启动再动手：趋势+吸筹+攻击齐备，不做马后炮追高\",\"买点看攻击带：涨幅4%-8.8%且未贴板，现价不超进场参考*(1+1%)\",\"量价先行：量比扩张+主力净流入确认，天量高潮警惕\",\"卖看结构破坏：破板急跌/弱转/掉出精选池，快走不纠结\"],\"buy_rules\":{\"min_score\":85,\"min_live_pct\":4.0,\"max_live_pct\":8.8,\"min_confidence\":60,\"require_attack\":true,\"forbid_risk_off\":true,\"max_chase\":0.01},\"tactics\":[{\"name\":\"冲板确认\",\"desc\":\"盘中涨幅达标、未贴板且外盘未risk_off才允许开仓\",\"status\":\"active\"},{\"name\":\"隔夜风控\",\"desc\":\"外盘risk_off日不开新仓，已持仓须评估避险\",\"status\":\"active\"}]},\"param_changes\":[{\"key\":\"min_buy_score\",\"value\":85,\"why\"",
-    "self": "====================================================\n老股民自我总结 · 冲向十万  2026-10-15\n生成: 2026-10-15 15:28:39\n====================================================\n\n【目标进度 2万→10万】\n  总资产 19,911.89 | 本金 20,000 | 目标 100,000\n  进度 0.0% | 距目标还差 80,088.11 | 已放大 1.00x\n  阶段: 起步保本 — 仓位宜轻，只打高分确认单，先把胜率做起来\n\n【今日盘面自评】\n  累计盈亏 -88.11 | 浮盈0 / 浮亏0\n  今日成交: 买0 / 卖1\n  自评: 账户承压。老规矩——砍弱留强，明天解锁的先处理，禁止报复性开仓。\n\n【亏损股归因与处置】\n  当前无浮亏持仓。\n\n【技能升级 / 参数微调】\n  本轮不改参（样本不足、已优化过、或已在边界）。\n  当前老股民生效参数:\n    · batch_lots = 1\n    · max_chase_vs_watch = 0.01\n    · min_buy_score = 85.0\n    · min_live_pct_buy = 4.0\n    · no_buy_after = 14:45\n    · prefer_dip_entry = False\n    · require_attack_confirm = True\n    · soft_stop = -0.035\n    · soft_take = 0.05\n    · startup_min_score = 74.0\n  累计升级次数: 3\n\n【LLM自我学习 · 资深玩家战法】\n  身份: 短线连板高手\n  模型: auto @ https://api.hcnsec.cn/v1/\n  战法版本: 12  买入干预: 开\n  买入规则: {'min_score': 85.0, 'min_live_pct': 4.0, 'max_live_pct': 8.8, 'min_confidence': 55.0, 'require_attack': True, 'forbid_risk_off': True, 'max_chase': 0.01}\n  · 战法 冲板确认: 盘中涨幅达标、未贴板且外盘未risk_off才允许开仓 [active]\n  · 战法 隔夜风控: 外盘risk_off日不开新仓，已持仓须评估避险 [active]\n  模型自评: 三波学习由托盘循环按时段触发（早盘前/午前/收盘）\n  详情: 最新LLM复盘.txt / 最新战法.txt\n\n【近期教训（刻在脑子里）】\n  2026-10-09 14:18:41 ",
+    "llm": "【收盘学习】 2026-10-15 16:37:38\n模型: auto\n摘要: 今日亏损88元，因雪人集团弱转卖出，观察池中高分票待机，整体市场偏空。\n市场偏向: risk_off\n教训:\n  - 低分票易被震荡洗出，需严守85分入场线；\n  - 市场整体下跌时应暂停新仓，只做已持仓风险评估；\n  - 观察池高分票可在次日早盘回封确认后介入。\n参数:\n  - LLM战法调参 min_buy_score: 85.0 → 86.0（提高门槛以避免低分票被震荡洗出）\n风险: 市场整体下跌，隔夜持仓需设置软止损3.5%，避免大幅回撤。\n买入规则: {\"min_score\": 85.0, \"min_live_pct\": 4.0, \"max_live_pct\": 8.8, \"min_confidence\": 55.0, \"require_attack\": true, \"forbid_risk_off\": true, \"max_chase\": 0.01}\n\n原始回复:\n{\"summary\":\"今日亏损88元，因雪人集团弱转卖出，观察池中高分票待机，整体市场偏空。\",\"lessons\":[\"低分票易被震荡洗出，需严守85分入场线；\",\"市场整体下跌时应暂停新仓，只做已持仓风险评估；\",\"观察池高分票可在次日早盘回封确认后介入。\"],\"playbook\":{\"principles\":[\"外盘risk_off日坚决不开新仓，不幻想逆势独立\",\"高潮期打确认板/回封弱转强，不追高位接力\",\"先发现启动再动手：趋势+吸筹+攻击齐备，不做马后炮追高\",\"买点看攻击带：涨幅4%-8.8%且未贴板，现价不超进场参考*(1+1%)\",\"量价先行：量比扩张+主力净流入确认，天量高潮警惕\",\"卖看结构破坏：破板急跌/弱转/掉出精选池，快走不纠结\"],\"buy_rules\":{\"min_score\":85.0,\"min_live_pct\":4.0,\"max_live_pct\":8.8,\"min_confidence\":55.0,\"require_attack\":true,\"forbid_risk_off\":true,\"max_chase\":0.01},\"tactics\":[{\"name\":\"冲板确认\",\"desc\":\"盘中涨幅达标、未贴板且外盘未risk_off才允许开仓\",\"status\":\"active\"}]},\"param_changes\":[{\"key\":\"min_buy_score\",\"value\":86,\"why\":\"提高门槛以避免低分票被震荡洗出\"}],\"hold_advice\":[],\"watchlist_hints\":[{\"code\":\"603466\",\"action\":\"PRIORITY\",\"why\":\"得分94.96高于85，具备强势板块及5日动量偏强\"},{\"code\":",
+    "self": "====================================================\n老股民自我总结 · 冲向十万  2026-10-15\n生成: 2026-10-15 16:42:14\n====================================================\n\n【目标进度 2万→10万】\n  总资产 19,911.89 | 本金 20,000 | 目标 100,000\n  进度 0.0% | 距目标还差 80,088.11 | 已放大 1.00x\n  阶段: 起步保本 — 仓位宜轻，只打高分确认单，先把胜率做起来\n\n【今日盘面自评】\n  累计盈亏 -88.11 | 浮盈0 / 浮亏0\n  今日成交: 买0 / 卖1\n  自评: 账户承压。老规矩——砍弱留强，明天解锁的先处理，禁止报复性开仓。\n\n【亏损股归因与处置】\n  当前无浮亏持仓。\n\n【技能升级 / 参数微调】\n  本轮不改参（样本不足、已优化过、或已在边界）。\n  当前老股民生效参数:\n    · batch_lots = 1\n    · max_chase_vs_watch = 0.01\n    · min_buy_score = 86.0\n    · min_live_pct_buy = 4.0\n    · no_buy_after = 14:45\n    · prefer_dip_entry = False\n    · require_attack_confirm = True\n    · soft_stop = -0.035\n    · soft_take = 0.05\n    · startup_min_score = 74.0\n  累计升级次数: 3\n\n【LLM自我学习 · 资深玩家战法】\n  身份: 短线连板高手\n  模型: auto @ https://api.hcnsec.cn/v1/\n  战法版本: 13  买入干预: 开\n  买入规则: {'min_score': 85.0, 'min_live_pct': 4.0, 'max_live_pct': 8.8, 'min_confidence': 55.0, 'require_attack': True, 'forbid_risk_off': True, 'max_chase': 0.01}\n  · 战法 冲板确认: 盘中涨幅达标、未贴板且外盘未risk_off才允许开仓 [active]\n  模型自评: 三波学习由托盘循环按时段触发（早盘前/午前/收盘）\n  详情: 最新LLM复盘.txt / 最新战法.txt\n\n【近期教训（刻在脑子里）】\n  2026-10-09 14:18:41 [起步保本]: 起步阶段：单票最多2手，先活下来\n  2026-10-14 11:15:43 ",
     "learn_wl": "【自选更新学习】 2026-10-15 10:29:28\n模型: auto\n摘要: 账户基本持平，自选4只质量尚可但数量偏少，需降低入选门槛扩充候选池，同时收紧止盈以积累胜率\n盈亏: -5.00  权益: 19995.00\n自选: +0 更新1 共4\n调参:\n  - LLM战法调参 startup_min_score: 76.0 → 74.0（自选仅4只远低于上限12，降低门槛扩充候选池）\n  - LLM战法调参 soft_take: 0.06 → 0.05（起步阶段收紧止盈，先）\n教训:\n  - 起步阶段仓位宜轻，只打高分确认单，先把胜率做起来\n  - 自选池仅4只，候选不足，需适当降低startup_min_score扩充观察面\n  - 止盈6%在起步阶段偏宽，应更早落袋以积累正收益\n\n原始回复:\nLet me analyze the current situation:\n\n1. **Account Status**: Equity 19995, initial 20000, total PnL -5.0. Very early stage, essentially flat.\n2. **Positions**: 1 position - 雪人集团 (002639), 800 shares at cost 15.37, floating at cost (0.0).\n3. **Watchlist**: 4 stocks, all with decent scores (80-95 range).\n4. **Current overrides**: min_buy_score 85, min_live_pct_buy 4.0, max_chase_vs_watch 0.01, startup_min_score 76, batch_lots 1, soft_stop -0.035, soft_take 0.06.\n\n**Analysis:**\n\n- The account is essentially flat (-5 loss), so we're in \"起步保本\" stage.\n- Only 4 watchlist stocks, well below the 12 max.\n- The watchlist quality is decent - top 2 are 94.96 and 91.69, which are strong.\n- Current min_buy_score is 85, which means only the top 2 (风语筑 94.96, 骏亚科技 91.69) would qualify for buying.\n- startup_min_score is 76, which is reasonable for f",
-    "last_summary": "大盘全线走弱（上证-1.47%），涨停情绪冰点；雪人集团已掉池走弱须清仓；观察池风语筑/骏亚科技高分待攻击带确认，冰点可小仓试错。",
-    "memory": "账户基本持平，自选4只质量尚可但数量偏少，需降低入选门槛扩充候选池，同时收紧止盈以积累胜率",
-    "playbook": "短线连板高手 v12 · 2026-10-15 09:35:58"
+    "last_summary": "今日亏损88元，因雪人集团弱转卖出，观察池中高分票待机，整体市场偏空。",
+    "memory": "今日亏损88元，因雪人集团弱转卖出，观察池中高分票待机，整体市场偏空。",
+    "playbook": "短线连板高手 v13 · 2026-10-15 16:37:38"
   }
 }

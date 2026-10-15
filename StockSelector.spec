@@ -14,6 +14,8 @@ hiddenimports += [
     'stock_selector.agent.storage',
     'stock_selector.agent.scheduler',
     'stock_selector.utils.app_config',
+    'stock_selector.data.limit_up',
+    'stock_selector.data.market_board',
 ]
 tmp_ret = collect_all('akshare')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]

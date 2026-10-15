@@ -1,14 +1,14 @@
 {
   "pick_date": "20261015",
-  "screen_time": "2026-10-15 10:43:06",
+  "screen_time": "2026-10-15 16:37:38",
   "source": "board_startup_scan",
-  "count": 4,
+  "count": 3,
   "items": [
     {
       "rank": 1,
       "code": "603466",
       "name": "风语筑",
-      "score": 94.96,
+      "score": 100.96,
       "entry_watch": 14.52,
       "entry_band_lo": 14.52,
       "entry_band_hi": 14.86,
@@ -41,13 +41,13 @@
       "picked_at": "2026-10-15 09:31:54",
       "passed": false,
       "llm_hint": "PRIORITY",
-      "llm_hint_why": "评分91.96最高，数字媒体强势板块，5日动量19.53%偏强"
+      "llm_hint_why": "得分94.96高于85，具备强势板块及5日动量偏强"
     },
     {
       "rank": 2,
       "code": "603386",
       "name": "骏亚科技",
-      "score": 91.69,
+      "score": 94.69,
       "entry_watch": 18.88,
       "entry_band_lo": 18.88,
       "entry_band_hi": 19.13,
@@ -79,8 +79,8 @@
       "pick_date": "20261015",
       "picked_at": "2026-10-15 09:26:26",
       "passed": false,
-      "llm_hint": "KEEP",
-      "llm_hint_why": "评分91.69，量比1.59放量确认，5日动量8.51%"
+      "llm_hint": "PRIORITY",
+      "llm_hint_why": "得分91.69且量比1.59放大，符合攻击带条件"
     },
     {
       "rank": 3,
@@ -119,44 +119,7 @@
       "picked_at": "2026-10-15 09:31:54",
       "passed": false,
       "llm_hint": "KEEP",
-      "llm_hint_why": "评分86.67，PCB板块，量比1.44，但超额仅2.76%偏弱"
-    },
-    {
-      "rank": 4,
-      "code": "601999",
-      "name": "出版传媒",
-      "score": 80.25,
-      "entry_watch": 7.82,
-      "entry_band_lo": 7.82,
-      "entry_band_hi": 8.0,
-      "entry_attack": null,
-      "close": 7.53,
-      "ret_1d": 0.030096,
-      "vol_ratio": 1.2943,
-      "ret_accel": 0.031462,
-      "open_gap": -0.017784,
-      "board_attack": false,
-      "dist_to_limit": 0.0699,
-      "yest_near_limit": false,
-      "break_prior_high": true,
-      "break_prior_high_10": true,
-      "near_limit": false,
-      "start_confirmed": false,
-      "main_net_yi": 0.1783,
-      "main_net_3d_yi": 0.3484,
-      "large_net_yi": 0.1538,
-      "super_net_yi": 0.0245,
-      "large_net_3d_yi": 0.2858,
-      "super_net_3d_yi": 0.0626,
-      "big_order_share": 1.0,
-      "industry": "大众出版",
-      "industry_pct": 1.38,
-      "best_theme": "大众出版",
-      "pick_bucket": "watch_obs",
-      "reason": "观察·【标记】落在当日强势板块：大众出版；近5日动量偏强（12.39%）；相对沪深300有超额（16.07%）",
-      "pick_date": "20261015",
-      "picked_at": "2026-10-15 10:14:20",
-      "passed": false
+      "llm_hint_why": "得分86.67刚好超过85，可观察但不急于入场"
     }
   ]
 }

@@ -1,6 +1,6 @@
 ====================================================
 模拟盘日报（你只需看这份）  2026-10-15
-生成时间: 2026-10-15 15:28:39
+生成时间: 2026-10-15 16:45:59
 ====================================================
 
 【一、盈亏摘要】
@@ -44,7 +44,7 @@
   当前老股民生效参数:
     · batch_lots = 1
     · max_chase_vs_watch = 0.01
-    · min_buy_score = 85.0
+    · min_buy_score = 86.0
     · min_live_pct_buy = 4.0
     · no_buy_after = 14:45
     · prefer_dip_entry = False
@@ -57,10 +57,9 @@
 【LLM自我学习 · 资深玩家战法】
   身份: 短线连板高手
   模型: auto @ https://api.hcnsec.cn/v1/
-  战法版本: 12  买入干预: 开
+  战法版本: 13  买入干预: 开
   买入规则: {'min_score': 85.0, 'min_live_pct': 4.0, 'max_live_pct': 8.8, 'min_confidence': 55.0, 'require_attack': True, 'forbid_risk_off': True, 'max_chase': 0.01}
   · 战法 冲板确认: 盘中涨幅达标、未贴板且外盘未risk_off才允许开仓 [active]
-  · 战法 隔夜风控: 外盘risk_off日不开新仓，已持仓须评估避险 [active]
   模型自评: 三波学习由托盘循环按时段触发（早盘前/午前/收盘）
   详情: 最新LLM复盘.txt / 最新战法.txt
 

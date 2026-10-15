@@ -8,7 +8,11 @@
 - 行业板块榜：https://proxy.finance.qq.com/cgi/cgi-bin/rank/pt/getRank?board_type=hy
 - 新浪兜底指数：https://hq.sinajs.cn/list=s_sh000001,...
 """
+import json
+import os
 import time
+from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Optional
 
 import requests
@@ -16,6 +20,10 @@ import requests
 TENCENT_QUOTE_URL = 'https://qt.gtimg.cn/q='
 TENCENT_RANK_URL = 'https://proxy.finance.qq.com/cgi/cgi-bin/rank/pt/getRank'
 SINA_QUOTE_URL = 'https://hq.sinajs.cn/list='
+EASTMONEY_LIMIT_UP_URL = 'https://push2ex.eastmoney.com/getTopicZTPool'
+RESEARCHER_MARKET_SNAPSHOT = Path(os.getenv(
+    'STOCK_SELECTOR_RESEARCHER_MARKET_SNAPSHOT',
+    r'E:\trading\致富研究员\money\paper\market_overview.json'))
 EASTMONEY_INDUSTRY_HOSTS = (
     'https://82.push2.eastmoney.com',
     'https://push2.eastmoney.com',
@@ -38,12 +46,31 @@ HEADERS = {
     'Referer': 'https://gu.qq.com/',
 }
 
+_LIMIT_UP_CACHE = {'day': '', 'at': 0.0, 'counts': None}
+
 
 def _num(value, default=0.0) -> float:
     try:
         return float(value)
     except (TypeError, ValueError):
         return default
+
+
+def _parse_zgb(value):
+    """腾讯板块 zgb 形如 "25/122"（上涨家数/成分家数）→ (up, down, member)。"""
+    try:
+        parts = str(value or '').split('/')
+        if len(parts) != 2:
+            return None, None, None
+        up = int(float(parts[0]))
+        member = int(float(parts[1]))
+        if member <= 0:
+            return None, None, None
+        up = max(0, min(up, member))
+        down = member - up
+        return up, down, member
+    except (TypeError, ValueError):
+        return None, None, None
 
 
 class MarketBoardClient:
@@ -126,6 +153,10 @@ class MarketBoardClient:
         if rows:
             self.last_board_source = '东方财富细分行业'
             return rows
+        rows = self._industry_boards_researcher_snapshot()
+        if rows:
+            self.last_board_source = '致富研究员当日行业快照'
+            return rows
         rows = self._industry_boards_tencent(pz)
         self.last_board_source = '腾讯综合行业（兜底）' if rows else '无可用行业数据'
         return rows
@@ -134,8 +165,8 @@ class MarketBoardClient:
         params = {
             'pn': '1', 'pz': str(pz), 'po': '1', 'np': '1', 'fid': 'f3',
             'fs': 'm:90+t:2',
-            # f104/f105/f106 是行业成分上涨/下跌/平盘数；f107 为行业涨停数。
-            'fields': 'f12,f14,f3,f62,f104,f105,f106,f107,f128,f184',
+            # f104/f105/f106 是行业成分上涨/下跌/平盘数；涨停数另由涨停池按行业聚合。
+            'fields': 'f12,f14,f3,f62,f104,f105,f106,f128,f184',
         }
         for host in EASTMONEY_INDUSTRY_HOSTS:
             data = self._get_json(host + '/api/qt/clist/get', params)
@@ -147,8 +178,6 @@ class MarketBoardClient:
                 up = int(_num(item.get('f104')))
                 down = int(_num(item.get('f105')))
                 flat = int(_num(item.get('f106')))
-                limit_up = (int(_num(item.get('f107')))
-                            if item.get('f107') not in (None, '') else None)
                 member = up + down + flat
                 rows.append({
                     'code': item.get('f12'),
@@ -159,13 +188,96 @@ class MarketBoardClient:
                     'main_net_5d_yi': None,
                     'up': up, 'down': down, 'flat': flat, 'member': member,
                     'up_ratio': up / member if member else None,
-                    'limit_up': limit_up,
+                    'limit_up': None,
                     'main_net_pct': _num(item.get('f184')),
                     'leader': item.get('f128'),
                 })
             if rows:
+                limit_map = self._fetch_limit_up_by_industry()
+                if limit_map is not None:
+                    for row in rows:
+                        row['limit_up'] = limit_map.get(self._normalize_board_name(row['name']), 0)
                 return rows
         return []
+
+    @staticmethod
+    def _normalize_board_name(name) -> str:
+        return ''.join(str(name or '').strip().lower().split())
+
+    def _fetch_limit_up_by_industry(self):
+        """读取东方财富涨停池并按所属行业统计。接口失败时返回 None。"""
+        now = time.time()
+        day = datetime.now().strftime('%Y%m%d')
+        if _LIMIT_UP_CACHE['day'] == day and now - _LIMIT_UP_CACHE['at'] < 30:
+            return _LIMIT_UP_CACHE['counts']
+        params = {
+            'ut': '7eea3edcaed734bea9cbfc24409ed989',
+            'dpt': 'wz.ztzt', 'Pageindex': '0', 'pagesize': '10000',
+            'sort': 'fbt:asc', 'date': day,
+        }
+        data = self._get_json(EASTMONEY_LIMIT_UP_URL, params)
+        payload = (data or {}).get('data')
+        counts = None
+        if isinstance(payload, dict) and str(payload.get('qdate', day)) == day:
+            pool = payload.get('pool')
+            if isinstance(pool, list):
+                counts = self._aggregate_limit_up_by_industry(
+                    item.get('hybk') for item in pool if isinstance(item, dict))
+        _LIMIT_UP_CACHE.update(day=day, at=now, counts=counts)
+        return counts
+
+    @classmethod
+    def _aggregate_limit_up_by_industry(cls, industries):
+        counts = {}
+        for industry in industries:
+            key = cls._normalize_board_name(industry)
+            if key:
+                counts[key] = counts.get(key, 0) + 1
+        return counts
+
+    def _industry_boards_researcher_snapshot(self) -> List[Dict]:
+        """东财行业接口故障时读取本机研究员的同日有效快照。"""
+        try:
+            stat = RESEARCHER_MARKET_SNAPSHOT.stat()
+            file_time = datetime.fromtimestamp(stat.st_mtime)
+            now = datetime.now()
+            if file_time.date() != now.date() or now.timestamp() - stat.st_mtime > 180:
+                # 收盘后，同日最后一份快照依然是当天的有效收盘数据。
+                if not (file_time.date() == now.date() and now.hour >= 15 and file_time.hour >= 15):
+                    return []
+            data = json.loads(RESEARCHER_MARKET_SNAPSHOT.read_text(encoding='utf-8'))
+            if not data.get('ok') or data.get('stale') or not data.get('boards_fresh'):
+                return []
+            # all_boards 在致富研究员中只保留流入/流出各前20，不能拿这个截断集合
+            # 再排序生成跌幅榜；直接组合对应的资金流入榜和流出榜。
+            raw = (data.get('up_boards') or []) + (data.get('down_boards') or [])
+            if not raw:
+                raw = data.get('all_boards') or []
+            limit_map = self._fetch_limit_up_by_industry()
+            rows = []
+            seen = set()
+            for item in raw:
+                code = str(item.get('code') or '')
+                if not code or code in seen:
+                    continue
+                seen.add(code)
+                name = item.get('name') or ''
+                rows.append({
+                    'code': code, 'name': name,
+                    'pct_chg': item.get('pct_chg'), 'pct_chg_5d': None,
+                    'main_net_yi': item.get('main_net_yi'),
+                    'main_net_5d_yi': None,
+                    'up': item.get('up'), 'down': item.get('down'),
+                    'flat': item.get('flat'), 'member': item.get('member'),
+                    'up_ratio': item.get('up_ratio'),
+                    'limit_up': (limit_map.get(self._normalize_board_name(name), 0)
+                                 if limit_map is not None else None),
+                    'main_net_pct': item.get('main_net_pct'),
+                    'leader': item.get('leader'),
+                })
+            return rows
+        except (OSError, ValueError, TypeError, KeyError):
+            return []
 
     def _industry_boards_tencent(self, pz: int = 100) -> List[Dict]:
         params = {
@@ -177,6 +289,7 @@ class MarketBoardClient:
         rows = []
         for it in items:
             lzg = it.get('lzg') or {}
+            up, down, member = _parse_zgb(it.get('zgb'))
             rows.append({
                 'code': it.get('code'),
                 'name': it.get('name'),
@@ -184,15 +297,33 @@ class MarketBoardClient:
                 'pct_chg_5d': _num(it.get('zdf_d5')),
                 'main_net_yi': _num(it.get('zljlr')) / 10000.0,
                 'main_net_5d_yi': _num(it.get('zljlr_d5')) / 10000.0,
-                'up': None, 'down': None, 'flat': None, 'member': None,
-                'up_ratio': None, 'limit_up': None, 'main_net_pct': None,
+                'up': up, 'down': down, 'flat': None, 'member': member,
+                'up_ratio': (up / member) if up is not None and member else None,
+                'limit_up': None, 'main_net_pct': None,
                 'leader': lzg.get('name'),
             })
+        limit_map = self._fetch_limit_up_by_industry()
+        if limit_map:
+            for row in rows:
+                key = self._normalize_board_name(row['name'])
+                if key in limit_map:
+                    row['limit_up'] = limit_map[key]
         return rows
 
     def fetch_snapshot(self, board_limit: int = 8) -> Dict:
         indices = self.fetch_indices()
         boards = self.fetch_industry_boards()
+        stale = False
+        if not boards:
+            cached = _load_cache()
+            if cached:
+                boards = cached.get('boards') or []
+                if not indices:
+                    indices = cached.get('indices') or indices
+                self.last_board_source = f"{cached.get('board_source') or '上次缓存'}(缓存)"
+                stale = True
+        elif indices:
+            _save_cache(indices, boards, self.last_board_source)
         # 与资金研究口径一致：优先按主力净流入排序；接口无资金字段时才按涨跌幅。
         has_flow = any(b.get('main_net_yi') is not None and abs(b.get('main_net_yi') or 0) > 1e-9
                        for b in boards)
@@ -206,6 +337,7 @@ class MarketBoardClient:
             'losers': bearish[:board_limit],
             'sort_key': key,
             'board_source': self.last_board_source,
+            'stale': stale,
             'time': time.strftime('%H:%M:%S'),
         }
 
@@ -228,6 +360,41 @@ class MarketBoardClient:
                 return r.json()
         except Exception:
             return None
+        return None
+
+
+def _cache_path():
+    try:
+        from stock_selector.config import CACHE_DIR
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        return CACHE_DIR / 'market_board.json'
+    except Exception:
+        return None
+
+
+def _save_cache(indices, boards, source):
+    path = _cache_path()
+    if path is None:
+        return
+    try:
+        import json
+        path.write_text(json.dumps(
+            {'indices': indices, 'boards': boards, 'board_source': source,
+             'saved_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')},
+            ensure_ascii=False), encoding='utf-8')
+    except Exception:
+        pass
+
+
+def _load_cache() -> Optional[Dict]:
+    path = _cache_path()
+    if path is None or not path.exists():
+        return None
+    try:
+        import json
+        data = json.loads(path.read_text(encoding='utf-8'))
+        return data if isinstance(data, dict) else None
+    except Exception:
         return None
 
 
