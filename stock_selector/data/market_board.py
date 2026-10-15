@@ -134,7 +134,8 @@ class MarketBoardClient:
         params = {
             'pn': '1', 'pz': str(pz), 'po': '1', 'np': '1', 'fid': 'f3',
             'fs': 'm:90+t:2',
-            'fields': 'f12,f14,f3,f62,f104,f105,f106,f128,f184',
+            # f104/f105/f106 是行业成分上涨/下跌/平盘数；f107 为行业涨停数。
+            'fields': 'f12,f14,f3,f62,f104,f105,f106,f107,f128,f184',
         }
         for host in EASTMONEY_INDUSTRY_HOSTS:
             data = self._get_json(host + '/api/qt/clist/get', params)
@@ -146,6 +147,8 @@ class MarketBoardClient:
                 up = int(_num(item.get('f104')))
                 down = int(_num(item.get('f105')))
                 flat = int(_num(item.get('f106')))
+                limit_up = (int(_num(item.get('f107')))
+                            if item.get('f107') not in (None, '') else None)
                 member = up + down + flat
                 rows.append({
                     'code': item.get('f12'),
@@ -156,6 +159,7 @@ class MarketBoardClient:
                     'main_net_5d_yi': None,
                     'up': up, 'down': down, 'flat': flat, 'member': member,
                     'up_ratio': up / member if member else None,
+                    'limit_up': limit_up,
                     'main_net_pct': _num(item.get('f184')),
                     'leader': item.get('f128'),
                 })
@@ -181,7 +185,7 @@ class MarketBoardClient:
                 'main_net_yi': _num(it.get('zljlr')) / 10000.0,
                 'main_net_5d_yi': _num(it.get('zljlr_d5')) / 10000.0,
                 'up': None, 'down': None, 'flat': None, 'member': None,
-                'up_ratio': None, 'main_net_pct': None,
+                'up_ratio': None, 'limit_up': None, 'main_net_pct': None,
                 'leader': lzg.get('name'),
             })
         return rows

@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "time": "2026-10-15 15:15:03",
+  "time": "2026-10-15 15:29:12",
   "session": "已收盘",
   "in_session": false,
   "quote_error": "",
@@ -109,7 +109,7 @@
   ],
   "market": {
     "ok": true,
-    "time": "2026-10-15 15:14:56",
+    "time": "2026-10-15 15:29:12",
     "breadth": {
       "ok": false,
       "up": 0,
@@ -2305,7 +2305,7 @@
   },
   "emotion": {
     "ok": true,
-    "time": "2026-10-15 15:14:44",
+    "time": "2026-10-15 15:28:04",
     "day": "20261015",
     "limit_up_n": 36,
     "broken_seal_n": 7,
@@ -2382,7 +2382,7 @@
         "last_seal": 145020,
         "amount": 1566969936,
         "industry": "出版",
-        "fund": 1619214
+        "fund": 1662700
       },
       {
         "code": "605189",
@@ -2394,7 +2394,7 @@
         "last_seal": 93503,
         "amount": 724182160,
         "industry": "纺织制造",
-        "fund": 7197120
+        "fund": 6956145
       },
       {
         "code": "300111",
@@ -2492,7 +2492,7 @@
         "last_seal": 93503,
         "amount": 724182160,
         "industry": "纺织制造",
-        "fund": 7197120
+        "fund": 6956145
       },
       {
         "code": "001318",
@@ -2516,7 +2516,7 @@
         "last_seal": 93125,
         "amount": 140388812,
         "industry": "出版",
-        "fund": 7444740
+        "fund": 7419594
       },
       {
         "code": "001225",
@@ -2612,7 +2612,7 @@
         "last_seal": 94046,
         "amount": 677157968,
         "industry": "医疗服务",
-        "fund": 6104530
+        "fund": 5932215
       },
       {
         "code": "603230",
@@ -2624,7 +2624,7 @@
         "last_seal": 143529,
         "amount": 934846576,
         "industry": "出版",
-        "fund": 2978052
+        "fund": 2950464
       },
       {
         "code": "003029",
@@ -2660,7 +2660,7 @@
         "last_seal": 133610,
         "amount": 141841182,
         "industry": "食品加工",
-        "fund": 1006317
+        "fund": 755973
       },
       {
         "code": "603386",
@@ -2672,7 +2672,7 @@
         "last_seal": 95825,
         "amount": 480281968,
         "industry": "元件",
-        "fund": 3604500
+        "fund": 3582225
       },
       {
         "code": "600281",
@@ -2684,7 +2684,7 @@
         "last_seal": 130249,
         "amount": 276508288,
         "industry": "小金属",
-        "fund": 504849
+        "fund": 432951
       },
       {
         "code": "600668",
@@ -2696,7 +2696,7 @@
         "last_seal": 112438,
         "amount": 269210912,
         "industry": "水泥",
-        "fund": 1441396
+        "fund": 1219274
       },
       {
         "code": "603690",
@@ -2708,7 +2708,7 @@
         "last_seal": 130001,
         "amount": 909691472,
         "industry": "半导体",
-        "fund": 6943217
+        "fund": 6810105
       },
       {
         "code": "605058",
@@ -2720,7 +2720,7 @@
         "last_seal": 143336,
         "amount": 1488855968,
         "industry": "元件",
-        "fund": 2347317
+        "fund": 1938475
       },
       {
         "code": "600812",
@@ -2732,7 +2732,7 @@
         "last_seal": 145428,
         "amount": 2115357568,
         "industry": "化学制药",
-        "fund": 1256841
+        "fund": 2279790
       },
       {
         "code": "002889",
@@ -2780,7 +2780,7 @@
         "last_seal": 132541,
         "amount": 125921716,
         "industry": "物流",
-        "fund": 1096317
+        "fund": 821060
       },
       {
         "code": "605003",
@@ -2792,7 +2792,7 @@
         "last_seal": 134404,
         "amount": 65485334,
         "industry": "服装家纺",
-        "fund": 890428
+        "fund": 867064
       },
       {
         "code": "603329",
@@ -2804,7 +2804,7 @@
         "last_seal": 131505,
         "amount": 230174353,
         "industry": "物流",
-        "fund": 874676
+        "fund": 837287
       },
       {
         "code": "002748",
@@ -2828,7 +2828,7 @@
         "last_seal": 133913,
         "amount": 97926517,
         "industry": "化学制品",
-        "fund": 839677
+        "fund": 810935
       },
       {
         "code": "603200",
@@ -2840,7 +2840,7 @@
         "last_seal": 150000,
         "amount": 1268184176,
         "industry": "环境治理",
-        "fund": 432135
+        "fund": 650870
       },
       {
         "code": "601811",
@@ -2852,7 +2852,7 @@
         "last_seal": 145020,
         "amount": 1566969936,
         "industry": "出版",
-        "fund": 1619214
+        "fund": 1662700
       }
     ],
     "broken_samples": [
@@ -3026,9 +3026,9 @@
     "n": 66,
     "open": 3,
     "sealed": 30,
-    "broken": 8,
+    "broken": 7,
     "resealing": 0,
-    "resealed": 25,
+    "resealed": 26,
     "other": 0
   },
   "channel": {
@@ -3343,7 +3343,7 @@
     {
       "code": "605189",
       "name": "富春染织",
-      "score": 72.72,
+      "score": 72.7,
       "board_n": 2,
       "broken_n": 1,
       "board_role": "weak_to_strong",
@@ -3351,7 +3351,7 @@
       "from_hunt": true,
       "from_potential": true,
       "from_watchlist": false,
-      "fund": 7197120,
+      "fund": 6956145,
       "amount": 724182160,
       "first_seal": 93042,
       "last_seal": 93503,
@@ -3371,13 +3371,13 @@
         "near_limit",
         "resealed"
       ],
-      "board_potential": 72.72,
+      "board_potential": 72.7,
       "trend_label": "连板中"
     },
     {
       "code": "601811",
       "name": "新华文轩",
-      "score": 72.16,
+      "score": 72.17,
       "board_n": 2,
       "broken_n": 1,
       "board_role": "weak_to_strong",
@@ -3385,7 +3385,7 @@
       "from_hunt": true,
       "from_potential": true,
       "from_watchlist": false,
-      "fund": 1619214,
+      "fund": 1662700,
       "amount": 1566969936,
       "first_seal": 144938,
       "last_seal": 145020,
@@ -3405,7 +3405,7 @@
         "near_limit",
         "resealed"
       ],
-      "board_potential": 72.16,
+      "board_potential": 72.17,
       "trend_label": "连板中"
     },
     {
@@ -3717,7 +3717,7 @@
     {
       "code": "603690",
       "name": "至纯科技",
-      "score": 64.69,
+      "score": 64.68,
       "board_n": 1,
       "broken_n": 1,
       "board_role": "weak_to_strong",
@@ -3725,7 +3725,7 @@
       "from_hunt": true,
       "from_potential": true,
       "from_watchlist": false,
-      "fund": 6943217,
+      "fund": 6810105,
       "amount": 909691472,
       "first_seal": 100618,
       "last_seal": 130001,
@@ -3745,7 +3745,7 @@
         "near_limit",
         "resealed"
       ],
-      "board_potential": 64.69,
+      "board_potential": 64.68,
       "trend_label": "首板猎杀"
     }
   ],
@@ -3803,3 +3803,4 @@
   "slots": 3,
   "max_positions": 3,
   "held_n": 0
+}

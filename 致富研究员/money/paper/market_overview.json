@@ -1,15 +1,30 @@
 {
   "ok": true,
-  "time": "2026-10-15 15:11:08",
+  "time": "2026-10-15 15:20:47",
   "breadth": {
-    "ok": false,
-    "up": 0,
-    "down": 0,
-    "flat": 0,
-    "total": 0,
-    "up_ratio": null,
-    "down_ratio": null,
-    "parts": []
+    "ok": true,
+    "up": 403,
+    "down": 4856,
+    "flat": 33,
+    "total": 5292,
+    "up_ratio": 0.0762,
+    "down_ratio": 0.9176,
+    "parts": [
+      {
+        "code": "000001",
+        "name": "上证指数",
+        "up": 190,
+        "down": 2148,
+        "flat": 18
+      },
+      {
+        "code": "399001",
+        "name": "深证成指",
+        "up": 213,
+        "down": 2708,
+        "flat": 15
+      }
+    ]
   },
   "industry_up_n": 14,
   "industry_down_n": 186,
@@ -2190,7 +2205,7 @@
       "flow_side": "in"
     }
   ],
-  "error": "涨跌家数: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+  "error": "",
   "stale": false,
   "boards_fresh": true
 }

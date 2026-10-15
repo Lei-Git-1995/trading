@@ -5,25 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="80e5262d-bf5f-448f-913c-7e19aa05266a" name="Changes" comment="chore(paper): 更新模拟盘周期性运行数据&#10;&#10;- 刷新行情快照与涨停情绪数据，情绪阶段由&quot;偏弱&quot;转为&quot;修复&quot;&#10;- 涨停家数由29增至31，新增东方嘉盛、华林证券封板&#10;- 追加自动交易日志记录，本轮未执行买卖操作&#10;- 更新净值曲线与账户最后标记时间至10:57&#10;- 同步agent记忆与周期状态文件时间戳">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/StockSelector.spec" beforeDir="false" afterPath="$PROJECT_DIR$/StockSelector.spec" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/StockSelector/StockSelector.exe" beforeDir="false" afterPath="$PROJECT_DIR$/dist/StockSelector/StockSelector.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/StockSelector/_internal/base_library.zip" beforeDir="false" afterPath="$PROJECT_DIR$/dist/StockSelector/_internal/base_library.zip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_selector/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_selector/build_gui.ps1" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/build_gui.ps1" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_selector/data/postgres_store.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/data/postgres_store.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stock_selector/data/market_board.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/data/market_board.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stock_selector/docs/快速开始.md" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/docs/快速开始.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stock_selector/gui_app.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/gui_app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_selector/trading/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/trading/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_selector/trading/ai_trader.py" beforeDir="false" afterPath="$PROJECT_DIR$/stock_selector/trading/ai_trader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stock_selector/trading/ths_client.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/致富研究员/money/paper/.last_mark_minute" beforeDir="false" afterPath="$PROJECT_DIR$/致富研究员/money/paper/.last_mark_minute" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/致富研究员/money/paper/account.json" beforeDir="false" afterPath="$PROJECT_DIR$/致富研究员/money/paper/account.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/致富研究员/money/paper/agent_memory.json" beforeDir="false" afterPath="$PROJECT_DIR$/致富研究员/money/paper/agent_memory.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/致富研究员/money/paper/auto_trade.log" beforeDir="false" afterPath="$PROJECT_DIR$/致富研究员/money/paper/auto_trade.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/致富研究员/money/paper/daily_nav.csv" beforeDir="false" afterPath="$PROJECT_DIR$/致富研究员/money/paper/daily_nav.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/致富研究员/money/paper/journal/日记_20261015.txt" beforeDir="false" afterPath="$PROJECT_DIR$/致富研究员/money/paper/journal/日记_20261015.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/致富研究员/money/paper/last_cycle.json" beforeDir="false" afterPath="$PROJECT_DIR$/致富研究员/money/paper/last_cycle.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/致富研究员/money/paper/last_good_quotes.json" beforeDir="false" afterPath="$PROJECT_DIR$/致富研究员/money/paper/last_good_quotes.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/致富研究员/money/paper/limit_up_emotion.json" beforeDir="false" afterPath="$PROJECT_DIR$/致富研究员/money/paper/limit_up_emotion.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/致富研究员/money/paper/live_pnl.json" beforeDir="false" afterPath="$PROJECT_DIR$/致富研究员/money/paper/live_pnl.json" afterDir="false" />

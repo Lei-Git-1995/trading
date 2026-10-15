@@ -322,18 +322,82 @@ class StockSelectorApp:
         # 连板/阶梯（参照致富研究员）
         board_frame = ttk.Frame(notebook, padding=(6, 6))
         notebook.add(board_frame, text='连板/阶梯')
+        bf_meta = ttk.Frame(board_frame)
+        bf_meta.pack(fill='x', pady=(0, 4))
+        self.var_board_tab_meta = tk.StringVar(value='猎板/阶梯: 加载中...')
+        ttk.Label(bf_meta, textvariable=self.var_board_tab_meta, font=FONT).pack(side='left')
+        ttk.Label(board_frame, text='左：盘中猎板池（涨停/炸板）· 右：跨日阶梯战役与待办 · 随盯盘刷新',
+                   style='Hint.TLabel').pack(anchor='w', pady=(0, 4))
+        bf_panes = ttk.Frame(board_frame)
+        bf_panes.pack(fill='both', expand=True)
+        bf_panes.columnconfigure(0, weight=1)
+        bf_panes.columnconfigure(1, weight=1)
+        bf_panes.rowconfigure(0, weight=1)
+        hunt_box = ttk.LabelFrame(bf_panes, text='猎板池（涨停/炸板）', padding=4)
+        hunt_box.grid(row=0, column=0, sticky='nsew', padx=(0, 4))
+        lad_box = ttk.LabelFrame(bf_panes, text='阶梯战役', padding=4)
+        lad_box.grid(row=0, column=1, sticky='nsew', padx=(4, 0))
+        hcols = ('rank', 'code', 'name', 'bn', 'kind', 'seal', 'pct', 'score', 'fund')
+        self.hunt_tree = ttk.Treeview(hunt_box, columns=hcols, show='headings', height=14)
+        hheaders = {'rank':('#',28),'code':('代码',58),'name':('名称',72),'bn':('板',36),'kind':('类型',70),'seal':('封板',56),'pct':('涨幅',56),'score':('分',44),'fund':('封单亿',56)}
+        for c,(t,w) in hheaders.items():
+            self.hunt_tree.heading(c,text=t); self.hunt_tree.column(c,width=w,anchor='center')
+        self.hunt_tree.tag_configure('sealed',foreground=COLOR_UP); self.hunt_tree.tag_configure('broken',foreground=COLOR_DOWN); self.hunt_tree.tag_configure('flat',foreground=COLOR_FLAT)
+        hscroll = ttk.Scrollbar(hunt_box, orient='vertical', command=self.hunt_tree.yview); self.hunt_tree.configure(yscrollcommand=hscroll.set)
+        self.hunt_tree.pack(side='left', fill='both', expand=True); hscroll.pack(side='right', fill='y')
+        lcols = ('code','name','status','h','tgt','days','plan')
+        self.ladder_tree = ttk.Treeview(lad_box, columns=lcols, show='headings', height=14)
+        lheaders = {'code':('代码',58),'name':('备注',72),'status':('状态',64),'h':('高度',44),'tgt':('目标',44),'days':('持有天',52),'plan':('剧本',160)}
+        for c,(t,w) in lheaders.items():
+            self.ladder_tree.heading(c,text=t); self.ladder_tree.column(c,width=w,anchor='w' if c=='plan' else 'center')
+        self.ladder_tree.tag_configure('holding',foreground=COLOR_UP); self.ladder_tree.tag_configure('abort',foreground=COLOR_DOWN); self.ladder_tree.tag_configure('flat',foreground=COLOR_FLAT)
+        lscroll = ttk.Scrollbar(lad_box, orient='vertical', command=self.ladder_tree.yview); self.ladder_tree.configure(yscrollcommand=lscroll.set)
+        self.ladder_tree.pack(side='left', fill='both', expand=True); lscroll.pack(side='right', fill='y')
+        pend_box = ttk.LabelFrame(board_frame, text='阶梯待办 / Agent目标', padding=4)
+        pend_box.pack(fill='x', pady=(6,0))
+        self.var_ladder_pending = tk.StringVar(value='待办: -')
+        ttk.Label(pend_box, textvariable=self.var_ladder_pending, font=FONT).pack(anchor='w')
+
 
         # 最近交易
         trade_frame = ttk.Frame(notebook, padding=(6, 6))
         notebook.add(trade_frame, text='最近交易')
+        tcols = ('time','side','code','name','qty','price','amount','pnl','reason')
+        self.trade_tree = ttk.Treeview(trade_frame, columns=tcols, show='headings')
+        theaders = {'time':('时间',130),'side':('方向',50),'code':('代码',70),'name':('名称',80),'qty':('数量',60),'price':('价格',70),'amount':('金额',80),'pnl':('本次盈亏',80),'reason':('原因',200)}
+        for c,(t,w) in theaders.items():
+            self.trade_tree.heading(c,text=t); self.trade_tree.column(c,width=w,anchor='w' if c=='reason' else 'center')
+        self.trade_tree.tag_configure('profit',foreground=COLOR_UP); self.trade_tree.tag_configure('loss',foreground=COLOR_DOWN); self.trade_tree.tag_configure('flat',foreground=COLOR_FLAT)
+        tscroll = ttk.Scrollbar(trade_frame, orient='vertical', command=self.trade_tree.yview); self.trade_tree.configure(yscrollcommand=tscroll.set)
+        self.trade_tree.pack(side='left', fill='both', expand=True); tscroll.pack(side='right', fill='y')
+
 
         # 自动交易记录
         trade_log_frame = ttk.Frame(notebook, padding=(6, 6))
         notebook.add(trade_log_frame, text='自动交易记录')
+        self.trade_log_text = tk.Text(trade_log_frame, wrap='word', font=FONT_MONO, height=10, state='disabled',
+                                       relief='flat', background='#fbfbfb', padx=6, pady=4)
+        lscroll = ttk.Scrollbar(trade_log_frame, orient='vertical', command=self.trade_log_text.yview)
+        self.trade_log_text.configure(yscrollcommand=lscroll.set)
+        self.trade_log_text.pack(side='left', fill='both', expand=True)
+        lscroll.pack(side='right', fill='y')
+
 
         # 今日复盘
         review_frame = ttk.Frame(notebook, padding=(6, 6))
         notebook.add(review_frame, text='今日复盘')
+        rev_top = ttk.Frame(review_frame)
+        rev_top.pack(fill='x', pady=(0,4))
+        self.var_review_meta = tk.StringVar(value='复盘: 加载中...')
+        ttk.Label(rev_top, textvariable=self.var_review_meta, font=FONT).pack(side='left')
+        rev_body = ttk.Frame(review_frame)
+        rev_body.pack(fill='both', expand=True)
+        self.review_text = tk.Text(rev_body, wrap='word', font=FONT, spacing1=2, spacing3=4, padx=8, pady=8)
+        rscroll = ttk.Scrollbar(rev_body, orient='vertical', command=self.review_text.yview)
+        self.review_text.configure(yscrollcommand=rscroll.set)
+        self.review_text.pack(side='left', fill='both', expand=True)
+        rscroll.pack(side='right', fill='y')
+
 
         # 配置（AI 大模型）
         config_frame = ttk.Frame(notebook, padding=(6, 6))
@@ -429,10 +493,10 @@ class StockSelectorApp:
         self.board_sort_var = tk.StringVar(value='')
         ttk.Label(parent, textvariable=self.board_sort_var, anchor='w',
                   style='Hint.TLabel').pack(fill='x')
-        ttk.Label(parent, text='涨幅榜', anchor='w', font=FONT_BOLD,
+        ttk.Label(parent, text='主力净流入榜', anchor='w', font=FONT_BOLD,
                   foreground=COLOR_UP).pack(fill='x', pady=(4, 0))
         self.board_up_tree = self._mk_board_tree(parent, 7)
-        ttk.Label(parent, text='跌幅榜', anchor='w', font=FONT_BOLD,
+        ttk.Label(parent, text='主力净流出榜', anchor='w', font=FONT_BOLD,
                   foreground=COLOR_DOWN).pack(fill='x', pady=(4, 0))
         self.board_down_tree = self._mk_board_tree(parent, 7)
 
@@ -442,9 +506,11 @@ class StockSelectorApp:
     @staticmethod
     def _mk_board_tree(parent, height):
         tree = ttk.Treeview(
-            parent, columns=('板块', '涨跌%', '上涨比', '主力亿', '主力%'), show='headings', height=height)
-        for col, width, anchor in (('板块', 90, 'w'), ('涨跌%', 58, 'e'),
-                                   ('上涨比', 58, 'e'), ('主力亿', 70, 'e'), ('主力%', 58, 'e')):
+            parent, columns=('板块', '净流入(亿)', '涨幅', '上涨家数', '涨停数', '上涨比'),
+            show='headings', height=height)
+        for col, width, anchor in (('板块', 92, 'w'), ('净流入(亿)', 80, 'e'),
+                                   ('涨幅', 58, 'e'), ('上涨家数', 62, 'e'),
+                                   ('涨停数', 54, 'e'), ('上涨比', 58, 'e')):
             tree.heading(col, text=col, anchor=anchor)
             tree.column(col, width=width, anchor=anchor)
         tree.tag_configure('up', foreground='#d0021b')
@@ -515,10 +581,14 @@ class StockSelectorApp:
             up_ratio = b.get('up_ratio')
             tree.insert(
                 '', 'end', tags=(tag,) if tag else (),
-                values=(b.get('name', ''), self._fmt_signed(pct),
-                        '—' if up_ratio is None else f'{up_ratio * 100:.1f}%',
-                        self._fmt_signed(b.get('main_net_yi')),
-                        self._fmt_signed(b.get('main_net_pct'))))
+                values=(b.get('name', ''), self._fmt_signed(b.get('main_net_yi')),
+                        self._fmt_signed(pct), self._fmt_count(b.get('up')),
+                        self._fmt_count(b.get('limit_up')),
+                        '—' if up_ratio is None else f'{up_ratio * 100:.1f}%'))
+
+    @staticmethod
+    def _fmt_count(value):
+        return '—' if value is None else f'{int(value):,}'
 
     @staticmethod
     def _fmt_signed(value):
