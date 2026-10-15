@@ -1,5 +1,5 @@
 {
-  "time": "2026-10-15 10:47:01",
+  "time": "2026-10-15 10:54:52",
   "session": "交易中(上午)",
   "buys_n": 0,
   "sells_n": 0,
@@ -22,12 +22,12 @@
   "regime": {
     "risk_off": true,
     "source": "picks_archive",
-    "asof": "2026-10-15 10:46:53"
+    "asof": "2026-10-15 10:54:43"
   },
   "emotion": {
-    "phase": "ice",
-    "phase_label": "偏弱",
-    "limit_up_n": 29,
+    "phase": "repair",
+    "phase_label": "修复",
+    "limit_up_n": 30,
     "max_board_height": 5,
     "promotion_rate": 0.1667,
     "broken_seal_n": 3,
@@ -35,9 +35,9 @@
     "broken_open_n": 3
   },
   "seal_tracker": {
-    "n": 55,
+    "n": 56,
     "open": 3,
-    "sealed": 29,
+    "sealed": 30,
     "broken": 5,
     "resealing": 0,
     "resealed": 18,

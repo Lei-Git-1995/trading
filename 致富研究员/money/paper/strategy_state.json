@@ -60,7 +60,7 @@
     "days_with_win": 0
   },
   "milestones": [],
-  "updated_at": "2026-10-15 10:48:56",
+  "updated_at": "2026-10-15 10:56:48",
   "optimize_count": 3,
   "last_llm_slots": {
     "afternoon": "2026-10-09",
@@ -233,7 +233,7 @@
     "updated_at": "2026-10-15 09:35:58",
     "version": 12
   },
-  "slot_risk_off_hint": true,
+  "slot_risk_off_hint": false,
   "last_llm_day": "2026-10-15",
   "last_llm_summary": "大盘全线走弱（上证-1.47%），涨停情绪冰点；雪人集团已掉池走弱须清仓；观察池风语筑/骏亚科技高分待攻击带确认，冰点可小仓试错。",
   "last_llm_at": "2026-10-15 09:35:58",
@@ -667,6 +667,5 @@
     }
   ],
   "hold_advice_at": "2026-10-15 09:35:58",
-  "hold_advice_slot": "open",
-  "slot_risk_off_at": 1792028158.532401
+  "hold_advice_slot": "open"
 }

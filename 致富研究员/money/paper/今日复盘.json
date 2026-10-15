@@ -1,13 +1,13 @@
 {
   "ok": true,
-  "time": "2026-10-15 10:49:54",
+  "time": "2026-10-15 10:56:43",
   "day": "2026-10-15",
-  "sentiment": "偏弱·涨停29·高5",
+  "sentiment": "修复·涨停31·高5",
   "emotion": {
     "ok": true,
-    "time": "2026-10-15 10:49:34",
+    "time": "2026-10-15 10:56:42",
     "day": "20261015",
-    "limit_up_n": 29,
+    "limit_up_n": 31,
     "broken_seal_n": 3,
     "resealed_n": 18,
     "broken_open_n": 3,
@@ -15,10 +15,10 @@
     "promo_n": 6,
     "yest_limit_up_n": 36,
     "promotion_rate": 0.1667,
-    "phase": "ice",
-    "phase_label": "偏弱",
+    "phase": "repair",
+    "phase_label": "修复",
     "height_hist": {
-      "1": 23,
+      "1": 25,
       "5": 2,
       "2": 2,
       "3": 2
@@ -32,9 +32,9 @@
         "broken_n": 1,
         "first_seal": 93000,
         "last_seal": 95836,
-        "amount": 753008528,
+        "amount": 753497824,
         "industry": "饲料",
-        "fund": 128777919
+        "fund": 127565429
       },
       {
         "code": "002343",
@@ -44,21 +44,21 @@
         "broken_n": 0,
         "first_seal": 93015,
         "last_seal": 93015,
-        "amount": 640644208,
+        "amount": 646848240,
         "industry": "影视院线",
-        "fund": 227300265
+        "fund": 216808740
       },
       {
         "code": "000530",
         "name": "冰山冷热",
         "pct_chg": 10.0,
         "board_n": 3,
-        "broken_n": 7,
+        "broken_n": 9,
         "first_seal": 93027,
-        "last_seal": 103357,
-        "amount": 1582632624,
+        "last_seal": 105551,
+        "amount": 1602738656,
         "industry": "通用设备",
-        "fund": 40874068
+        "fund": 388773
       },
       {
         "code": "001318",
@@ -68,9 +68,9 @@
         "broken_n": 0,
         "first_seal": 93048,
         "last_seal": 93048,
-        "amount": 277534160,
+        "amount": 278026288,
         "industry": "饮料乳品",
-        "fund": 164194932
+        "fund": 163146186
       },
       {
         "code": "603258",
@@ -80,9 +80,9 @@
         "broken_n": 1,
         "first_seal": 93008,
         "last_seal": 101150,
-        "amount": 354839344,
+        "amount": 357152992,
         "industry": "游戏Ⅱ",
-        "fund": 77878802
+        "fund": 77642461
       },
       {
         "code": "605189",
@@ -92,9 +92,9 @@
         "broken_n": 1,
         "first_seal": 93042,
         "last_seal": 93503,
-        "amount": 692351216,
+        "amount": 693290128,
         "industry": "纺织制造",
-        "fund": 99286091
+        "fund": 99275381
       },
       {
         "code": "300111",
@@ -104,9 +104,9 @@
         "broken_n": 1,
         "first_seal": 95636,
         "last_seal": 95754,
-        "amount": 681942704,
+        "amount": 683907520,
         "industry": "化学制药",
-        "fund": 263899349
+        "fund": 262290693
       },
       {
         "code": "301282",
@@ -116,9 +116,9 @@
         "broken_n": 0,
         "first_seal": 93306,
         "last_seal": 93306,
-        "amount": 512590032,
+        "amount": 514547888,
         "industry": "元件",
-        "fund": 507415883
+        "fund": 503256549
       }
     ],
     "zt_items": [
@@ -130,9 +130,9 @@
         "broken_n": 0,
         "first_seal": 92500,
         "last_seal": 92500,
-        "amount": 284664080,
+        "amount": 285645216,
         "industry": "元件",
-        "fund": 1144339053
+        "fund": 1124723028
       },
       {
         "code": "000626",
@@ -142,9 +142,9 @@
         "broken_n": 1,
         "first_seal": 93000,
         "last_seal": 100212,
-        "amount": 338052384,
+        "amount": 338705696,
         "industry": "物流",
-        "fund": 115338495
+        "fund": 114610155
       },
       {
         "code": "002696",
@@ -154,9 +154,9 @@
         "broken_n": 1,
         "first_seal": 93000,
         "last_seal": 95836,
-        "amount": 753008528,
+        "amount": 753497824,
         "industry": "饲料",
-        "fund": 128777919
+        "fund": 127565429
       },
       {
         "code": "603258",
@@ -166,9 +166,9 @@
         "broken_n": 1,
         "first_seal": 93008,
         "last_seal": 101150,
-        "amount": 354839344,
+        "amount": 357152992,
         "industry": "游戏Ⅱ",
-        "fund": 77878802
+        "fund": 77642461
       },
       {
         "code": "002343",
@@ -178,21 +178,21 @@
         "broken_n": 0,
         "first_seal": 93015,
         "last_seal": 93015,
-        "amount": 640644208,
+        "amount": 646848240,
         "industry": "影视院线",
-        "fund": 227300265
+        "fund": 216808740
       },
       {
         "code": "000530",
         "name": "冰山冷热",
         "pct_chg": 10.0,
         "board_n": 3,
-        "broken_n": 7,
+        "broken_n": 9,
         "first_seal": 93027,
-        "last_seal": 103357,
-        "amount": 1582632624,
+        "last_seal": 105551,
+        "amount": 1602738656,
         "industry": "通用设备",
-        "fund": 40874068
+        "fund": 388773
       },
       {
         "code": "605189",
@@ -202,9 +202,9 @@
         "broken_n": 1,
         "first_seal": 93042,
         "last_seal": 93503,
-        "amount": 692351216,
+        "amount": 693290128,
         "industry": "纺织制造",
-        "fund": 99286091
+        "fund": 99275381
       },
       {
         "code": "001318",
@@ -214,9 +214,9 @@
         "broken_n": 0,
         "first_seal": 93048,
         "last_seal": 93048,
-        "amount": 277534160,
+        "amount": 278026288,
         "industry": "饮料乳品",
-        "fund": 164194932
+        "fund": 163146186
       },
       {
         "code": "603999",
@@ -226,9 +226,9 @@
         "broken_n": 0,
         "first_seal": 93125,
         "last_seal": 93125,
-        "amount": 107012290,
+        "amount": 107439772,
         "industry": "出版",
-        "fund": 243982494
+        "fund": 239114838
       },
       {
         "code": "001225",
@@ -238,9 +238,9 @@
         "broken_n": 1,
         "first_seal": 93130,
         "last_seal": 93257,
-        "amount": 213324247,
+        "amount": 213378147,
         "industry": "专用设备",
-        "fund": 309669360
+        "fund": 309623160
       },
       {
         "code": "000710",
@@ -250,9 +250,9 @@
         "broken_n": 0,
         "first_seal": 93306,
         "last_seal": 93306,
-        "amount": 319302800,
+        "amount": 321200352,
         "industry": "医疗服务",
-        "fund": 320023073
+        "fund": 317384171
       },
       {
         "code": "301282",
@@ -262,9 +262,9 @@
         "broken_n": 0,
         "first_seal": 93306,
         "last_seal": 93306,
-        "amount": 512590032,
+        "amount": 514547888,
         "industry": "元件",
-        "fund": 507415883
+        "fund": 503256549
       },
       {
         "code": "000722",
@@ -274,9 +274,9 @@
         "broken_n": 0,
         "first_seal": 93309,
         "last_seal": 93309,
-        "amount": 294550656,
+        "amount": 295516000,
         "industry": "电力",
-        "fund": 391592486
+        "fund": 376232141
       },
       {
         "code": "002103",
@@ -286,9 +286,9 @@
         "broken_n": 3,
         "first_seal": 93536,
         "last_seal": 101606,
-        "amount": 247069086,
+        "amount": 248736336,
         "industry": "文娱用品",
-        "fund": 116173957
+        "fund": 107953207
       },
       {
         "code": "002134",
@@ -298,9 +298,9 @@
         "broken_n": 1,
         "first_seal": 93557,
         "last_seal": 100206,
-        "amount": 526559056,
+        "amount": 534856576,
         "industry": "元件",
-        "fund": 284276596
+        "fund": 273815264
       },
       {
         "code": "000995",
@@ -310,9 +310,9 @@
         "broken_n": 1,
         "first_seal": 93748,
         "last_seal": 93821,
-        "amount": 320837696,
+        "amount": 321544960,
         "industry": "白酒Ⅱ",
-        "fund": 203150839
+        "fund": 202819263
       },
       {
         "code": "002543",
@@ -322,9 +322,9 @@
         "broken_n": 1,
         "first_seal": 93800,
         "last_seal": 93818,
-        "amount": 165698858,
+        "amount": 167285890,
         "industry": "厨卫电器",
-        "fund": 93823929
+        "fund": 90899661
       },
       {
         "code": "000892",
@@ -334,9 +334,9 @@
         "broken_n": 5,
         "first_seal": 93830,
         "last_seal": 101954,
-        "amount": 1068546640,
+        "amount": 1070272480,
         "industry": "影视院线",
-        "fund": 140255520
+        "fund": 136975296
       },
       {
         "code": "600721",
@@ -346,9 +346,9 @@
         "broken_n": 0,
         "first_seal": 94046,
         "last_seal": 94046,
-        "amount": 509054448,
+        "amount": 511090896,
         "industry": "医疗服务",
-        "fund": 374306740
+        "fund": 367520180
       },
       {
         "code": "000692",
@@ -358,9 +358,9 @@
         "broken_n": 0,
         "first_seal": 94242,
         "last_seal": 94242,
-        "amount": 214689798,
+        "amount": 215079943,
         "industry": "电力",
-        "fund": 116196154
+        "fund": 116045066
       },
       {
         "code": "003029",
@@ -370,9 +370,9 @@
         "broken_n": 1,
         "first_seal": 94927,
         "last_seal": 94948,
-        "amount": 210902215,
+        "amount": 213049141,
         "industry": "软件开发",
-        "fund": 102085111
+        "fund": 99824242
       },
       {
         "code": "300111",
@@ -382,9 +382,9 @@
         "broken_n": 1,
         "first_seal": 95636,
         "last_seal": 95754,
-        "amount": 681942704,
+        "amount": 683907520,
         "industry": "化学制药",
-        "fund": 263899349
+        "fund": 262290693
       },
       {
         "code": "603237",
@@ -394,9 +394,9 @@
         "broken_n": 2,
         "first_seal": 95637,
         "last_seal": 104816,
-        "amount": 109591698,
+        "amount": 110485097,
         "industry": "食品加工",
-        "fund": 37395793
+        "fund": 29960511
       },
       {
         "code": "603386",
@@ -406,9 +406,9 @@
         "broken_n": 0,
         "first_seal": 95825,
         "last_seal": 95825,
-        "amount": 442039440,
+        "amount": 443205840,
         "industry": "元件",
-        "fund": 190767150
+        "fund": 188691525
       },
       {
         "code": "600281",
@@ -418,9 +418,9 @@
         "broken_n": 1,
         "first_seal": 100046,
         "last_seal": 104201,
-        "amount": 224240164,
+        "amount": 228155740,
         "industry": "小金属",
-        "fund": 99235391
+        "fund": 85851682
       },
       {
         "code": "600668",
@@ -430,9 +430,9 @@
         "broken_n": 1,
         "first_seal": 100605,
         "last_seal": 101402,
-        "amount": 191970432,
+        "amount": 195407411,
         "industry": "水泥",
-        "fund": 108974643
+        "fund": 88527753
       },
       {
         "code": "603690",
@@ -442,9 +442,9 @@
         "broken_n": 0,
         "first_seal": 100618,
         "last_seal": 100618,
-        "amount": 657911744,
+        "amount": 674740896,
         "industry": "半导体",
-        "fund": 305866726
+        "fund": 276339632
       },
       {
         "code": "605058",
@@ -454,9 +454,9 @@
         "broken_n": 1,
         "first_seal": 100830,
         "last_seal": 101803,
-        "amount": 1140958016,
+        "amount": 1144419088,
         "industry": "元件",
-        "fund": 176848554
+        "fund": 179999457
       },
       {
         "code": "600812",
@@ -466,16 +466,40 @@
         "broken_n": 1,
         "first_seal": 102258,
         "last_seal": 103319,
-        "amount": 1573853680,
+        "amount": 1611467664,
         "industry": "化学制药",
-        "fund": 194954060
+        "fund": 168140044
+      },
+      {
+        "code": "002889",
+        "name": "东方嘉盛",
+        "pct_chg": 9.97,
+        "board_n": 1,
+        "broken_n": 0,
+        "first_seal": 105027,
+        "last_seal": 105027,
+        "amount": 108094479,
+        "industry": "物流",
+        "fund": 111623731
+      },
+      {
+        "code": "002945",
+        "name": "华林证券",
+        "pct_chg": 10.01,
+        "board_n": 1,
+        "broken_n": 0,
+        "first_seal": 105612,
+        "last_seal": 105612,
+        "amount": 480227424,
+        "industry": "证券Ⅱ",
+        "fund": 899377610
       }
     ],
     "broken_samples": [
       {
         "code": "301025",
         "name": "读客文化",
-        "pct_chg": 8.61,
+        "pct_chg": 9.8,
         "broken_n": 1,
         "first_seal": 93912,
         "industry": "出版"
@@ -483,7 +507,7 @@
       {
         "code": "603533",
         "name": "掌阅科技",
-        "pct_chg": 4.45,
+        "pct_chg": 3.64,
         "broken_n": 2,
         "first_seal": 94005,
         "industry": "数字媒体"
@@ -491,7 +515,7 @@
       {
         "code": "603230",
         "name": "内蒙新华",
-        "pct_chg": 7.12,
+        "pct_chg": 7.5,
         "broken_n": 2,
         "first_seal": 94517,
         "industry": "出版"
@@ -501,7 +525,7 @@
       {
         "code": "301025",
         "name": "读客文化",
-        "pct_chg": 8.61,
+        "pct_chg": 9.8,
         "broken_n": 1,
         "first_seal": 93912,
         "industry": "出版"
@@ -509,7 +533,7 @@
       {
         "code": "603533",
         "name": "掌阅科技",
-        "pct_chg": 4.45,
+        "pct_chg": 3.64,
         "broken_n": 2,
         "first_seal": 94005,
         "industry": "数字媒体"
@@ -517,7 +541,7 @@
       {
         "code": "603230",
         "name": "内蒙新华",
-        "pct_chg": 7.12,
+        "pct_chg": 7.5,
         "broken_n": 2,
         "first_seal": 94517,
         "industry": "出版"
@@ -526,12 +550,12 @@
     "yest_boards": {
       "002696": 4,
       "000530": 2,
-      "000823": 2,
       "002860": 2,
-      "001318": 2,
       "000668": 2,
-      "600202": 2,
       "002552": 1,
+      "000823": 2,
+      "001318": 2,
+      "600202": 2,
       "605189": 1,
       "002343": 4,
       "601188": 2,
@@ -566,12 +590,12 @@
     "today_empty": false,
     "buy_bias": {
       "prefer_buy": true,
-      "tighten": true,
+      "tighten": false,
       "pause_hint": false,
       "trial_ok": true,
-      "score_add": 0.0,
+      "score_add": -1.0,
       "live_pct_add": 0.0,
-      "note": "冰点偏进攻试错：优先攻击带内启动/首板/弱转强，半仓到八成仓；禁贴板死封与高位接力"
+      "note": "修复期偏进攻：低位启动/首二板积极试错"
     }
   },
   "account": {
@@ -608,154 +632,154 @@
     "watchlist_n": 4
   },
   "market": {
-    "up": 592,
-    "down": 4646,
-    "flat": 54,
-    "up_ratio": 0.1119,
-    "total_inflow_yi": 89.07,
-    "total_outflow_yi": 966.34,
+    "up": 0,
+    "down": 0,
+    "flat": 0,
+    "up_ratio": null,
+    "total_inflow_yi": 90.99,
+    "total_outflow_yi": 974.31,
     "inflow_boards": [
       {
         "code": "BK1216",
         "name": "医药生物",
-        "pct_chg": -0.19,
-        "up": 180,
-        "down": 320,
-        "flat": 12,
+        "pct_chg": -0.29,
+        "up": 158,
+        "down": 337,
+        "flat": 17,
         "member": 512,
-        "up_ratio": 0.3516,
-        "main_net_yi": 14.1532,
-        "inflow_yi": 14.1532,
+        "up_ratio": 0.3086,
+        "main_net_yi": 13.6344,
+        "inflow_yi": 13.6344,
         "outflow_yi": 0.0,
-        "large_net_yi": 7.6096,
-        "super_net_yi": 6.5436,
-        "main_net_pct": 2.24,
+        "large_net_yi": 7.3018,
+        "super_net_yi": 6.3326,
+        "main_net_pct": 2.1,
         "side": "down",
         "flow_side": "in"
       },
       {
         "code": "BK1594",
         "name": "化学制剂",
-        "pct_chg": 0.43,
-        "up": 59,
-        "down": 52,
-        "flat": 4,
+        "pct_chg": 0.33,
+        "up": 54,
+        "down": 55,
+        "flat": 6,
         "member": 115,
-        "up_ratio": 0.513,
-        "main_net_yi": 8.6631,
-        "inflow_yi": 8.6631,
+        "up_ratio": 0.4696,
+        "main_net_yi": 8.5567,
+        "inflow_yi": 8.5567,
         "outflow_yi": 0.0,
-        "large_net_yi": 5.0955,
-        "super_net_yi": 3.5676,
-        "main_net_pct": 4.09,
+        "large_net_yi": 5.1258,
+        "super_net_yi": 3.4309,
+        "main_net_pct": 3.95,
         "side": "up",
         "flow_side": "in"
       },
       {
         "code": "BK0465",
         "name": "化学制药",
-        "pct_chg": 0.03,
-        "up": 67,
-        "down": 89,
-        "flat": 5,
+        "pct_chg": -0.07,
+        "up": 61,
+        "down": 93,
+        "flat": 7,
         "member": 161,
-        "up_ratio": 0.4161,
-        "main_net_yi": 8.2998,
-        "inflow_yi": 8.2998,
+        "up_ratio": 0.3789,
+        "main_net_yi": 8.1231,
+        "inflow_yi": 8.1231,
         "outflow_yi": 0.0,
-        "large_net_yi": 4.6147,
-        "super_net_yi": 3.6851,
-        "main_net_pct": 3.28,
-        "side": "up",
-        "flow_side": "in"
-      },
-      {
-        "code": "BK0727",
-        "name": "医疗服务",
-        "pct_chg": 0.83,
-        "up": 24,
-        "down": 30,
-        "flat": 0,
-        "member": 54,
-        "up_ratio": 0.4444,
-        "main_net_yi": 5.7458,
-        "inflow_yi": 5.7458,
-        "outflow_yi": 0.0,
-        "large_net_yi": 2.2177,
-        "super_net_yi": 3.5281,
-        "main_net_pct": 3.99,
-        "side": "up",
+        "large_net_yi": 4.6532,
+        "super_net_yi": 3.4699,
+        "main_net_pct": 3.13,
+        "side": "down",
         "flow_side": "in"
       },
       {
         "code": "BK1575",
         "name": "白酒Ⅲ",
-        "pct_chg": 1.57,
+        "pct_chg": 1.62,
         "up": 18,
         "down": 2,
         "flat": 0,
         "member": 20,
         "up_ratio": 0.9,
-        "main_net_yi": 5.3675,
-        "inflow_yi": 5.3675,
+        "main_net_yi": 5.7765,
+        "inflow_yi": 5.7765,
         "outflow_yi": 0.0,
-        "large_net_yi": 1.6515,
-        "super_net_yi": 3.7161,
-        "main_net_pct": 6.06,
+        "large_net_yi": 2.1451,
+        "super_net_yi": 3.6313,
+        "main_net_pct": 6.33,
         "side": "up",
         "flow_side": "in"
       },
       {
         "code": "BK1277",
         "name": "白酒Ⅱ",
-        "pct_chg": 1.57,
+        "pct_chg": 1.62,
         "up": 18,
         "down": 2,
         "flat": 0,
         "member": 20,
         "up_ratio": 0.9,
-        "main_net_yi": 5.3675,
-        "inflow_yi": 5.3675,
+        "main_net_yi": 5.7765,
+        "inflow_yi": 5.7765,
         "outflow_yi": 0.0,
-        "large_net_yi": 1.6515,
-        "super_net_yi": 3.7161,
-        "main_net_pct": 6.06,
+        "large_net_yi": 2.1451,
+        "super_net_yi": 3.6313,
+        "main_net_pct": 6.34,
+        "side": "up",
+        "flow_side": "in"
+      },
+      {
+        "code": "BK0727",
+        "name": "医疗服务",
+        "pct_chg": 0.46,
+        "up": 16,
+        "down": 35,
+        "flat": 3,
+        "member": 54,
+        "up_ratio": 0.2963,
+        "main_net_yi": 5.7497,
+        "inflow_yi": 5.7497,
+        "outflow_yi": 0.0,
+        "large_net_yi": 2.143,
+        "super_net_yi": 3.6067,
+        "main_net_pct": 3.89,
         "side": "up",
         "flow_side": "in"
       },
       {
         "code": "BK1600",
         "name": "医疗研发外包",
-        "pct_chg": 1.25,
-        "up": 15,
-        "down": 14,
+        "pct_chg": 0.69,
+        "up": 10,
+        "down": 19,
         "flat": 0,
         "member": 29,
-        "up_ratio": 0.5172,
-        "main_net_yi": 4.4131,
-        "inflow_yi": 4.4131,
+        "up_ratio": 0.3448,
+        "main_net_yi": 4.4183,
+        "inflow_yi": 4.4183,
         "outflow_yi": 0.0,
-        "large_net_yi": 2.633,
-        "super_net_yi": 1.7801,
-        "main_net_pct": 4.2,
+        "large_net_yi": 2.5971,
+        "super_net_yi": 1.8212,
+        "main_net_pct": 4.08,
         "side": "up",
         "flow_side": "in"
       },
       {
         "code": "BK0438",
         "name": "食品饮料",
-        "pct_chg": -0.26,
-        "up": 43,
-        "down": 87,
-        "flat": 1,
+        "pct_chg": -0.12,
+        "up": 46,
+        "down": 80,
+        "flat": 5,
         "member": 131,
-        "up_ratio": 0.3282,
-        "main_net_yi": 3.7631,
-        "inflow_yi": 3.7631,
+        "up_ratio": 0.3511,
+        "main_net_yi": 4.0877,
+        "inflow_yi": 4.0877,
         "outflow_yi": 0.0,
-        "large_net_yi": 0.6873,
-        "super_net_yi": 3.0758,
-        "main_net_pct": 2.25,
+        "large_net_yi": 1.1635,
+        "super_net_yi": 2.9242,
+        "main_net_pct": 2.38,
         "side": "down",
         "flow_side": "in"
       }
@@ -764,144 +788,144 @@
       {
         "code": "BK1201",
         "name": "电子",
-        "pct_chg": -2.4,
-        "up": 59,
-        "down": 461,
-        "flat": 3,
+        "pct_chg": -2.13,
+        "up": 66,
+        "down": 453,
+        "flat": 4,
         "member": 523,
-        "up_ratio": 0.1128,
-        "main_net_yi": -96.8525,
+        "up_ratio": 0.1262,
+        "main_net_yi": -96.8931,
         "inflow_yi": 0.0,
-        "outflow_yi": 96.8525,
-        "large_net_yi": -42.866,
-        "super_net_yi": -53.9865,
-        "main_net_pct": -4.78,
+        "outflow_yi": 96.8931,
+        "large_net_yi": -43.741,
+        "super_net_yi": -53.1521,
+        "main_net_pct": -4.64,
         "side": "down",
         "flow_side": "out"
       },
       {
         "code": "BK1036",
         "name": "半导体",
-        "pct_chg": -3.14,
-        "up": 12,
-        "down": 176,
+        "pct_chg": -2.67,
+        "up": 18,
+        "down": 170,
         "flat": 0,
         "member": 188,
-        "up_ratio": 0.0638,
-        "main_net_yi": -58.6765,
+        "up_ratio": 0.0957,
+        "main_net_yi": -58.3626,
         "inflow_yi": 0.0,
-        "outflow_yi": 58.6765,
-        "large_net_yi": -19.6748,
-        "super_net_yi": -39.0017,
-        "main_net_pct": -6.21,
+        "outflow_yi": 58.3626,
+        "large_net_yi": -19.9691,
+        "super_net_yi": -38.3934,
+        "main_net_pct": -5.96,
         "side": "down",
         "flow_side": "out"
       },
       {
         "code": "BK1215",
         "name": "通信",
-        "pct_chg": -2.65,
-        "up": 4,
-        "down": 125,
-        "flat": 4,
+        "pct_chg": -2.49,
+        "up": 8,
+        "down": 122,
+        "flat": 3,
         "member": 133,
-        "up_ratio": 0.0301,
-        "main_net_yi": -49.5768,
+        "up_ratio": 0.0602,
+        "main_net_yi": -51.3973,
         "inflow_yi": 0.0,
-        "outflow_yi": 49.5768,
-        "large_net_yi": -25.9877,
-        "super_net_yi": -23.5891,
-        "main_net_pct": -9.39,
+        "outflow_yi": 51.3973,
+        "large_net_yi": -26.8484,
+        "super_net_yi": -24.5489,
+        "main_net_pct": -9.43,
         "side": "down",
         "flow_side": "out"
       },
       {
         "code": "BK0448",
         "name": "通信设备",
-        "pct_chg": -3.0,
-        "up": 3,
-        "down": 88,
+        "pct_chg": -2.9,
+        "up": 4,
+        "down": 87,
         "flat": 3,
         "member": 94,
-        "up_ratio": 0.0319,
-        "main_net_yi": -46.5868,
+        "up_ratio": 0.0426,
+        "main_net_yi": -48.4111,
         "inflow_yi": 0.0,
-        "outflow_yi": 46.5868,
-        "large_net_yi": -24.5396,
-        "super_net_yi": -22.0472,
-        "main_net_pct": -9.53,
+        "outflow_yi": 48.4111,
+        "large_net_yi": -25.3636,
+        "super_net_yi": -23.0475,
+        "main_net_pct": -9.59,
         "side": "down",
         "flow_side": "out"
       },
       {
         "code": "BK1331",
         "name": "数字芯片设计",
-        "pct_chg": -3.94,
-        "up": 1,
-        "down": 55,
+        "pct_chg": -3.51,
+        "up": 3,
+        "down": 53,
         "flat": 0,
         "member": 56,
-        "up_ratio": 0.0179,
-        "main_net_yi": -40.3977,
+        "up_ratio": 0.0536,
+        "main_net_yi": -40.9829,
         "inflow_yi": 0.0,
-        "outflow_yi": 40.3977,
-        "large_net_yi": -12.3115,
-        "super_net_yi": -28.0862,
-        "main_net_pct": -9.57,
+        "outflow_yi": 40.9829,
+        "large_net_yi": -12.9255,
+        "super_net_yi": -28.0575,
+        "main_net_pct": -9.42,
         "side": "down",
         "flow_side": "out"
       },
       {
         "code": "BK1205",
         "name": "机械设备",
-        "pct_chg": -2.58,
-        "up": 37,
-        "down": 587,
+        "pct_chg": -2.35,
+        "up": 44,
+        "down": 580,
         "flat": 4,
         "member": 628,
-        "up_ratio": 0.0589,
-        "main_net_yi": -36.4484,
+        "up_ratio": 0.0701,
+        "main_net_yi": -37.3354,
         "inflow_yi": 0.0,
-        "outflow_yi": 36.4484,
-        "large_net_yi": -17.4299,
-        "super_net_yi": -19.0184,
-        "main_net_pct": -6.28,
+        "outflow_yi": 37.3354,
+        "large_net_yi": -17.3548,
+        "super_net_yi": -19.9806,
+        "main_net_pct": -6.25,
         "side": "down",
         "flow_side": "out"
       },
       {
         "code": "BK1591",
         "name": "通信网络设备及器件",
-        "pct_chg": -3.45,
-        "up": 1,
-        "down": 36,
+        "pct_chg": -3.41,
+        "up": 0,
+        "down": 37,
         "flat": 1,
         "member": 38,
-        "up_ratio": 0.0263,
-        "main_net_yi": -34.666,
+        "up_ratio": 0.0,
+        "main_net_yi": -36.2001,
         "inflow_yi": 0.0,
-        "outflow_yi": 34.666,
-        "large_net_yi": -18.8114,
-        "super_net_yi": -15.8547,
-        "main_net_pct": -10.05,
+        "outflow_yi": 36.2001,
+        "large_net_yi": -19.5428,
+        "super_net_yi": -16.6572,
+        "main_net_pct": -10.16,
         "side": "down",
         "flow_side": "out"
       },
       {
-        "code": "BK0478",
-        "name": "有色金属",
-        "pct_chg": -2.96,
-        "up": 3,
-        "down": 141,
-        "flat": 2,
-        "member": 146,
-        "up_ratio": 0.0205,
-        "main_net_yi": -29.9321,
+        "code": "BK1200",
+        "name": "电力设备",
+        "pct_chg": -2.42,
+        "up": 30,
+        "down": 383,
+        "flat": 0,
+        "member": 413,
+        "up_ratio": 0.0726,
+        "main_net_yi": -29.9108,
         "inflow_yi": 0.0,
-        "outflow_yi": 29.9321,
-        "large_net_yi": -15.0759,
-        "super_net_yi": -14.8562,
-        "main_net_pct": -7.72,
+        "outflow_yi": 29.9108,
+        "large_net_yi": -18.4437,
+        "super_net_yi": -11.4671,
+        "main_net_pct": -4.42,
         "side": "down",
         "flow_side": "out"
       }
@@ -912,54 +936,54 @@
       "code": "000001",
       "name": "上证指数",
       "title": "上证指数",
-      "close": 3704.208,
-      "change": -63.0191,
-      "pct_chg": -1.67,
+      "close": 3712.9586,
+      "change": -54.2685,
+      "pct_chg": -1.44,
       "source": "sina"
     },
     {
       "code": "399001",
       "name": "深证成指",
       "title": "深证成指",
-      "close": 11826.79,
-      "change": -283.801,
-      "pct_chg": -2.34,
+      "close": 11845.43,
+      "change": -265.163,
+      "pct_chg": -2.19,
       "source": "sina"
     },
     {
       "code": "399006",
       "name": "创业板指",
       "title": "创业板指",
-      "close": 2782.58,
-      "change": -84.179,
-      "pct_chg": -2.94,
+      "close": 2784.71,
+      "change": -82.053,
+      "pct_chg": -2.86,
       "source": "sina"
     },
     {
       "code": "000688",
       "name": "科创50",
       "title": "科创50",
-      "close": 1342.7142,
-      "change": -37.5435,
-      "pct_chg": -2.72,
+      "close": 1349.5182,
+      "change": -30.7395,
+      "pct_chg": -2.23,
       "source": "sina"
     },
     {
       "code": "000300",
       "name": "沪深300",
       "title": "沪深300",
-      "close": 4146.3414,
-      "change": -71.3387,
-      "pct_chg": -1.69,
+      "close": 4156.1403,
+      "change": -61.5398,
+      "pct_chg": -1.46,
       "source": "sina"
     },
     {
       "code": "000016",
       "name": "上证50",
       "title": "上证50",
-      "close": 2744.4035,
-      "change": -32.5161,
-      "pct_chg": -1.17,
+      "close": 2753.3143,
+      "change": -23.6053,
+      "pct_chg": -0.85,
       "source": "sina"
     }
   ],

@@ -1,8 +1,8 @@
 {
   "ok": true,
-  "time": "2026-10-15 10:50:04",
+  "time": "2026-10-15 10:56:42",
   "day": "20261015",
-  "limit_up_n": 29,
+  "limit_up_n": 31,
   "broken_seal_n": 3,
   "resealed_n": 18,
   "broken_open_n": 3,
@@ -10,10 +10,10 @@
   "promo_n": 6,
   "yest_limit_up_n": 36,
   "promotion_rate": 0.1667,
-  "phase": "ice",
-  "phase_label": "偏弱",
+  "phase": "repair",
+  "phase_label": "修复",
   "height_hist": {
-    "1": 23,
+    "1": 25,
     "5": 2,
     "2": 2,
     "3": 2
@@ -27,9 +27,9 @@
       "broken_n": 1,
       "first_seal": 93000,
       "last_seal": 95836,
-      "amount": 753009600,
+      "amount": 753497824,
       "industry": "饲料",
-      "fund": 128545078
+      "fund": 127565429
     },
     {
       "code": "002343",
@@ -39,21 +39,21 @@
       "broken_n": 0,
       "first_seal": 93015,
       "last_seal": 93015,
-      "amount": 640673616,
+      "amount": 646848240,
       "industry": "影视院线",
-      "fund": 227167506
+      "fund": 216808740
     },
     {
       "code": "000530",
       "name": "冰山冷热",
       "pct_chg": 10.0,
       "board_n": 3,
-      "broken_n": 7,
+      "broken_n": 9,
       "first_seal": 93027,
-      "last_seal": 103357,
-      "amount": 1583679744,
+      "last_seal": 105551,
+      "amount": 1602738656,
       "industry": "通用设备",
-      "fund": 36749790
+      "fund": 388773
     },
     {
       "code": "001318",
@@ -63,9 +63,9 @@
       "broken_n": 0,
       "first_seal": 93048,
       "last_seal": 93048,
-      "amount": 277563008,
+      "amount": 278026288,
       "industry": "饮料乳品",
-      "fund": 164198326
+      "fund": 163146186
     },
     {
       "code": "603258",
@@ -75,9 +75,9 @@
       "broken_n": 1,
       "first_seal": 93008,
       "last_seal": 101150,
-      "amount": 354924640,
+      "amount": 357152992,
       "industry": "游戏Ⅱ",
-      "fund": 77857478
+      "fund": 77642461
     },
     {
       "code": "605189",
@@ -87,9 +87,9 @@
       "broken_n": 1,
       "first_seal": 93042,
       "last_seal": 93503,
-      "amount": 692772480,
+      "amount": 693290128,
       "industry": "纺织制造",
-      "fund": 99166496
+      "fund": 99275381
     },
     {
       "code": "300111",
@@ -99,9 +99,9 @@
       "broken_n": 1,
       "first_seal": 95636,
       "last_seal": 95754,
-      "amount": 682180880,
+      "amount": 683907520,
       "industry": "化学制药",
-      "fund": 263617389
+      "fund": 262290693
     },
     {
       "code": "301282",
@@ -111,9 +111,9 @@
       "broken_n": 0,
       "first_seal": 93306,
       "last_seal": 93306,
-      "amount": 512629968,
+      "amount": 514547888,
       "industry": "元件",
-      "fund": 507455819
+      "fund": 503256549
     }
   ],
   "zt_items": [
@@ -125,9 +125,9 @@
       "broken_n": 0,
       "first_seal": 92500,
       "last_seal": 92500,
-      "amount": 284743120,
+      "amount": 285645216,
       "industry": "元件",
-      "fund": 1143967053
+      "fund": 1124723028
     },
     {
       "code": "000626",
@@ -137,9 +137,9 @@
       "broken_n": 1,
       "first_seal": 93000,
       "last_seal": 100212,
-      "amount": 338056960,
+      "amount": 338705696,
       "industry": "物流",
-      "fund": 115300065
+      "fund": 114610155
     },
     {
       "code": "002696",
@@ -149,9 +149,9 @@
       "broken_n": 1,
       "first_seal": 93000,
       "last_seal": 95836,
-      "amount": 753009600,
+      "amount": 753497824,
       "industry": "饲料",
-      "fund": 128545078
+      "fund": 127565429
     },
     {
       "code": "603258",
@@ -161,9 +161,9 @@
       "broken_n": 1,
       "first_seal": 93008,
       "last_seal": 101150,
-      "amount": 354924640,
+      "amount": 357152992,
       "industry": "游戏Ⅱ",
-      "fund": 77857478
+      "fund": 77642461
     },
     {
       "code": "002343",
@@ -173,21 +173,21 @@
       "broken_n": 0,
       "first_seal": 93015,
       "last_seal": 93015,
-      "amount": 640673616,
+      "amount": 646848240,
       "industry": "影视院线",
-      "fund": 227167506
+      "fund": 216808740
     },
     {
       "code": "000530",
       "name": "冰山冷热",
       "pct_chg": 10.0,
       "board_n": 3,
-      "broken_n": 7,
+      "broken_n": 9,
       "first_seal": 93027,
-      "last_seal": 103357,
-      "amount": 1583679744,
+      "last_seal": 105551,
+      "amount": 1602738656,
       "industry": "通用设备",
-      "fund": 36749790
+      "fund": 388773
     },
     {
       "code": "605189",
@@ -197,9 +197,9 @@
       "broken_n": 1,
       "first_seal": 93042,
       "last_seal": 93503,
-      "amount": 692772480,
+      "amount": 693290128,
       "industry": "纺织制造",
-      "fund": 99166496
+      "fund": 99275381
     },
     {
       "code": "001318",
@@ -209,9 +209,9 @@
       "broken_n": 0,
       "first_seal": 93048,
       "last_seal": 93048,
-      "amount": 277563008,
+      "amount": 278026288,
       "industry": "饮料乳品",
-      "fund": 164198326
+      "fund": 163146186
     },
     {
       "code": "603999",
@@ -221,9 +221,9 @@
       "broken_n": 0,
       "first_seal": 93125,
       "last_seal": 93125,
-      "amount": 107022958,
+      "amount": 107439772,
       "industry": "出版",
-      "fund": 244002306
+      "fund": 239114838
     },
     {
       "code": "001225",
@@ -233,9 +233,9 @@
       "broken_n": 1,
       "first_seal": 93130,
       "last_seal": 93257,
-      "amount": 213324247,
+      "amount": 213378147,
       "industry": "专用设备",
-      "fund": 309669360
+      "fund": 309623160
     },
     {
       "code": "000710",
@@ -245,9 +245,9 @@
       "broken_n": 0,
       "first_seal": 93306,
       "last_seal": 93306,
-      "amount": 319351600,
+      "amount": 321200352,
       "industry": "医疗服务",
-      "fund": 320052123
+      "fund": 317384171
     },
     {
       "code": "301282",
@@ -257,9 +257,9 @@
       "broken_n": 0,
       "first_seal": 93306,
       "last_seal": 93306,
-      "amount": 512629968,
+      "amount": 514547888,
       "industry": "元件",
-      "fund": 507455819
+      "fund": 503256549
     },
     {
       "code": "000722",
@@ -269,9 +269,9 @@
       "broken_n": 0,
       "first_seal": 93309,
       "last_seal": 93309,
-      "amount": 294584144,
+      "amount": 295516000,
       "industry": "电力",
-      "fund": 391623176
+      "fund": 376232141
     },
     {
       "code": "002103",
@@ -281,9 +281,9 @@
       "broken_n": 3,
       "first_seal": 93536,
       "last_seal": 101606,
-      "amount": 247091586,
+      "amount": 248736336,
       "industry": "文娱用品",
-      "fund": 112345957
+      "fund": 107953207
     },
     {
       "code": "002134",
@@ -293,9 +293,9 @@
       "broken_n": 1,
       "first_seal": 93557,
       "last_seal": 100206,
-      "amount": 526605312,
+      "amount": 534856576,
       "industry": "元件",
-      "fund": 284235218
+      "fund": 273815264
     },
     {
       "code": "000995",
@@ -305,9 +305,9 @@
       "broken_n": 1,
       "first_seal": 93748,
       "last_seal": 93821,
-      "amount": 320905872,
+      "amount": 321544960,
       "industry": "白酒Ⅱ",
-      "fund": 203355400
+      "fund": 202819263
     },
     {
       "code": "002543",
@@ -317,9 +317,9 @@
       "broken_n": 1,
       "first_seal": 93800,
       "last_seal": 93818,
-      "amount": 165789478,
+      "amount": 167285890,
       "industry": "厨卫电器",
-      "fund": 93738037
+      "fund": 90899661
     },
     {
       "code": "000892",
@@ -329,9 +329,9 @@
       "broken_n": 5,
       "first_seal": 93830,
       "last_seal": 101954,
-      "amount": 1068585552,
+      "amount": 1070272480,
       "industry": "影视院线",
-      "fund": 140197992
+      "fund": 136975296
     },
     {
       "code": "600721",
@@ -341,9 +341,9 @@
       "broken_n": 0,
       "first_seal": 94046,
       "last_seal": 94046,
-      "amount": 509127952,
+      "amount": 511090896,
       "industry": "医疗服务",
-      "fund": 374211545
+      "fund": 367520180
     },
     {
       "code": "000692",
@@ -353,9 +353,9 @@
       "broken_n": 0,
       "first_seal": 94242,
       "last_seal": 94242,
-      "amount": 214739498,
+      "amount": 215079943,
       "industry": "电力",
-      "fund": 116163849
+      "fund": 116045066
     },
     {
       "code": "003029",
@@ -365,9 +365,9 @@
       "broken_n": 1,
       "first_seal": 94927,
       "last_seal": 94948,
-      "amount": 211172080,
+      "amount": 213049141,
       "industry": "软件开发",
-      "fund": 101823242
+      "fund": 99824242
     },
     {
       "code": "300111",
@@ -377,9 +377,9 @@
       "broken_n": 1,
       "first_seal": 95636,
       "last_seal": 95754,
-      "amount": 682180880,
+      "amount": 683907520,
       "industry": "化学制药",
-      "fund": 263617389
+      "fund": 262290693
     },
     {
       "code": "603237",
@@ -389,9 +389,9 @@
       "broken_n": 2,
       "first_seal": 95637,
       "last_seal": 104816,
-      "amount": 109986978,
+      "amount": 110485097,
       "industry": "食品加工",
-      "fund": 32981833
+      "fund": 29960511
     },
     {
       "code": "603386",
@@ -401,9 +401,9 @@
       "broken_n": 0,
       "first_seal": 95825,
       "last_seal": 95825,
-      "amount": 442041456,
+      "amount": 443205840,
       "industry": "元件",
-      "fund": 190686150
+      "fund": 188691525
     },
     {
       "code": "600281",
@@ -413,9 +413,9 @@
       "broken_n": 1,
       "first_seal": 100046,
       "last_seal": 104201,
-      "amount": 224773147,
+      "amount": 228155740,
       "industry": "小金属",
-      "fund": 98599771
+      "fund": 85851682
     },
     {
       "code": "600668",
@@ -425,9 +425,9 @@
       "broken_n": 1,
       "first_seal": 100605,
       "last_seal": 101402,
-      "amount": 193658719,
+      "amount": 195407411,
       "industry": "水泥",
-      "fund": 99273185
+      "fund": 88527753
     },
     {
       "code": "603690",
@@ -437,9 +437,9 @@
       "broken_n": 0,
       "first_seal": 100618,
       "last_seal": 100618,
-      "amount": 658275424,
+      "amount": 674740896,
       "industry": "半导体",
-      "fund": 305557716
+      "fund": 276339632
     },
     {
       "code": "605058",
@@ -449,9 +449,9 @@
       "broken_n": 1,
       "first_seal": 100830,
       "last_seal": 101803,
-      "amount": 1142029472,
+      "amount": 1144419088,
       "industry": "元件",
-      "fund": 175629077
+      "fund": 179999457
     },
     {
       "code": "600812",
@@ -461,16 +461,40 @@
       "broken_n": 1,
       "first_seal": 102258,
       "last_seal": 103319,
-      "amount": 1575146000,
+      "amount": 1611467664,
       "industry": "化学制药",
-      "fund": 191703881
+      "fund": 168140044
+    },
+    {
+      "code": "002889",
+      "name": "东方嘉盛",
+      "pct_chg": 9.97,
+      "board_n": 1,
+      "broken_n": 0,
+      "first_seal": 105027,
+      "last_seal": 105027,
+      "amount": 108094479,
+      "industry": "物流",
+      "fund": 111623731
+    },
+    {
+      "code": "002945",
+      "name": "华林证券",
+      "pct_chg": 10.01,
+      "board_n": 1,
+      "broken_n": 0,
+      "first_seal": 105612,
+      "last_seal": 105612,
+      "amount": 480227424,
+      "industry": "证券Ⅱ",
+      "fund": 899377610
     }
   ],
   "broken_samples": [
     {
       "code": "301025",
       "name": "读客文化",
-      "pct_chg": 8.61,
+      "pct_chg": 9.8,
       "broken_n": 1,
       "first_seal": 93912,
       "industry": "出版"
@@ -478,7 +502,7 @@
     {
       "code": "603533",
       "name": "掌阅科技",
-      "pct_chg": 3.94,
+      "pct_chg": 3.64,
       "broken_n": 2,
       "first_seal": 94005,
       "industry": "数字媒体"
@@ -486,7 +510,7 @@
     {
       "code": "603230",
       "name": "内蒙新华",
-      "pct_chg": 7.12,
+      "pct_chg": 7.5,
       "broken_n": 2,
       "first_seal": 94517,
       "industry": "出版"
@@ -496,7 +520,7 @@
     {
       "code": "301025",
       "name": "读客文化",
-      "pct_chg": 8.61,
+      "pct_chg": 9.8,
       "broken_n": 1,
       "first_seal": 93912,
       "industry": "出版"
@@ -504,7 +528,7 @@
     {
       "code": "603533",
       "name": "掌阅科技",
-      "pct_chg": 3.94,
+      "pct_chg": 3.64,
       "broken_n": 2,
       "first_seal": 94005,
       "industry": "数字媒体"
@@ -512,7 +536,7 @@
     {
       "code": "603230",
       "name": "内蒙新华",
-      "pct_chg": 7.12,
+      "pct_chg": 7.5,
       "broken_n": 2,
       "first_seal": 94517,
       "industry": "出版"
@@ -521,12 +545,12 @@
   "yest_boards": {
     "002696": 4,
     "000530": 2,
-    "000823": 2,
     "002860": 2,
-    "001318": 2,
     "000668": 2,
-    "600202": 2,
     "002552": 1,
+    "000823": 2,
+    "001318": 2,
+    "600202": 2,
     "605189": 1,
     "002343": 4,
     "601188": 2,
@@ -561,11 +585,11 @@
   "today_empty": false,
   "buy_bias": {
     "prefer_buy": true,
-    "tighten": true,
+    "tighten": false,
     "pause_hint": false,
     "trial_ok": true,
-    "score_add": 0.0,
+    "score_add": -1.0,
     "live_pct_add": 0.0,
-    "note": "冰点偏进攻试错：优先攻击带内启动/首板/弱转强，半仓到八成仓；禁贴板死封与高位接力"
+    "note": "修复期偏进攻：低位启动/首二板积极试错"
   }
 }
