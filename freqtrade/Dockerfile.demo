@@ -1,0 +1,26 @@
+# OKX Demo 本地镜像：从 Git 仓库拉取指定分支代码，固化进镜像。
+# 用法：docker build --build-arg BRANCH=main -t freqtrade-okx-demo:2026.9 -f Dockerfile.demo .
+# 运行期密钥通过 .env.demo（环境变量注入）提供，不写入镜像。
+FROM freqtradeorg/freqtrade:2026.9
+
+ARG BRANCH=main
+ARG REPO=https://github.com/Lei-Git-1995/trading.git
+
+# 仅安装构建阶段需要的 git，避免污染运行镜像。
+RUN apk add --no-cache git
+
+WORKDIR /freqtrade
+
+# 拉取指定分支的仓库代码到工作目录。
+# 仓库结构：freqtrade/ 子目录存放 Freqtrade 项目文件。
+RUN set -eux; \
+    git clone --depth 1 --branch "${BRANCH}" "${REPO}" /tmp/repo; \
+    cp /tmp/repo/freqtrade/demo_guard.py /freqtrade/demo_guard.py; \
+    mkdir -p /freqtrade/user_data/strategies; \
+    cp /tmp/repo/freqtrade/user_data/strategies/OKXDemoFuturesStrategy.py \
+        /freqtrade/user_data/strategies/OKXDemoFuturesStrategy.py; \
+    cp /tmp/repo/freqtrade/user_data/config_okx_demo.json \
+        /freqtrade/user_data/config_okx_demo.json; \
+    cp /tmp/repo/freqtrade/user_data/config_okx_futures_backtest.json \
+        /freqtrade/user_data/config_okx_futures_backtest.json; \
+    rm -rf /tmp/repo

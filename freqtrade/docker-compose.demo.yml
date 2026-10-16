@@ -1,6 +1,11 @@
 services:
   freqtrade-demo:
-    image: freqtradeorg/freqtrade:2026.9
+    build:
+      context: .
+      dockerfile: Dockerfile.demo
+      args:
+        BRANCH: ${OKX_DEMO_BRANCH:-main}
+    image: freqtrade-okx-demo:2026.9
     container_name: freqtrade-okx-demo
     restart: unless-stopped
     env_file:
