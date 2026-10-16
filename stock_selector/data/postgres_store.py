@@ -437,6 +437,25 @@ class PostgresStore:
                          'target_price': _number(r[8]), 'stop_loss': _number(r[9])}
                         for r in cur.fetchall()]
 
+    def set_paper_position_risk(self, account_id: int, code: str, *,
+                                target_price: Optional[float] = None,
+                                stop_loss: Optional[float] = None) -> None:
+        code = str(code).strip().zfill(6)
+        target = _number(target_price)
+        stop = _number(stop_loss)
+        if target is not None and target <= 0 or stop is not None and stop <= 0:
+            raise ValueError('止盈价和止损价必须大于0')
+        if target is not None and stop is not None and stop >= target:
+            raise ValueError('止损价必须低于止盈价')
+        with self.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute('''UPDATE paper_positions
+                    SET target_price=%s, stop_loss=%s, updated_at=NOW()
+                    WHERE account_id=%s AND code=%s AND volume > 0''',
+                    (target, stop, account_id, code))
+                if cur.rowcount == 0:
+                    raise ValueError(f'{code} 当前没有模拟盘持仓')
+
     def execute_paper_order(self, account_id: int, *, code: str, name: str,
                             action: str, price: float, volume: int, reason: str = '',
                             max_position_pct: Optional[float] = None,
