@@ -11,3 +11,14 @@ output/*
 !output/.gitkeep
 gui_crash.log
 config.local.json
+
+# PyInstaller build outputs
+build_market_*/
+*.spec
+*.exe
+*.pyz
+*.pkg
+*.toc
+*.html
+warn-*
+xref-*

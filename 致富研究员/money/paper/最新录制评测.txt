@@ -1,3 +1,0 @@
-录制周期评测
-ticks=12 buys=0 pnl=0.0
-E:\trading\致富研究员\money\paper\eval\recorded_latest_fixture.json

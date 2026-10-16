@@ -626,6 +626,48 @@ class PostgresStore:
                          'signal_date': str(row[11]) if row[11] else '', 'explanation': row[12]}
                         for row in cur.fetchall()]
 
+    def query_selections(self, *, date_from: Optional[str] = None,
+                         date_to: Optional[str] = None,
+                         category: Optional[str] = None,
+                         strategy_id: Optional[str] = None,
+                         limit: int = 100, offset: int = 0) -> tuple[list[Dict[str, Any]], int]:
+        """按日期范围（可选类别/策略）分页查询选股明细，返回 (rows, total)。"""
+        where, params = [], []
+        if date_from:
+            where.append('r.trade_date >= %s')
+            params.append(date_from)
+        if date_to:
+            where.append('r.trade_date <= %s')
+            params.append(date_to)
+        if category:
+            where.append('r.category = %s')
+            params.append(category)
+        if strategy_id:
+            where.append('r.strategy_id = %s')
+            params.append(strategy_id)
+        clause = ('WHERE ' + ' AND '.join(where)) if where else ''
+        base = ('FROM daily_selections d JOIN selection_runs r ON d.run_id = r.id ' + clause)
+        with self.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute('SELECT COUNT(*) ' + base, params)
+                total = int(cur.fetchone()[0] or 0)
+                cur.execute(
+                    'SELECT d.trade_date, r.category, r.strategy_name, d.code, d.name, '
+                    'd.price, d.change_pct, d.turnover, d.volume_ratio, d.volume, d.amount, '
+                    'd.outer_ratio, d.sector, d.score, d.signal_date, d.explanation '
+                    + base + ' ORDER BY d.trade_date DESC, d.score DESC NULLS LAST, d.code '
+                    'LIMIT %s OFFSET %s', params + [int(limit), int(offset)])
+                rows = [{'trade_date': str(r[0]) if r[0] else '',
+                         'category': r[1] or '', 'strategy_name': r[2] or '',
+                         'code': r[3], 'name': r[4], 'price': _number(r[5]),
+                         'change_pct': _number(r[6]), 'turnover': _number(r[7]),
+                         'volume_ratio': _number(r[8]), 'volume': _number(r[9]),
+                         'amount': _number(r[10]), 'outer_ratio': _number(r[11]),
+                         'sector': r[12] or '', 'score': _number(r[13]),
+                         'signal_date': str(r[14]) if r[14] else '', 'explanation': r[15]}
+                        for r in cur.fetchall()]
+        return rows, total
+
     @staticmethod
     def _run_from_row(row) -> Dict[str, Any]:
         return {'id': row[0], 'trade_date': str(row[1]), 'generated_at': row[2],

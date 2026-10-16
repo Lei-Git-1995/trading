@@ -143,6 +143,8 @@ class StockSelectorApp:
         self.market_refreshing = False
         self.board_refreshing = False
         self._last_emotion = None
+        self.q_page = 0
+        self.q_page_size = 100
 
         # LLM 持续分析 Agent
         self.agent_store = None
@@ -307,7 +309,14 @@ class StockSelectorApp:
         ttk.Label(result_top, text='数量:').pack(side='left', padx=(12, 2))
         self.paper_qty_var = tk.StringVar(value='100')
         ttk.Entry(result_top, textvariable=self.paper_qty_var, width=7).pack(side='left')
+        ttk.Label(result_top, text='止盈价:').pack(side='left', padx=(8, 2))
+        self.paper_target_price_var = tk.StringVar(value='')
+        ttk.Entry(result_top, textvariable=self.paper_target_price_var, width=8).pack(side='left')
+        ttk.Label(result_top, text='止损价:').pack(side='left', padx=(6, 2))
+        self.paper_stop_loss_var = tk.StringVar(value='')
+        ttk.Entry(result_top, textvariable=self.paper_stop_loss_var, width=8).pack(side='left')
         ttk.Button(result_top, text='模拟买入(选中)', command=self._on_paper_buy).pack(side='left', padx=4)
+        ttk.Button(result_top, text='模拟卖出(选中持仓)', command=self._on_paper_sell_result).pack(side='left', padx=2)
         ttk.Button(result_top, text='刷新持仓', command=self._refresh_positions).pack(side='left', padx=2)
         self.tree = ttk.Treeview(result_frame, columns=COLUMNS, show='headings', height=16)
         for col in COLUMNS:
@@ -471,13 +480,21 @@ class StockSelectorApp:
         ttk.Button(pos_top, text='模拟卖出(选中)', command=self._on_paper_sell).pack(side='left', padx=4)
         ttk.Button(pos_top, text='全部卖出', command=lambda: self._on_paper_sell(all_out=True)).pack(side='left', padx=2)
         ttk.Button(pos_top, text='刷新持仓', command=self._refresh_positions).pack(side='left', padx=2)
+        ttk.Label(pos_top, text='止盈价:').pack(side='left', padx=(10, 2))
+        self.pos_target_price_var = tk.StringVar(value='')
+        ttk.Entry(pos_top, textvariable=self.pos_target_price_var, width=8).pack(side='left')
+        ttk.Label(pos_top, text='止损价:').pack(side='left', padx=(6, 2))
+        self.pos_stop_loss_var = tk.StringVar(value='')
+        ttk.Entry(pos_top, textvariable=self.pos_stop_loss_var, width=8).pack(side='left')
+        ttk.Button(pos_top, text='设置风控价', command=self._on_set_position_risk).pack(side='left', padx=4)
         self.var_pos_meta = tk.StringVar(value='')
         ttk.Label(pos_top, textvariable=self.var_pos_meta, style='Hint.TLabel').pack(side='right')
-        pcols = ('code', 'name', 'volume', 'avg_cost', 'last_price', 'profit_pct', 'profit', 'value', 'opened')
+        pcols = ('code', 'name', 'volume', 'avg_cost', 'last_price', 'profit_pct', 'profit', 'value', 'target', 'stop', 'opened')
         self.pos_tree = ttk.Treeview(pos_box, columns=pcols, show='headings', height=8)
         pheaders = {'code': ('代码', 70), 'name': ('名称', 90), 'volume': ('持股', 60),
                     'avg_cost': ('成本', 70), 'last_price': ('现价', 70), 'profit_pct': ('盈亏%', 70),
-                    'profit': ('盈亏额', 80), 'value': ('市值', 90), 'opened': ('建仓日', 90)}
+                    'profit': ('盈亏额', 80), 'value': ('市值', 90), 'target': ('止盈价', 75),
+                    'stop': ('止损价', 75), 'opened': ('建仓日', 90)}
         for c, (t, w) in pheaders.items():
             self.pos_tree.heading(c, text=t)
             self.pos_tree.column(c, width=w, anchor='w' if c in ('name', 'opened') else 'center')
@@ -488,37 +505,66 @@ class StockSelectorApp:
         self.pos_tree.pack(side='left', fill='both', expand=True, pady=(4, 0))
         pscroll.pack(side='right', fill='y')
 
-        # 历史选股查询（PostgreSQL 后端）
+        # 历史选股查询（PostgreSQL 后端，日期范围 + 分页）
         q_controls = ttk.Frame(query_frame)
         q_controls.pack(fill='x')
-        ttk.Label(q_controls, text='日期:').pack(side='left')
-        self.q_date_var = tk.StringVar(value='')
-        self.q_date_box = ttk.Combobox(
-            q_controls, textvariable=self.q_date_var, width=12, values=[])
-        self.q_date_box.pack(side='left', padx=(4, 8))
+        ttk.Label(q_controls, text='起始日期:').pack(side='left')
+        self.q_from_var = tk.StringVar(value='')
+        self.q_from_box = ttk.Combobox(
+            q_controls, textvariable=self.q_from_var, width=12, values=[])
+        self.q_from_box.pack(side='left', padx=(4, 8))
+        ttk.Label(q_controls, text='结束日期:').pack(side='left')
+        self.q_to_var = tk.StringVar(value='')
+        self.q_to_box = ttk.Combobox(
+            q_controls, textvariable=self.q_to_var, width=12, values=[])
+        self.q_to_box.pack(side='left', padx=(4, 8))
         ttk.Label(q_controls, text='类别:').pack(side='left')
-        self.q_category_var = tk.StringVar(value='')
+        self.q_category_var = tk.StringVar(value='全部')
         self.q_category_box = ttk.Combobox(
-            q_controls, textvariable=self.q_category_var, width=10, state='readonly', values=[])
+            q_controls, textvariable=self.q_category_var, width=10, state='readonly', values=['全部'])
         self.q_category_box.pack(side='left', padx=(4, 8))
         self.q_category_box.bind('<<ComboboxSelected>>', lambda e: self._refresh_query_strategies())
         ttk.Label(q_controls, text='策略:').pack(side='left')
-        self.q_strategy_var = tk.StringVar(value='')
+        self.q_strategy_var = tk.StringVar(value='全部')
         self.q_strategy_box = ttk.Combobox(
-            q_controls, textvariable=self.q_strategy_var, width=22, state='readonly', values=[])
+            q_controls, textvariable=self.q_strategy_var, width=22, state='readonly', values=['全部'])
         self.q_strategy_box.pack(side='left', padx=(4, 8))
-        ttk.Button(q_controls, text='查询批次', command=self._on_query_runs).pack(side='left', padx=2)
+        ttk.Button(q_controls, text='查询', command=lambda: self._on_query_page(reset=True)).pack(side='left', padx=2)
+
+        q_quick = ttk.Frame(query_frame)
+        q_quick.pack(fill='x', pady=(6, 0))
+        ttk.Label(q_quick, text='快捷:').pack(side='left')
+        ttk.Button(q_quick, text='近3天', command=lambda: self._set_query_range(3)).pack(side='left', padx=2)
+        ttk.Button(q_quick, text='近5天', command=lambda: self._set_query_range(5)).pack(side='left', padx=2)
+        ttk.Button(q_quick, text='近10天', command=lambda: self._set_query_range(10)).pack(side='left', padx=2)
+        ttk.Button(q_quick, text='近30天', command=lambda: self._set_query_range(30)).pack(side='left', padx=2)
+        ttk.Button(q_quick, text='全部', command=lambda: self._set_query_range(0)).pack(side='left', padx=2)
 
         q_row2 = ttk.Frame(query_frame)
         q_row2.pack(fill='x', pady=(6, 0))
-        ttk.Label(q_row2, text='批次:').pack(side='left')
-        self.q_run_var = tk.StringVar(value='')
-        self.q_run_box = ttk.Combobox(
-            q_row2, textvariable=self.q_run_var, width=64, state='readonly', values=[])
-        self.q_run_box.pack(side='left', padx=(4, 8))
-        self.q_run_box.bind('<<ComboboxSelected>>', lambda e: self._on_query_run_selected())
-        ttk.Label(query_frame, text='查询结果展示在上方主表格，可点击「导出CSV」保存。',
-                  style='Hint.TLabel').pack(anchor='w', pady=(6, 0))
+        ttk.Button(q_row2, text='上一页', command=lambda: self._on_query_page(delta=-1)).pack(side='left', padx=2)
+        ttk.Button(q_row2, text='下一页', command=lambda: self._on_query_page(delta=1)).pack(side='left', padx=2)
+        self.q_page_var = tk.StringVar(value='第 1/1 页 · 共 0 条 · 每页 100')
+        ttk.Label(q_row2, textvariable=self.q_page_var).pack(side='left', padx=10)
+        ttk.Button(q_row2, text='导出CSV', command=self._on_export_query).pack(side='left', padx=2)
+
+        q_tree_wrap = ttk.Frame(query_frame)
+        q_tree_wrap.pack(fill='both', expand=True, pady=(6, 0))
+        self.q_tree = ttk.Treeview(q_tree_wrap, columns=COLUMNS, show='headings', height=14)
+        for col in COLUMNS:
+            anchor = 'e' if col in COL_RIGHT else 'w'
+            self.q_tree.heading(col, text=col, anchor=anchor)
+            self.q_tree.column(col, width=COL_WIDTHS.get(col, 90), anchor=anchor,
+                               stretch=(col == '说明'))
+        self.q_tree.tag_configure('up', foreground=COLOR_UP)
+        self.q_tree.tag_configure('down', foreground=COLOR_DOWN)
+        self.q_tree.tag_configure('flat', foreground=COLOR_FLAT)
+        q_vsb = ttk.Scrollbar(q_tree_wrap, orient='vertical', command=self.q_tree.yview)
+        q_hsb = ttk.Scrollbar(q_tree_wrap, orient='horizontal', command=self.q_tree.xview)
+        self.q_tree.configure(yscrollcommand=q_vsb.set, xscrollcommand=q_hsb.set)
+        q_vsb.pack(side='right', fill='y')
+        q_hsb.pack(side='bottom', fill='x')
+        self.q_tree.pack(side='left', fill='both', expand=True)
 
         # 日志区
         log_frame = ttk.LabelFrame(self.root, text='运行日志', padding=(6, 4))
@@ -1097,7 +1143,7 @@ class StockSelectorApp:
                 p.get('code', ''), p.get('name', ''), p.get('volume', 0),
                 f"{p.get('avg_cost', 0):.3f}", f"{p.get('last_price', 0):.2f}",
                 f"{profit_pct:+.2f}", f"{profit:+,.0f}", f"{market_value:,.0f}",
-                p.get('opened_on', '')))
+                _fmt(p.get('target_price'), 3), _fmt(p.get('stop_loss'), 3), p.get('opened_on', '')))
         if account:
             equity = account['cash_balance'] + total_value
             pnl = equity - account['initial_cash']
@@ -1140,6 +1186,17 @@ class StockSelectorApp:
             return
         volume = (volume // 100) * 100 or 100
         self.paper_qty_var.set(str(volume))
+        try:
+            target_price = float(self.paper_target_price_var.get()) if self.paper_target_price_var.get().strip() else None
+            stop_loss = float(self.paper_stop_loss_var.get()) if self.paper_stop_loss_var.get().strip() else None
+        except (TypeError, ValueError):
+            messagebox.showwarning('模拟买入', '止盈价和止损价必须是有效数字')
+            return
+        if ((target_price is not None and target_price <= price) or
+                (stop_loss is not None and stop_loss >= price) or
+                (target_price is not None and stop_loss is not None and stop_loss >= target_price)):
+            messagebox.showwarning('模拟买入', '止盈价应高于买入价，止损价应低于买入价')
+            return
         account = self._paper_account()
         if not account:
             messagebox.showerror('模拟买入', '模拟盘账户不可用')
@@ -1147,12 +1204,75 @@ class StockSelectorApp:
         try:
             order_id = self.db_store.execute_paper_order(
                 account['id'], code=code, name=name, action='buy',
-                price=price, volume=volume, reason='手动模拟买入')
+                price=price, volume=volume, reason='手动模拟买入',
+                target_price=target_price, stop_loss=stop_loss)
         except Exception as exc:  # noqa: BLE001
             messagebox.showerror('模拟买入失败', str(exc))
             return
         print(f'模拟买入 #{order_id}: {code} {name} {volume}股 @{price:.2f}')
         self.status_var.set(f'模拟买入成功：{code} {name} {volume}股 @{price:.2f}')
+        self._after_paper_trade()
+
+    def _on_paper_sell_result(self):
+        if not self._ensure_db_ready():
+            messagebox.showwarning('模拟卖出', '数据库未连接')
+            return
+        row = self._selected_result()
+        if not row:
+            messagebox.showinfo('模拟卖出', '请先在选股结果中选中一只股票')
+            return
+        code = str(row.get('代码') or '').strip().zfill(6)
+        name = str(row.get('名称') or '').strip()
+        try:
+            price = float(row.get('价格') or 0)
+            volume = int(self.paper_qty_var.get())
+        except (TypeError, ValueError):
+            price, volume = 0, 0
+        volume = (volume // 100) * 100
+        if price <= 0 or volume <= 0:
+            messagebox.showwarning('模拟卖出', '请检查选中股票的价格和卖出数量（100股整数倍）')
+            return
+        account = self._paper_account()
+        position = next((p for p in self.db_store.get_paper_positions(account['id'])
+                         if p['code'] == code), None) if account else None
+        if not position:
+            messagebox.showinfo('模拟卖出', f'{code} 当前没有模拟盘持仓')
+            return
+        if volume > position['volume']:
+            messagebox.showwarning('模拟卖出', f"持仓不足：持有 {position['volume']} 股")
+            return
+        try:
+            order_id = self.db_store.execute_paper_order(
+                account['id'], code=code, name=name or position['name'], action='sell',
+                price=price, volume=volume, reason='选股结果页手动模拟卖出')
+        except Exception as exc:  # noqa: BLE001
+            messagebox.showerror('模拟卖出失败', str(exc))
+            return
+        print(f'模拟卖出 #{order_id}: {code} {name} {volume}股 @{price:.2f}')
+        self.status_var.set(f'模拟卖出成功：{code} {name} {volume}股 @{price:.2f}')
+        self._after_paper_trade()
+
+    def _on_set_position_risk(self):
+        if not self._ensure_db_ready():
+            messagebox.showwarning('设置风控价', '数据库未连接')
+            return
+        sel = self.pos_tree.selection()
+        if not sel:
+            messagebox.showinfo('设置风控价', '请先在模拟盘持仓中选中一只股票')
+            return
+        values = self.pos_tree.item(sel[0], 'values')
+        try:
+            target = float(self.pos_target_price_var.get()) if self.pos_target_price_var.get().strip() else None
+            stop = float(self.pos_stop_loss_var.get()) if self.pos_stop_loss_var.get().strip() else None
+            if ((target is not None and target <= 0) or (stop is not None and stop <= 0) or
+                    (target is not None and stop is not None and stop >= target)):
+                raise ValueError('止盈价和止损价需大于0，且止损价低于止盈价')
+            self.db_store.set_paper_position_risk(
+                self._paper_account()['id'], values[0], target_price=target, stop_loss=stop)
+        except Exception as exc:  # noqa: BLE001
+            messagebox.showerror('设置风控价失败', str(exc))
+            return
+        self.status_var.set(f'已更新 {values[0]} 的止盈止损价')
         self._after_paper_trade()
 
     def _on_paper_sell(self, all_out: bool = False):
@@ -1299,6 +1419,8 @@ class StockSelectorApp:
                 self._refresh_positions()
             elif tab == '历史选股结果':
                 self._refresh_query_sources()
+                if not getattr(self, 'q_rows', None):
+                    self._on_query_page(reset=True)
         except Exception:  # noqa: BLE001
             pass
 
@@ -1516,26 +1638,25 @@ class StockSelectorApp:
     # ---------------- 历史选股查询（PostgreSQL 后端） ----------------
 
     def _refresh_query_sources(self):
-        if not hasattr(self, 'q_date_box'):
+        if not hasattr(self, 'q_from_box'):
             return
         try:
             dates = self.db_store.list_run_dates()
-            self.q_date_box.configure(values=dates)
-            if dates and self.q_date_var.get() not in dates:
-                self.q_date_var.set(dates[0])
-            categories = self.db_store.list_run_categories()
+            self.q_from_box.configure(values=dates)
+            self.q_to_box.configure(values=dates)
+            categories = ['全部'] + self.db_store.list_run_categories()
             self.q_category_box.configure(values=categories)
-            if categories:
-                self.q_category_var.set(categories[0])
-                self._refresh_query_strategies()
+            if self.q_category_var.get() not in categories:
+                self.q_category_var.set('全部')
+            self._refresh_query_strategies()
         except Exception as exc:  # noqa: BLE001
             print(f'查询：读取日期/类别失败：{exc}')
 
     def _refresh_query_strategies(self):
         try:
             category = self.q_category_var.get()
-            items = self.db_store.list_run_strategies(category or None)
-            self.q_strategy_ids_by_label = {}
+            items = self.db_store.list_run_strategies(None if category in ('', '全部') else category)
+            self.q_strategy_ids_by_label = {'全部': None}
             for item in items:
                 label = item['strategy_name'] or item['strategy_id']
                 if label in self.q_strategy_ids_by_label:
@@ -1543,85 +1664,97 @@ class StockSelectorApp:
                 self.q_strategy_ids_by_label[label] = item['strategy_id']
             values = list(self.q_strategy_ids_by_label)
             self.q_strategy_box.configure(values=values)
-            self.q_strategy_var.set(values[0] if values else '')
+            if self.q_strategy_var.get() not in values:
+                self.q_strategy_var.set('全部')
         except Exception as exc:  # noqa: BLE001
             print(f'查询：读取策略列表失败：{exc}')
 
-    def _on_query_runs(self):
+    def _set_query_range(self, days):
+        from datetime import timedelta
+        if days <= 0:
+            self.q_from_var.set('')
+            self.q_to_var.set('')
+            return
+        today = datetime.now().date()
+        self.q_to_var.set(str(today))
+        self.q_from_var.set(str(today - timedelta(days=days - 1)))
+
+    def _on_query_page(self, reset=False, delta=0):
         if not self._ensure_db_ready():
             messagebox.showwarning('数据库未连接', '请先启动本地 PostgreSQL 并配置数据库连接。')
             return
-        strategy_id = self.q_strategy_ids_by_label.get(self.q_strategy_var.get()) if hasattr(
-            self, 'q_strategy_ids_by_label') else None
-        try:
-            runs = self.db_store.list_runs(
-                trade_date=self.q_date_var.get() or None,
-                category=self.q_category_var.get() or None,
-                strategy_id=strategy_id,
-                limit=200)
-        except Exception as exc:  # noqa: BLE001
-            messagebox.showerror('查询失败', f'读取批次列表失败：\n{exc}')
-            return
-        self.q_run_ids_by_label = {}
-        for run in runs:
-            count = int(run['selected_count'] or 0)
-            stamp = run['generated_at'].strftime('%H:%M:%S') if run['generated_at'] else ''
-            label = f"#{run['id']} {stamp} {count}只 {run['strategy_id']}"
-            self.q_run_ids_by_label[label] = run['id']
-        values = list(self.q_run_ids_by_label)
-        self.q_run_box.configure(values=values)
-        if values:
-            self.q_run_var.set(values[0])
-            self._load_query_run(self.q_run_ids_by_label[values[0]])
-            self.status_var.set(f'查询：找到 {len(runs)} 个批次，显示最新批次')
-            print(f'查询：日期={self.q_date_var.get() or "全部"} '
-                  f'类别={self.q_category_var.get() or "全部"} '
-                  f'策略={self.q_strategy_var.get() or "全部"}，共 {len(runs)} 个批次')
+        page_size = getattr(self, 'q_page_size', 100)
+        if reset:
+            self.q_page = 0
         else:
-            self.tree.delete(*self.tree.get_children())
-            self.result_rows = []
-            self.export_btn.configure(state='disabled')
-            self.status_var.set('查询：无匹配批次')
-            print('查询：无匹配批次')
-
-    def _on_query_run_selected(self):
-        label = self.q_run_var.get()
-        run_id = self.q_run_ids_by_label.get(label)
-        if run_id:
-            self._load_query_run(run_id)
-
-    def _load_query_run(self, run_id):
+            self.q_page = max(0, getattr(self, 'q_page', 0) + delta)
+        category = self.q_category_var.get()
+        strategy_label = self.q_strategy_var.get()
+        strategy_id = (self.q_strategy_ids_by_label.get(strategy_label)
+                       if hasattr(self, 'q_strategy_ids_by_label') else None)
+        date_from = self.q_from_var.get().strip() or None
+        date_to = self.q_to_var.get().strip() or None
+        offset = self.q_page * page_size
         try:
-            run = self.db_store.get_run(run_id)
-            rows = self.db_store.fetch_run_rows(run_id)
+            rows, total = self.db_store.query_selections(
+                date_from=date_from, date_to=date_to,
+                category=None if category in ('', '全部') else category,
+                strategy_id=strategy_id, limit=page_size, offset=offset)
         except Exception as exc:  # noqa: BLE001
-            messagebox.showerror('查询失败', f'读取批次 #{run_id} 失败：\n{exc}')
+            messagebox.showerror('查询失败', f'读取选股结果失败：\n{exc}')
             return
-        self.tree.delete(*self.tree.get_children())
-        self.result_rows = []
+        max_page = max(0, (total - 1) // page_size)
+        if self.q_page > max_page:
+            self.q_page = max_page
+            offset = self.q_page * page_size
+            rows, total = self.db_store.query_selections(
+                date_from=date_from, date_to=date_to,
+                category=None if category in ('', '全部') else category,
+                strategy_id=strategy_id, limit=page_size, offset=offset)
+        self._render_query_rows(rows)
+        total_pages = (total + page_size - 1) // page_size if total else 0
+        self.q_page_var.set(f'第 {self.q_page + 1}/{total_pages or 1} 页 · 共 {total} 条 · 每页 {page_size}')
+        self.status_var.set(
+            f'查询：{date_from or "起始不限"} ~ {date_to or "结束不限"} · '
+            f'类别={category} · 策略={strategy_label} · 命中 {total} 条')
+        print(f'查询：日期={date_from or "不限"}~{date_to or "不限"} 类别={category} '
+              f'策略={strategy_label} 共 {total} 条，显示第 {self.q_page + 1} 页（{len(rows)} 条）')
+
+    def _render_query_rows(self, rows):
+        self.q_tree.delete(*self.q_tree.get_children())
+        self.q_rows = []
         for r in rows:
             display_row = {
                 '代码': r.get('code'), '名称': r.get('name'), '行业/板块': r.get('sector', ''),
                 '价格': r.get('price'), '涨跌幅%': r.get('change_pct'),
                 '换手%': r.get('turnover'), '量比': r.get('volume_ratio'),
                 '成交量': r.get('volume'), '成交额(亿)': r.get('amount'),
-                '评分': r.get('score'), '日期': r.get('signal_date'),
+                '评分': r.get('score'), '日期': r.get('trade_date') or r.get('signal_date'),
                 '说明': r.get('explanation'),
             }
             values = [self._cell(display_row.get(col)) for col in COLUMNS]
-            self.tree.insert('', 'end', values=values,
-                             tags=(_chg_tag(display_row.get('涨跌幅%')),))
-            self.result_rows.append(display_row)
-        self.last_export_columns = list(COLUMNS)
-        self.export_btn.configure(state='normal' if self.result_rows else 'disabled')
-        count = len(self.result_rows)
-        if run:
-            self.status_var.set(f'批次 #{run["id"]}：{run["strategy_name"]}（{run["strategy_id"]}），共 {count} 只')
-            print(f'批次 #{run["id"]}: {run["trade_date"]} {run["generated_at"]} '
-                  f'类别={run["category"]} 策略={run["strategy_id"]}（{run["strategy_name"]}），'
-                  f'数据 {count} 只')
-        else:
-            self.status_var.set(f'批次 #{run_id}：共 {count} 只')
+            self.q_tree.insert('', 'end', values=values,
+                               tags=(_chg_tag(display_row.get('涨跌幅%')),))
+            self.q_rows.append(display_row)
+
+    def _on_export_query(self):
+        rows = getattr(self, 'q_rows', [])
+        if not rows:
+            messagebox.showinfo('导出CSV', '当前没有查询结果可导出。')
+            return
+        default = f"history_selections_{datetime.now():%Y%m%d_%H%M%S}.csv"
+        path = filedialog.asksaveasfilename(
+            title='导出历史选股结果', defaultextension='.csv',
+            initialfile=default, filetypes=[('CSV 文件', '*.csv'), ('所有文件', '*.*')])
+        if not path:
+            return
+        try:
+            import pandas as pd
+            pd.DataFrame(rows, columns=list(COLUMNS)).to_csv(path, index=False, encoding='utf-8-sig')
+            self.status_var.set(f'已导出 {len(rows)} 条到 {path}')
+            print(f'历史选股结果已导出：{path}（{len(rows)} 条）')
+        except Exception as exc:  # noqa: BLE001
+            messagebox.showerror('导出失败', str(exc))
 
     def _preset_choices(self):
         from stock_selector.utils.config_loader import load_presets_file

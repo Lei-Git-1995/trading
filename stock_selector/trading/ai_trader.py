@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional
 import requests
 
 
-DEFAULT_BASE_URL = 'https://api.openai.com/v1'
+DEFAULT_BASE_URL = 'https://api.hcnsec.cn/v1/'
 
 SYSTEM_PROMPT = (
     '你是一个 A 股短线量化交易助理。根据给定的股票候选数据和当前持仓，'

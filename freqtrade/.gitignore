@@ -17,3 +17,4 @@ user_data/reports/
 backups/
 user_data/market_data.sqlite
 user_data/market_data.sqlite-*
+user_data/backtest_results/

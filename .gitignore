@@ -19,3 +19,12 @@ _diag*
 *.log
 money/
 Wealth-Researcher
+_internal/
+*.exe
+*.pyd
+*.dll
+*.so
+*.dylib
+build_market_*/
+user_data/backtest_results/
+.idea/workspace.xml

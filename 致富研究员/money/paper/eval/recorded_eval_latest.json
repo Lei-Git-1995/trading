@@ -1,8 +1,0 @@
-{
-  "ok": true,
-  "source": "E:\\trading\\致富研究员\\money\\paper\\agent_cycle_ticks.jsonl",
-  "fixture": "E:\\trading\\致富研究员\\money\\paper\\eval\\recorded_latest_fixture.json",
-  "ticks_n": 12,
-  "buys_n": 0,
-  "sim_pnl": 0.0
-}
