@@ -77,6 +77,7 @@ CATEGORY_V2 = 'v2评分'
 CATEGORY_CHOICES = [CATEGORY_PRESET, CATEGORY_TECH, CATEGORY_V2]
 
 # 表格列（顺序）
+NUMERIC_COLUMNS = frozenset({'价格', '涨跌幅%', '换手%', '量比', '成交量', '成交额(亿)', '评分'})
 COLUMNS = ('代码', '名称', '行业/板块', '价格', '涨跌幅%', '换手%', '量比',
            '成交量', '成交额(亿)', '评分', '日期', '说明')
 COL_WIDTHS = {'代码': 70, '名称': 100, '行业/板块': 110, '价格': 70, '涨跌幅%': 70,
@@ -149,6 +150,7 @@ class StockSelectorApp:
         self.risk_busy = False
         self.risk_enabled = threading.Event()
         self.risk_last_blocked = None
+        self._sort_states = {}
 
         # LLM 持续分析 Agent
         self.agent_store = None
@@ -284,7 +286,7 @@ class StockSelectorApp:
                                                                 columnspan=2, sticky='w', pady=(6, 0))
         ttk.Label(toolbar, text='间隔(秒):', style='Field.TLabel').grid(
             row=1, column=2, sticky='w', pady=(6, 0))
-        self.refresh_interval_var = tk.StringVar(value='60')
+        self.refresh_interval_var = tk.StringVar(value='300')
         ttk.Combobox(toolbar, textvariable=self.refresh_interval_var, width=6,
                      state='readonly', values=('30', '60', '120', '300')).grid(
             row=1, column=3, sticky='w', padx=(4, 18), pady=(6, 0))
@@ -339,7 +341,10 @@ class StockSelectorApp:
         self.tree = ttk.Treeview(result_frame, columns=COLUMNS, show='headings', height=16)
         for col in COLUMNS:
             anchor = 'e' if col in COL_RIGHT else 'w'
-            self.tree.heading(col, text=col, anchor=anchor)
+            heading_options = {'text': col, 'anchor': anchor}
+            if col in NUMERIC_COLUMNS:
+                heading_options['command'] = lambda c=col: self._sort_tree(self.tree, c)
+            self.tree.heading(col, **heading_options)
             self.tree.column(col, width=COL_WIDTHS.get(col, 90), anchor=anchor,
                              stretch=(col == '说明'))
         self.tree.tag_configure('up', foreground=COLOR_UP)
@@ -575,7 +580,10 @@ class StockSelectorApp:
         self.q_tree = ttk.Treeview(q_tree_wrap, columns=COLUMNS, show='headings', height=14)
         for col in COLUMNS:
             anchor = 'e' if col in COL_RIGHT else 'w'
-            self.q_tree.heading(col, text=col, anchor=anchor)
+            heading_options = {'text': col, 'anchor': anchor}
+            if col in NUMERIC_COLUMNS:
+                heading_options['command'] = lambda c=col: self._sort_tree(self.q_tree, c)
+            self.q_tree.heading(col, **heading_options)
             self.q_tree.column(col, width=COL_WIDTHS.get(col, 90), anchor=anchor,
                                stretch=(col == '说明'))
         self.q_tree.tag_configure('up', foreground=COLOR_UP)
@@ -1660,9 +1668,9 @@ class StockSelectorApp:
 
     def _schedule_auto_refresh(self):
         try:
-            seconds = max(10, int(self.refresh_interval_var.get() or '60'))
+            seconds = max(10, int(self.refresh_interval_var.get() or '300'))
         except ValueError:
-            seconds = 60
+            seconds = 300
         self.auto_refresh_job = self.root.after(seconds * 1000, self._auto_refresh_tick)
 
     def _auto_refresh_tick(self):
@@ -2126,6 +2134,27 @@ class StockSelectorApp:
         self.run_btn.configure(state='normal')
         self.status_var.set('运行失败')
         messagebox.showerror('运行失败', message)
+
+    def _sort_tree(self, tree, column):
+        state_key = (tree, column)
+        descending = self._sort_states.get(state_key, False)
+        sortable = []
+        missing = []
+        for item in tree.get_children(''):
+            raw = str(tree.set(item, column)).strip()
+            try:
+                number = float(raw.replace(',', '').replace('%', ''))
+            except (TypeError, ValueError):
+                missing.append(item)
+            else:
+                sortable.append((number, item))
+        sortable.sort(key=lambda pair: pair[0], reverse=descending)
+        for index, item in enumerate([item for _, item in sortable] + missing):
+            tree.move(item, '', index)
+        for col in NUMERIC_COLUMNS:
+            indicator = ' ↑' if col == column and not descending else ' ↓' if col == column else ''
+            tree.heading(col, text=col + indicator)
+        self._sort_states[state_key] = not descending
 
     def _cell(self, value):
         if isinstance(value, float):

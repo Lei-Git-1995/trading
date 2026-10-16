@@ -14,6 +14,19 @@ PROXY_CONFIG = ROOT / "user_data" / "config_proxy_local.example.json"
 STRATEGY = "OKXDemoFuturesStrategy"
 
 
+def api_server_is_local(api_server: dict) -> bool:
+    """Allow FreqUI only on loopback, and only with real credentials."""
+    if not api_server.get("enabled"):
+        return True
+    if api_server.get("listen_ip_address") not in ("127.0.0.1", "localhost", "::1"):
+        return False
+    for key in ("password", "jwt_secret_key", "ws_token"):
+        value = api_server.get(key) or ""
+        if not value or value.startswith("CHANGE_THIS"):
+            return False
+    return True
+
+
 def check_config() -> dict:
     config = json.loads(CONFIG.read_text(encoding="utf-8-sig"))
     exchange = config.get("exchange", {})
@@ -29,7 +42,7 @@ def check_config() -> dict:
         "REST host": ccxt_config.get("hostname") == "openapi.okx.com" and urls.get("rest") == "https://openapi.okx.com",
         "Demo WebSocket host": urls.get("ws") == "wss://wspap.okx.com:8443/ws/v5",
         "CCXT sandbox flag": options.get("sandboxMode") is True,
-        "API server disabled": config.get("api_server", {}).get("enabled") is False,
+        "API server localhost-only": api_server_is_local(config.get("api_server", {})),
         "limited pairs": 0 < len(exchange.get("pair_whitelist", [])) <= 2,
         "no alternate CCXT overrides": not exchange.get("ccxt_sync_config") and not exchange.get("ccxt_async_config"),
     }
