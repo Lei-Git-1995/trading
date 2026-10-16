@@ -147,6 +147,7 @@ def fetch_quotes(codes: List[str], timeout: int = 6) -> List[Dict[str, Any]]:
             'code': code6,
             'name': fields[1],
             'price': _f(3),
+            'quote_time': fields[30],
             'prev_close': _f(4),
             'open': _f(5),
             'high': _f(33),

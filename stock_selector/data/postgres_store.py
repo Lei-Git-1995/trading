@@ -441,12 +441,8 @@ class PostgresStore:
                                 target_price: Optional[float] = None,
                                 stop_loss: Optional[float] = None) -> None:
         code = str(code).strip().zfill(6)
-        target = _number(target_price)
-        stop = _number(stop_loss)
-        if target is not None and target <= 0 or stop is not None and stop <= 0:
-            raise ValueError('止盈价和止损价必须大于0')
-        if target is not None and stop is not None and stop >= target:
-            raise ValueError('止损价必须低于止盈价')
+        from stock_selector.trading.risk import risk_prices
+        target, stop = risk_prices(target_price, stop_loss)
         with self.connection() as conn:
             with conn.cursor() as cur:
                 cur.execute('''UPDATE paper_positions
@@ -464,6 +460,12 @@ class PostgresStore:
                             enforce_t_plus_one: bool = True) -> int:
         code, action = str(code).strip().zfill(6), str(action).lower()
         price, volume = float(price), int(volume)
+        import math
+        from stock_selector.trading.risk import risk_prices
+        if not math.isfinite(price):
+            raise ValueError('价格必须是有效数字')
+        if action == 'buy':
+            target_price, stop_loss = risk_prices(target_price, stop_loss, price)
         if not code.isdigit() or action not in ('buy', 'sell'):
             raise ValueError('委托信息无效')
         if price <= 0 or volume <= 0 or volume % 100:

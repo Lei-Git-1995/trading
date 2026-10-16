@@ -145,6 +145,10 @@ class StockSelectorApp:
         self._last_emotion = None
         self.q_page = 0
         self.q_page_size = 100
+        self.risk_queue = queue.Queue()
+        self.risk_busy = False
+        self.risk_enabled = threading.Event()
+        self.risk_last_blocked = None
 
         # LLM 持续分析 Agent
         self.agent_store = None
@@ -163,6 +167,7 @@ class StockSelectorApp:
         self.root.after(600, self._market_timer)
         self.root.after(900, self._board_timer)
         self.root.after(800, self._toggle_auto_refresh)
+        self.root.after(1500, self._risk_timer)
 
     # ---------------- 基础 ----------------
 
@@ -306,6 +311,9 @@ class StockSelectorApp:
         result_top.pack(fill='x', pady=(0, 4))
         self.paper_overview_var = tk.StringVar(value='模拟盘：加载中...')
         ttk.Label(result_top, textvariable=self.paper_overview_var, style='Hint.TLabel').pack(side='left')
+        result_actions = ttk.Frame(result_frame)
+        result_actions.pack(fill='x', pady=(0, 4))
+        result_top = result_actions
         ttk.Label(result_top, text='数量:').pack(side='left', padx=(12, 2))
         self.paper_qty_var = tk.StringVar(value='100')
         ttk.Entry(result_top, textvariable=self.paper_qty_var, width=7).pack(side='left')
@@ -318,6 +326,16 @@ class StockSelectorApp:
         ttk.Button(result_top, text='模拟买入(选中)', command=self._on_paper_buy).pack(side='left', padx=4)
         ttk.Button(result_top, text='模拟卖出(选中持仓)', command=self._on_paper_sell_result).pack(side='left', padx=2)
         ttk.Button(result_top, text='刷新持仓', command=self._refresh_positions).pack(side='left', padx=2)
+        risk_bar = ttk.Frame(result_frame)
+        risk_bar.pack(fill='x', pady=(0, 4))
+        self.risk_auto_var = tk.BooleanVar(value=True)
+        self.risk_enabled.set()
+        ttk.Checkbutton(risk_bar, text='自动止盈止损（模拟盘）', variable=self.risk_auto_var,
+                        command=self._toggle_risk).pack(side='left')
+        self.risk_status_var = tk.StringVar(value='每30秒检查；仅程序运行时生效；未成交原因见日志')
+        ttk.Label(risk_bar, textvariable=self.risk_status_var, style='Hint.TLabel').pack(side='left', padx=8)
+        ttk.Label(result_frame, text='风控价留空不设置；持仓页留空保存可清除',
+                  style='Hint.TLabel').pack(anchor='w')
         self.tree = ttk.Treeview(result_frame, columns=COLUMNS, show='headings', height=16)
         for col in COLUMNS:
             anchor = 'e' if col in COL_RIGHT else 'w'
@@ -480,6 +498,9 @@ class StockSelectorApp:
         ttk.Button(pos_top, text='模拟卖出(选中)', command=self._on_paper_sell).pack(side='left', padx=4)
         ttk.Button(pos_top, text='全部卖出', command=lambda: self._on_paper_sell(all_out=True)).pack(side='left', padx=2)
         ttk.Button(pos_top, text='刷新持仓', command=self._refresh_positions).pack(side='left', padx=2)
+        risk_editor = ttk.Frame(pos_box)
+        risk_editor.pack(fill='x', pady=3)
+        pos_top = risk_editor
         ttk.Label(pos_top, text='止盈价:').pack(side='left', padx=(10, 2))
         self.pos_target_price_var = tk.StringVar(value='')
         ttk.Entry(pos_top, textvariable=self.pos_target_price_var, width=8).pack(side='left')
@@ -488,9 +509,10 @@ class StockSelectorApp:
         ttk.Entry(pos_top, textvariable=self.pos_stop_loss_var, width=8).pack(side='left')
         ttk.Button(pos_top, text='设置风控价', command=self._on_set_position_risk).pack(side='left', padx=4)
         self.var_pos_meta = tk.StringVar(value='')
-        ttk.Label(pos_top, textvariable=self.var_pos_meta, style='Hint.TLabel').pack(side='right')
+        ttk.Label(pos_box, textvariable=self.var_pos_meta, style='Hint.TLabel').pack(anchor='w')
         pcols = ('code', 'name', 'volume', 'avg_cost', 'last_price', 'profit_pct', 'profit', 'value', 'target', 'stop', 'opened')
         self.pos_tree = ttk.Treeview(pos_box, columns=pcols, show='headings', height=8)
+        self.pos_tree.bind('<<TreeviewSelect>>', self._on_position_selected)
         pheaders = {'code': ('代码', 70), 'name': ('名称', 90), 'volume': ('持股', 60),
                     'avg_cost': ('成本', 70), 'last_price': ('现价', 70), 'profit_pct': ('盈亏%', 70),
                     'profit': ('盈亏额', 80), 'value': ('市值', 90), 'target': ('止盈价', 75),
@@ -837,6 +859,7 @@ class StockSelectorApp:
     # ---------------- LLM 持续分析 Agent ----------------
 
     def _on_close(self):
+        self.risk_enabled.clear()
         try:
             if self.agent_scheduler is not None:
                 self.agent_scheduler.stop()
@@ -1184,13 +1207,15 @@ class StockSelectorApp:
         except (TypeError, ValueError):
             messagebox.showwarning('模拟买入', '数量必须是100股的整数倍')
             return
-        volume = (volume // 100) * 100 or 100
-        self.paper_qty_var.set(str(volume))
+        if volume <= 0 or volume % 100:
+            messagebox.showwarning('模拟买入', '数量必须是正的100股整数倍')
+            return
         try:
-            target_price = float(self.paper_target_price_var.get()) if self.paper_target_price_var.get().strip() else None
-            stop_loss = float(self.paper_stop_loss_var.get()) if self.paper_stop_loss_var.get().strip() else None
+            from stock_selector.trading.risk import risk_prices
+            target_price, stop_loss = risk_prices(
+                self.paper_target_price_var.get(), self.paper_stop_loss_var.get(), price)
         except (TypeError, ValueError):
-            messagebox.showwarning('模拟买入', '止盈价和止损价必须是有效数字')
+            messagebox.showwarning('模拟买入', '风控价须大于0，止盈价高于买入价，止损价低于买入价')
             return
         if ((target_price is not None and target_price <= price) or
                 (stop_loss is not None and stop_loss >= price) or
@@ -1225,16 +1250,25 @@ class StockSelectorApp:
         name = str(row.get('名称') or '').strip()
         try:
             price = float(row.get('价格') or 0)
+        except (TypeError, ValueError):
+            price = 0
+        try:
             volume = int(self.paper_qty_var.get())
         except (TypeError, ValueError):
-            price, volume = 0, 0
-        volume = (volume // 100) * 100
-        if price <= 0 or volume <= 0:
+            volume = 0
+        import math
+        if not math.isfinite(price):
+            price = 0
+        if price <= 0 or volume <= 0 or volume % 100:
             messagebox.showwarning('模拟卖出', '请检查选中股票的价格和卖出数量（100股整数倍）')
             return
         account = self._paper_account()
-        position = next((p for p in self.db_store.get_paper_positions(account['id'])
-                         if p['code'] == code), None) if account else None
+        try:
+            position = next((p for p in self.db_store.get_paper_positions(account['id'])
+                             if p['code'] == code), None) if account else None
+        except Exception as exc:
+            messagebox.showerror('模拟卖出失败', str(exc))
+            return
         if not position:
             messagebox.showinfo('模拟卖出', f'{code} 当前没有模拟盘持仓')
             return
@@ -1262,11 +1296,8 @@ class StockSelectorApp:
             return
         values = self.pos_tree.item(sel[0], 'values')
         try:
-            target = float(self.pos_target_price_var.get()) if self.pos_target_price_var.get().strip() else None
-            stop = float(self.pos_stop_loss_var.get()) if self.pos_stop_loss_var.get().strip() else None
-            if ((target is not None and target <= 0) or (stop is not None and stop <= 0) or
-                    (target is not None and stop is not None and stop >= target)):
-                raise ValueError('止盈价和止损价需大于0，且止损价低于止盈价')
+            from stock_selector.trading.risk import risk_prices
+            target, stop = risk_prices(self.pos_target_price_var.get(), self.pos_stop_loss_var.get())
             self.db_store.set_paper_position_risk(
                 self._paper_account()['id'], values[0], target_price=target, stop_loss=stop)
         except Exception as exc:  # noqa: BLE001
@@ -1274,6 +1305,14 @@ class StockSelectorApp:
             return
         self.status_var.set(f'已更新 {values[0]} 的止盈止损价')
         self._after_paper_trade()
+
+    def _on_position_selected(self, _event=None):
+        sel = self.pos_tree.selection()
+        if not sel:
+            return
+        values = self.pos_tree.item(sel[0], 'values')
+        self.pos_target_price_var.set(values[8] if len(values) > 8 else '')
+        self.pos_stop_loss_var.set(values[9] if len(values) > 9 else '')
 
     def _on_paper_sell(self, all_out: bool = False):
         if not self._ensure_db_ready():
@@ -1301,7 +1340,9 @@ class StockSelectorApp:
             except (TypeError, ValueError):
                 messagebox.showwarning('模拟卖出', '数量必须是100股的整数倍')
                 return
-            volume = (volume // 100) * 100 or 100
+            if volume <= 0 or volume % 100:
+                messagebox.showwarning('模拟卖出', '数量必须是正的100股整数倍')
+                return
         if volume > held:
             messagebox.showwarning('模拟卖出', f'持仓不足：持有 {held} 股')
             return
@@ -1325,6 +1366,56 @@ class StockSelectorApp:
         self._refresh_positions()
         self._refresh_trades()
         self._refresh_review()
+
+    def _toggle_risk(self):
+        if self.risk_auto_var.get():
+            self.risk_enabled.set()
+            self.risk_status_var.set('已开启，每30秒检查持仓风控价；仅程序运行时生效')
+        else:
+            self.risk_enabled.clear()
+            self.risk_status_var.set('自动止盈止损已暂停')
+
+    def _risk_timer(self):
+        if self.risk_enabled.is_set() and self.db_ready and not self.risk_busy:
+            self.risk_busy = True
+            threading.Thread(target=self._risk_worker, daemon=True).start()
+            self.root.after(250, self._poll_risk)
+        self.root.after(30000, self._risk_timer)
+
+    def _risk_worker(self):
+        try:
+            from stock_selector.trading.risk import check_position_risk
+            from stock_selector.agent.tools import fetch_quotes
+            account = self.db_store.get_account('模拟盘')
+            outcome = check_position_risk(
+                self.db_store, account['id'], fetch_quotes, enabled=self.risk_enabled.is_set
+            ) if account else {'executed': [], 'blocked': [], 'status': '模拟盘未配置'}
+        except Exception as exc:
+            outcome = {'executed': [], 'blocked': [str(exc)], 'status': '检查失败，稍后重试'}
+        self.risk_queue.put(outcome)
+
+    def _poll_risk(self):
+        try:
+            outcome = self.risk_queue.get_nowait()
+        except queue.Empty:
+            self.root.after(250, self._poll_risk)
+            return
+        self.risk_busy = False
+        if self.risk_enabled.is_set():
+            blocked = outcome['blocked']
+            detail = f'；{blocked[0]}' if blocked else ''
+            self.risk_status_var.set(f"{datetime.now():%H:%M:%S} {outcome['status']}{detail}；仅程序运行时生效")
+        if outcome['blocked'] != self.risk_last_blocked:
+            for line in outcome['blocked']:
+                print(f'[模拟盘风控] {line}')
+            self.risk_last_blocked = outcome['blocked']
+        for line in outcome['executed']:
+            print(f'[模拟盘风控] {line}')
+        if outcome['executed']:
+            self._after_paper_trade()
+        else:
+            self._refresh_positions()
+            self._refresh_paper_overview()
 
     def _refresh_review(self):
         if not hasattr(self, 'review_text'):
