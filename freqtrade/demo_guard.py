@@ -94,7 +94,7 @@ def check_config(config_path: Path = CONFIG) -> dict:
     if overrides:
         raise RuntimeError("Unexpected Freqtrade environment overrides: " + ", ".join(overrides))
     check_ccxt_wiring(ccxt_config)
-    print("OKX Demo configuration checks passed.")
+    print("OKX 模拟盘配置检查通过。")
     return config
 
 
@@ -136,7 +136,7 @@ def check_proxy_config() -> str:
     proxy = settings["httpsProxy"]
     if proxy != settings["wssProxy"] or not proxy.startswith(("http://127.0.0.1:", "http://localhost:")):
         raise RuntimeError("Proxy overlay must use the same local HTTP proxy for REST and WS")
-    print("Local proxy configured for REST and WS:", proxy)
+    print("本地代理已配置（REST 与 WS）：", proxy)
     return proxy
 
 
@@ -171,7 +171,7 @@ def check_demo_credentials(config: dict, proxy: str | None = None) -> None:
             raise RuntimeError("Unexpected OKX Demo balance response")
     finally:
         exchange.close()
-    print("Authenticated signed OKX Demo balance request passed.")
+    print("OKX 模拟盘签名认证余额查询通过。")
 
 
 def main() -> int:
@@ -199,10 +199,10 @@ def main() -> int:
         if proxy:
             command += ["--config", str(PROXY_CONFIG)]
         command += ["--strategy", args.strategy, "--db-url", "sqlite:///" + db, "--logfile", logfile]
-        print("Starting Freqtrade on authenticated OKX Demo API only.", flush=True)
+        print("仅通过已认证的 OKX 模拟盘 API 启动 Freqtrade。", flush=True)
         return subprocess.call(command, cwd=str(ROOT))
     except Exception as exc:
-        print("Demo startup blocked: " + str(exc), file=sys.stderr)
+        print("模拟盘启动被阻止：" + str(exc), file=sys.stderr)
         return 2
 
 

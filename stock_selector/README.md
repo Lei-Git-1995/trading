@@ -109,4 +109,10 @@ py -3.11 -m pip install psycopg2-binary
 py -3.11 -m stock_selector.data.postgres_store
 ```
 
-GUI 启动后会自动检查并创建表；选股完成时会保存策略、日期、数据源、评分、指标和入选说明。数据库暂时不可用时，原有选股和报告仍可正常运行。
+GUI 启动后会自动检查并创建表；选股完成时会保存策略、日期、数据源、评分、指标和入选说明。数据库暂时不可用时，原有选股和报告仍可正常运行。 
+
+
+
+
+
+打包命令： powershell -ExecutionPolicy Bypass -File .\build_stock_selector.ps1

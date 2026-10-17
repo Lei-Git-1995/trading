@@ -40,24 +40,24 @@ foreach ($n in @("FREQTRADE__EXCHANGE__API_KEY", "FREQTRADE__EXCHANGE__SECRET", 
 
 $listener = Get-NetTCPConnection -LocalPort 8081 -State Listen -ErrorAction SilentlyContinue
 if ($listener) {
-    Write-Host "[WARN] Port 8081 already in use (PID $($listener.OwningProcess)). Is this instance already running?"
+    Write-Host "[警告] 端口 8081 已被占用 (PID $($listener.OwningProcess))。是否已启动第二实例？"
 }
 
-Write-Host "== Preflight: signed read-only OKX demo balance request =="
+Write-Host "== 预检：OKX 模拟盘签名只读余额请求 =="
 & $python (Join-Path $root "demo_guard.py") --local-proxy --preflight `
     --config (Join-Path $root "user_data\config_okx_demo_mr.json") `
     --strategy MeanReversion5mStrategy `
     --db tradesv3-demo-mr.sqlite `
     --logfile freqtrade-demo-mr.log
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "[ERROR] Preflight failed, startup blocked."
+    Write-Host "[错误] 预检失败，启动已阻止。"
     exit $LASTEXITCODE
 }
 
-Write-Host "== Preflight passed, starting mean-reversion bot =="
-Write-Host "Log: user_data\logs\freqtrade-demo-mr.log    DB: user_data\tradesv3-demo-mr.sqlite"
-Write-Host "FreqUI: http://127.0.0.1:8081"
-Write-Host "Stop: press Ctrl+C in this window"
+Write-Host "== 预检通过，正在启动 MeanReversion5m 多空策略实例 =="
+Write-Host "日志：user_data\logs\freqtrade-demo-mr.log    数据库：user_data\tradesv3-demo-mr.sqlite"
+Write-Host "FreqUI：http://127.0.0.1:8081"
+Write-Host "停止：按 Ctrl+C 退出本窗口"
 & $python (Join-Path $root "demo_guard.py") --local-proxy `
     --config (Join-Path $root "user_data\config_okx_demo_mr.json") `
     --strategy MeanReversion5mStrategy `

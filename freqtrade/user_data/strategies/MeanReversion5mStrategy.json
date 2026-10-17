@@ -1,0 +1,38 @@
+{
+  "strategy_name": "MeanReversion5mStrategy",
+  "params": {
+    "roi": {
+      "0": 0.04,
+      "30": 0.025,
+      "90": 0.012,
+      "180": 0
+    },
+    "stoploss": {
+      "stoploss": -0.05
+    },
+    "trailing": {
+      "trailing_stop": false,
+      "trailing_stop_positive": null,
+      "trailing_stop_positive_offset": 0.0,
+      "trailing_only_offset_is_reached": false
+    },
+    "max_open_trades": {
+      "max_open_trades": 6
+    },
+    "buy": {
+      "adx_max": 28,
+      "bb_period": 18,
+      "bb_width_max": 0.139,
+      "buy_rsi": 30,
+      "nbdev": 2.857,
+      "rsi_period": 8,
+      "trend_ema": 213,
+      "use_adx": true
+    },
+    "sell": {
+      "sell_rsi": 85
+    }
+  },
+  "ft_stratparam_v": 1,
+  "export_time": "2026-10-17T17:36:00Z"
+}

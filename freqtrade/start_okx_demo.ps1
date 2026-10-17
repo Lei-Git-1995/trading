@@ -39,14 +39,14 @@ foreach ($n in @("FREQTRADE__EXCHANGE__API_KEY", "FREQTRADE__EXCHANGE__SECRET", 
     }
 }
 
-Write-Host "== Preflight: signed read-only OKX demo balance request =="
+Write-Host "== 预检：OKX 模拟盘签名只读余额请求 =="
 & $python (Join-Path $root "demo_guard.py") --local-proxy --preflight
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "[ERROR] Preflight failed, startup blocked. Check API key / passphrase / account mode / proxy."
+    Write-Host "[错误] 预检失败，启动已阻止。请检查 API 密钥、密码/口令、账号模式或代理设置。"
     exit $LASTEXITCODE
 }
 
-Write-Host "== Preflight passed, starting OKX demo auto trading =="
-Write-Host "Log: user_data\logs\freqtrade-demo.log    DB: user_data\tradesv3-demo.sqlite"
-Write-Host "Stop: press Ctrl+C in this window"
+Write-Host "== 预检通过，正在启动 OKX 模拟盘自动交易 =="
+Write-Host "日志：user_data\logs\freqtrade-demo.log    数据库：user_data\tradesv3-demo.sqlite"
+Write-Host "停止：按 Ctrl+C 退出本窗口"
 & $python (Join-Path $root "demo_guard.py") --local-proxy
