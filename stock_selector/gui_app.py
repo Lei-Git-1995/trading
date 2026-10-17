@@ -2077,6 +2077,7 @@ class StockSelectorApp:
         if historical_date:
             for row in rows:
                 row['日期'] = historical_date
+                row['时间'] = f'{historical_date} 15:00:00'
                 reason = str(row.get('说明') or '').strip()
                 row['说明'] = (reason + '；历史日K筛选，无盘中内外盘数据').strip('；')
 
