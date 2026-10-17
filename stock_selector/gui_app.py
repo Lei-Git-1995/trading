@@ -17,7 +17,7 @@ import queue
 import re
 import sys
 import threading
-from datetime import datetime
+from datetime import datetime, date
 from pathlib import Path
 
 import tkinter as tk
@@ -263,6 +263,12 @@ class StockSelectorApp:
         self.limit_var = tk.StringVar(value='500')
         ttk.Entry(toolbar, textvariable=self.limit_var, width=8).grid(
             row=0, column=7, sticky='w', padx=(4, 18))
+
+        ttk.Label(toolbar, text='历史日期(可空):', style='Field.TLabel').grid(
+            row=1, column=10, sticky='w', pady=(6, 0))
+        self.history_date_var = tk.StringVar(value='')
+        ttk.Entry(toolbar, textvariable=self.history_date_var, width=12).grid(
+            row=1, column=11, sticky='w', padx=(4, 18), pady=(6, 0))
 
         self.exclude_st_var = tk.BooleanVar(value=True)
         ttk.Checkbutton(toolbar, text='排除ST/退市', variable=self.exclude_st_var).grid(
@@ -1915,6 +1921,16 @@ class StockSelectorApp:
             messagebox.showwarning('提示', '处理上限必须是整数')
             return
 
+        history_date = self.history_date_var.get().strip()
+        if history_date:
+            try:
+                parsed_history_date = datetime.strptime(history_date, '%Y-%m-%d').date()
+                if parsed_history_date > date.today():
+                    raise ValueError('不能选择未来日期')
+            except ValueError as exc:
+                messagebox.showwarning('日期格式', f'请输入 YYYY-MM-DD 格式的有效历史日期。\n{exc}')
+                return
+
         self.running = True
         self.run_btn.configure(state='disabled')
         self.export_btn.configure(state='disabled')
@@ -1934,6 +1950,7 @@ class StockSelectorApp:
             exclude_st=self.exclude_st_var.get(),
             filter_cyb=self.filter_cyb_var.get(),
             filter_kcb=self.filter_kcb_var.get(),
+            history_date=history_date or None,
         )
         threading.Thread(target=self._run_worker, args=(params,), daemon=True).start()
 
@@ -1950,21 +1967,37 @@ class StockSelectorApp:
     def _execute(self, params):
         import pandas as pd
         from stock_selector.data.smart_provider_manager import SmartProviderManager
+        from stock_selector.data.providers import create_provider
 
         print(f"\n===== 开始选股 {datetime.now():%Y-%m-%d %H:%M:%S} =====")
         print(f"数据源: {params['source'] or '智能'}  策略: {params['strategy_label']}（{params['strategy']}）")
 
-        manager = SmartProviderManager(params['source'])
-        provider = manager.get_provider()
+        historical_date = params.get('history_date')
+        if historical_date:
+            provider_name = params['source'] or 'tencent'
+            provider = create_provider(provider_name)
+            manager = None
+        else:
+            manager = SmartProviderManager(params['source'])
+            provider = manager.get_provider()
         if provider is None:
             raise RuntimeError('所有数据源均不可用，请检查网络')
-        print(f"已连接数据源: {manager.current_provider_name}")
-        params['resolved_source'] = manager.current_provider_name
+        resolved_source = provider_name if historical_date else manager.current_provider_name
+        print(f"已连接数据源: {resolved_source}")
+        params['resolved_source'] = resolved_source
 
         stocks = provider.get_all_stocks()
         if stocks is None or stocks.empty:
             raise RuntimeError('无法获取股票行情列表')
-        print(f"获取行情: {len(stocks)} 只")
+        print(f"获取股票列表: {len(stocks)} 只")
+
+        if historical_date:
+            stocks = self._historical_stock_snapshot(
+                stocks, provider, historical_date, resolved_source)
+            if stocks.empty:
+                raise RuntimeError(f'没有找到 {historical_date} 的有效历史日 K 数据')
+            provider = self._active_historical_provider
+            print(f"历史日 K {historical_date}: {len(stocks)} 只；内外盘等分时字段不可用")
 
         if params['exclude_st']:
             mask = ~stocks['name'].astype(str).str.contains('ST|退', case=False, na=False)
@@ -1988,16 +2021,83 @@ class StockSelectorApp:
         category = params['category']
         if category == CATEGORY_PRESET:
             rows, columns = self._run_preset(params['strategy'], stocks, provider,
-                                             manager.current_provider_name)
+                                             resolved_source)
         elif category == CATEGORY_TECH:
             rows, columns = self._run_tech(params['strategy'], stocks, provider,
-                                            manager.current_provider_name)
+                                            resolved_source)
         else:
             rows, columns = self._run_v2(params['strategy'], stocks, provider,
-                                         manager.current_provider_name)
+                                         resolved_source)
+
+        if historical_date:
+            for row in rows:
+                row['日期'] = historical_date
+                reason = str(row.get('说明') or '').strip()
+                row['说明'] = (reason + '；历史日K筛选，无盘中内外盘数据').strip('；')
 
         print(f"选股完成: {len(rows)} 只")
         return rows, columns
+
+    def _historical_stock_snapshot(self, universe, provider, target_date, source):
+        import pandas as pd
+        from concurrent.futures import ThreadPoolExecutor
+        from stock_selector.data.cache import KlineCache
+
+        target = datetime.strptime(target_date, '%Y-%m-%d').date()
+        cache = KlineCache(ttl_hours=72, namespace=f'{source}-history-{target_date}')
+        histories = {}
+
+        def load(item):
+            _, stock = item
+            code = str(stock['code']).zfill(6)
+            hist = cache.get(code)
+            if hist is None:
+                try:
+                    hist = provider.get_stock_history(code, days=180, end_date=target_date)
+                except TypeError:
+                    hist = provider.get_stock_history(code, days=180)
+                if hist is None or hist.empty or '日期' not in hist:
+                    return None
+                hist = hist.copy()
+                hist['日期'] = pd.to_datetime(hist['日期'], errors='coerce').dt.date
+                hist = hist[hist['日期'] <= target].dropna(subset=['日期'])
+                if hist.empty or hist.iloc[-1]['日期'] != target:
+                    return None
+                cache.set(code, hist)
+            histories[code] = hist
+            last = hist.iloc[-1]
+            close = float(last['收盘'])
+            volume = float(last['成交量'])
+            previous_volumes = pd.to_numeric(hist['成交量'].iloc[-6:-1], errors='coerce').dropna()
+            volume_ratio = (volume / previous_volumes.mean()) if len(previous_volumes) and previous_volumes.mean() else 0.0
+            change_pct = float(last.get('涨跌幅', 0) or 0)
+            turnover = last.get('换手率')
+            try:
+                turnover = float(turnover)
+                if pd.isna(turnover):
+                    turnover = float('nan')
+            except (TypeError, ValueError):
+                turnover = float('nan')
+            return {
+                'code': code, 'name': stock.get('name', code), 'price': close,
+                'change_pct': change_pct, 'turnover': turnover, 'volume': volume,
+                'inner_vol': float('nan'), 'outer_vol': float('nan'),
+                'outer_ratio': float('nan'), 'inner_ratio': float('nan'),
+                'sector': stock.get('sector', ''), 'volume_ratio': volume_ratio,
+            }
+
+        workers = min(12, max(1, len(universe)))
+        with ThreadPoolExecutor(max_workers=workers, thread_name_prefix='historical-kline') as pool:
+            rows = [row for row in pool.map(load, universe.iterrows()) if row]
+        self._historical_histories = histories
+
+        class HistoricalProvider:
+            def get_stock_history(self, code, days=10, end_date=None):
+                hist = histories.get(str(code).zfill(6))
+                return hist.tail(days).copy() if hist is not None else None
+
+        self._active_historical_provider = HistoricalProvider()
+        return pd.DataFrame(rows)
 
     def _save_selection_to_db(self, params, rows):
         if not self.db_ready and not self.db_store.try_ensure_schema():
@@ -2005,7 +2105,8 @@ class StockSelectorApp:
         self.db_ready = True
         try:
             run_id = self.db_store.save_selection_run(
-                trade_date=datetime.now().date(),
+                trade_date=(date.fromisoformat(params['history_date'])
+                            if params.get('history_date') else datetime.now().date()),
                 category=params['category'],
                 strategy_id=params['strategy'],
                 strategy_name=params['strategy_label'],

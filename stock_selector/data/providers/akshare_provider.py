@@ -50,9 +50,10 @@ class AkshareSinaProvider(DataProvider):
         })
         return out[STOCK_COLS]
 
-    def get_stock_history(self, code: str, days: int = 10):
+    def get_stock_history(self, code: str, days: int = 10, end_date: str = None):
         symbol = _to_symbol(str(code))
-        end = datetime.now().strftime('%Y%m%d')
+        end = (datetime.strptime(end_date, '%Y-%m-%d') if end_date
+               else datetime.now()).strftime('%Y%m%d')
         start = (datetime.now() - timedelta(days=days * 2 + 5)).strftime('%Y%m%d')
         try:
             df = self._ak.stock_zh_a_daily(symbol=symbol, start_date=start, end_date=end, adjust='qfq')

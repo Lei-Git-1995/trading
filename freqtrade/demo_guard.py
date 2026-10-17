@@ -11,7 +11,40 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 CONFIG = ROOT / "user_data" / "config_okx_demo.json"
 PROXY_CONFIG = ROOT / "user_data" / "config_proxy_local.example.json"
-STRATEGY = "OKXDemoFuturesStrategy"
+STRATEGY = "OKXDemoBreakoutStrategy"
+MAX_PAIRS = 30
+
+
+def valid_pair_list(pairs: list) -> bool:
+    """At most MAX_PAIRS pairs, all USDT-settled linear-swap symbols."""
+    if not (0 < len(pairs) <= MAX_PAIRS):
+        return False
+    return all(
+        isinstance(pair, str) and pair.endswith("/USDT:USDT") and pair.count("/") == 1
+        for pair in pairs
+    )
+
+
+def uses_dynamic_pairlist(config: dict) -> bool:
+    """True when the first pairlist generator selects pairs dynamically from the exchange."""
+    pairlists = config.get("pairlists", [])
+    return (
+        bool(pairlists)
+        and isinstance(pairlists[0], dict)
+        and pairlists[0].get("method") == "VolumePairList"
+    )
+
+
+def dynamic_pairlist_ok(config: dict) -> bool:
+    """A dynamic VolumePairList may omit the static whitelist, but must stay within MAX_PAIRS."""
+    pairlists = config.get("pairlists", [])
+    if not pairlists or not isinstance(pairlists[0], dict):
+        return False
+    try:
+        number_assets = int(pairlists[0].get("number_assets", 0))
+    except (TypeError, ValueError):
+        return False
+    return 0 < number_assets <= MAX_PAIRS
 
 
 def api_server_is_local(api_server: dict) -> bool:
@@ -27,13 +60,20 @@ def api_server_is_local(api_server: dict) -> bool:
     return True
 
 
-def check_config() -> dict:
-    config = json.loads(CONFIG.read_text(encoding="utf-8-sig"))
+def check_config(config_path: Path = CONFIG) -> dict:
+    config = json.loads(config_path.read_text(encoding="utf-8-sig"))
     exchange = config.get("exchange", {})
     ccxt_config = exchange.get("ccxt_config", {})
     headers = {str(k).lower(): str(v) for k, v in ccxt_config.get("headers", {}).items()}
     options = ccxt_config.get("options", {})
     urls = ccxt_config.get("urls", {}).get("api", {})
+    pair_whitelist = exchange.get("pair_whitelist") or []
+    if uses_dynamic_pairlist(config):
+        pair_list_ok = dynamic_pairlist_ok(config) and (
+            not pair_whitelist or valid_pair_list(pair_whitelist)
+        )
+    else:
+        pair_list_ok = valid_pair_list(pair_whitelist)
     checks = {
         "exchange is okx": exchange.get("name") == "okx",
         "demo orders enabled": config.get("dry_run") is False,
@@ -43,7 +83,7 @@ def check_config() -> dict:
         "Demo WebSocket host": urls.get("ws") == "wss://wspap.okx.com:8443/ws/v5",
         "CCXT sandbox flag": options.get("sandboxMode") is True,
         "API server localhost-only": api_server_is_local(config.get("api_server", {})),
-        "limited pairs": 0 < len(exchange.get("pair_whitelist", [])) <= 2,
+        "valid pair list": pair_list_ok,
         "no alternate CCXT overrides": not exchange.get("ccxt_sync_config") and not exchange.get("ccxt_async_config"),
     }
     failed = [name for name, ok in checks.items() if not ok]
@@ -139,21 +179,26 @@ def main() -> int:
     parser.add_argument("--check-config", action="store_true", help="offline static checks only")
     parser.add_argument("--preflight", action="store_true", help="signed read-only Demo API check")
     parser.add_argument("--local-proxy", action="store_true", help="use optional localhost proxy overlay")
+    parser.add_argument("--config", default=str(CONFIG), help="config path (default: main demo config)")
+    parser.add_argument("--strategy", default=STRATEGY, help="strategy class name")
+    parser.add_argument("--db", default="tradesv3-demo.sqlite", help="sqlite filename inside user_data")
+    parser.add_argument("--logfile", default="freqtrade-demo.log", help="log filename inside user_data/logs")
     args = parser.parse_args()
+    config_path = Path(args.config)
     try:
-        config = check_config()
+        config = check_config(config_path)
         proxy = check_proxy_config() if args.local_proxy else None
         if args.check_config:
             return 0
         check_demo_credentials(config, proxy)
         if args.preflight:
             return 0
-        db = (ROOT / "user_data" / "tradesv3-demo.sqlite").as_posix()
-        logfile = str(ROOT / "user_data" / "logs" / "freqtrade-demo.log")
-        command = [sys.executable, "-m", "freqtrade", "trade", "--config", str(CONFIG)]
+        db = (ROOT / "user_data" / args.db).as_posix()
+        logfile = str(ROOT / "user_data" / "logs" / args.logfile)
+        command = [sys.executable, "-m", "freqtrade", "trade", "--config", str(config_path)]
         if proxy:
             command += ["--config", str(PROXY_CONFIG)]
-        command += ["--strategy", STRATEGY, "--db-url", "sqlite:///" + db, "--logfile", logfile]
+        command += ["--strategy", args.strategy, "--db-url", "sqlite:///" + db, "--logfile", logfile]
         print("Starting Freqtrade on authenticated OKX Demo API only.", flush=True)
         return subprocess.call(command, cwd=str(ROOT))
     except Exception as exc:

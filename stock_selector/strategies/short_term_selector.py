@@ -34,6 +34,15 @@ class ShortTermSelector:
         self.config = config
         self.client = client or EastMoneyClient()
         self.cache = cache  # None 表示禁用缓存（--no-cache）
+    def _fetch_history_threadsafe(self, code):
+        hist = self.cache.get(code) if self.cache is not None else None
+        if hist is not None:
+            return hist
+        hist = self.client.get_stock_history(code, days=self.config.history_days)
+        if self.cache is not None:
+            self.cache.set(code, hist)
+        time.sleep(self.config.request_sleep)
+        return hist
 
     # ---------------- 第一步：快筛 ----------------
 
@@ -97,38 +106,32 @@ class ShortTermSelector:
         else:
             iterator = candidates
 
-        for idx, cand in enumerate(iterator, 1):
-            # 每 10 只记录一次进度（GUI 无终端时这是唯一的进度反馈）
-            if idx % 10 == 0:
-                logger.info(f'  深度分析进度: {idx}/{total}')
+        def analyze(cand):
 
             code = cand['code']
             hist = self.cache.get(code) if self.cache is not None else None
             if hist is None:
-                hist = self.client.get_stock_history(code, days=c.history_days)
-                if self.cache is not None:
-                    self.cache.set(code, hist)
-                time.sleep(c.request_sleep)
+                hist = self._fetch_history_threadsafe(code)
 
             if hist is None or len(hist) < 3:
-                continue
+                return None
 
             ind = self._compute_indicators(hist)
             if ind is None:
-                continue
+                return None
 
             # 量能放量验证
             vol_ratio, ok = check_volume_boost(ind['成交量'], threshold=c.volume_ratio)
             if not ok:
-                continue
+                return None
 
             # 技术指标不超买（--no-kdj / --no-rsi 可关闭对应检查）
             kdj_val = ind['KDJ_K'].iloc[-1]
             rsi_val = ind['RSI6'].iloc[-1]
             if c.check_kdj and pd.notna(kdj_val) and kdj_val >= 88:
-                continue
+                return None
             if c.check_rsi and pd.notna(rsi_val) and rsi_val >= 80:
-                continue
+                return None
 
             # 检查是否炸板(不过滤,只标记)
             is_failed_limit = self._is_failed_limit_up(hist)
@@ -144,7 +147,7 @@ class ShortTermSelector:
             except (KeyError, IndexError, TypeError, ValueError):
                 amount_yi = None
 
-            qualified.append({
+            return ({
                 **cand,
                 'amount': amount_yi,
                 'volume_ratio': vol_ratio,
@@ -154,6 +157,30 @@ class ShortTermSelector:
                 'is_failed_limit': is_failed_limit,  # 炸板标记
                 'hist_data': ind,
             })
+
+        if total < 8:
+            for idx, cand in enumerate(iterator, 1):
+                result = analyze(cand)
+                if result:
+                    qualified.append(result)
+                if idx % 10 == 0:
+                    logger.info(f'  深度分析进度: {idx}/{total}')
+        else:
+            from concurrent.futures import ThreadPoolExecutor, as_completed
+            done = 0
+            worker_count = min(8, total)
+            with ThreadPoolExecutor(max_workers=worker_count, thread_name_prefix='short-term-kline') as pool:
+                futures = [pool.submit(analyze, cand) for cand in candidates]
+                for future in as_completed(futures):
+                    try:
+                        result = future.result()
+                        if result:
+                            qualified.append(result)
+                    except Exception:
+                        logger.debug('  深度分析线程异常', exc_info=True)
+                    done += 1
+                    if done % 10 == 0:
+                        logger.info(f'  深度分析进度: {done}/{total}')
 
         logger.info(f'  深度分析完成: {len(qualified)} 只通过')
         return qualified

@@ -93,8 +93,9 @@ class StrategyAdapter:
         if price_filter.get('change_min') is not None:
             filtered = filtered[filtered['change_pct'] >= price_filter['change_min']]
 
-        if liquidity.get('turnover_min') is not None:
-            filtered = filtered[filtered['turnover'] >= liquidity['turnover_min']]
+        if liquidity.get('turnover_min') is not None and 'turnover' in filtered:
+            turnover = pd.to_numeric(filtered['turnover'], errors='coerce')
+            filtered = filtered[turnover.isna() | (turnover >= liquidity['turnover_min'])]
 
         # 注意：腾讯数据源没有 amount 字段，跳过成交额过滤
         # 如果将来需要，可以从 volume * price 计算
@@ -122,21 +123,21 @@ class StrategyAdapter:
         logger.info('\n[数据增强] 计算高级指标...')
         enhanced_stocks = []
 
-        import sys
-        from tqdm import tqdm
+        from concurrent.futures import ThreadPoolExecutor, as_completed
         total = len(filtered)
-        use_tqdm = getattr(sys.stderr, 'isatty', lambda: False)()
-        iterator = tqdm(filtered.iterrows(), total=total, desc='  增强进度', unit='只') if use_tqdm else filtered.iterrows()
-        for idx, (_, stock) in enumerate(iterator, 1):
-            if not use_tqdm and idx % 20 == 0:
-                logger.info(f'  数据增强进度: {idx}/{total}')
+
+        def enhance(item):
+            _, stock = item
             try:
-                enhanced = self._enhance_stock_data(stock, client)
-                if enhanced:
-                    enhanced_stocks.append(enhanced)
+                return self._enhance_stock_data(stock, client)
             except Exception as e:
                 logger.debug(f"  增强数据失败({stock['code']}): {e}")
-                continue
+                return None
+
+        worker_count = max(1, min(8, total))
+        with ThreadPoolExecutor(max_workers=worker_count, thread_name_prefix='v2-kline') as pool:
+            results = list(pool.map(enhance, filtered.iterrows()))
+        enhanced_stocks.extend(r for r in results if r)
 
         logger.info(f'  数据增强完成: {len(enhanced_stocks)}/{len(filtered)}只')
 

@@ -26,7 +26,7 @@ class DataProvider(ABC):
         """获取沪深全A股实时快照，返回 STOCK_COLS 格式 DataFrame"""
 
     @abstractmethod
-    def get_stock_history(self, code: str, days: int = 10) -> pd.DataFrame:
+    def get_stock_history(self, code: str, days: int = 10, end_date: str = None) -> pd.DataFrame:
         """获取个股近N交易日K线，返回 KLINE_COLS 格式 DataFrame"""
 
 

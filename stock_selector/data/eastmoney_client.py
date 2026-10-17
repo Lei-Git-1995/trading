@@ -84,14 +84,14 @@ class EastMoneyClient:
 
     # ---------------- 个股历史K线 ----------------
 
-    def get_stock_history(self, stock_code: str, days: int = 5) -> pd.DataFrame:
+    def get_stock_history(self, stock_code: str, days: int = 5, end_date: str = None) -> pd.DataFrame:
         """获取个股近N个交易日的日K，统一列：日期,开盘,收盘,最高,最低,成交量,成交额,振幅,涨跌幅,涨跌额,换手率"""
-        df = self._eastmoney_kline(stock_code, days)
+        df = self._eastmoney_kline(stock_code, days, end_date=end_date)
         if df is None:
-            df = self._tencent_kline(stock_code, days)
+            df = self._tencent_kline(stock_code, days, end_date=end_date)
         return df
 
-    def _eastmoney_kline(self, stock_code, days) -> pd.DataFrame:
+    def _eastmoney_kline(self, stock_code, days, end_date=None) -> pd.DataFrame:
         host = self._first_ok_host(
             KLINE_HOSTS,
             probe_path='/api/qt/stock/kline/get',
@@ -105,8 +105,9 @@ class EastMoneyClient:
             return None
 
         secid = f'1.{stock_code}' if stock_code.startswith('6') else f'0.{stock_code}'
-        end = datetime.now().strftime('%Y%m%d')
-        start = (pd.Timestamp.now() - pd.Timedelta(days=days * 2)).strftime('%Y%m%d')
+        end_dt = pd.Timestamp(end_date) if end_date else pd.Timestamp.now()
+        end = end_dt.strftime('%Y%m%d')
+        start = (end_dt - pd.Timedelta(days=days * 2)).strftime('%Y%m%d')
 
         data = self._get_json(f'http://{host}/api/qt/stock/kline/get', {
             'secid': secid,
@@ -127,10 +128,11 @@ class EastMoneyClient:
         df['日期'] = df['日期'].astype(str)
         return df
 
-    def _tencent_kline(self, stock_code, days) -> pd.DataFrame:
+    def _tencent_kline(self, stock_code, days, end_date=None) -> pd.DataFrame:
         """腾讯行情 K 线回退通道；仅含 OHLCV，涨跌幅/振幅由收盘价推算，换手率缺失"""
         market = 'sh' if stock_code.startswith('6') else 'sz'
-        param = f'{market}{stock_code},day,1990-01-01,{datetime.now().strftime("%Y-%m-%d")},{days},qfq'
+        end = end_date or datetime.now().strftime('%Y-%m-%d')
+        param = f'{market}{stock_code},day,1990-01-01,{end},{days},qfq'
 
         try:
             r = self.session.get(TENCENT_KLINE_URL, params={'param': param}, timeout=self.timeout)

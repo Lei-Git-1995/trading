@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.freqtrade.io/schema.json",
-  "max_open_trades": 2,
+  "max_open_trades": 15,
   "stake_currency": "USDT",
-  "stake_amount": 25,
+  "stake_amount": 50,
   "tradable_balance_ratio": 0.5,
   "timeframe": "15m",
   "dry_run": false,
@@ -46,15 +46,26 @@
         }
       }
     },
-    "pair_whitelist": [
-      "BTC/USDT:USDT",
-      "ETH/USDT:USDT"
-    ],
+    "pair_whitelist": [],
     "pair_blacklist": []
   },
   "pairlists": [
     {
-      "method": "StaticPairList"
+      "method": "VolumePairList",
+      "number_assets": 20,
+      "sort_key": "quoteVolume",
+      "min_value": 2000000,
+      "refresh_period": 3600,
+      "lookback_timeframe": "1h",
+      "lookback_period": 24
+    },
+    {
+      "method": "AgeFilter",
+      "min_days_listed": 10
+    },
+    {
+      "method": "SpreadFilter",
+      "max_spread_ratio": 0.005
     }
   ],
   "telegram": {

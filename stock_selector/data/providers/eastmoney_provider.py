@@ -21,5 +21,5 @@ class EastMoneyProvider(DataProvider):
         df = load_stock_list(raw)
         return df[STOCK_COLS] if len(df) else df
 
-    def get_stock_history(self, code: str, days: int = 10):
-        return self._client.get_stock_history(code, days)
+    def get_stock_history(self, code: str, days: int = 10, end_date: str = None):
+        return self._client.get_stock_history(code, days, end_date=end_date)
