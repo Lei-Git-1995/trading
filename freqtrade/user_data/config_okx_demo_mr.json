@@ -1,0 +1,107 @@
+{
+  "$schema": "https://schema.freqtrade.io/schema.json",
+  "max_open_trades": 6,
+  "stake_currency": "USDT",
+  "stake_amount": 25,
+  "tradable_balance_ratio": 0.25,
+  "timeframe": "5m",
+  "dry_run": false,
+  "trading_mode": "futures",
+  "margin_mode": "isolated",
+  "liquidation_buffer": 0.1,
+  "cancel_open_orders_on_exit": true,
+  "unfilledtimeout": {
+    "entry": 3,
+    "exit": 3,
+    "exit_timeout_count": 0,
+    "unit": "minutes"
+  },
+  "entry_pricing": {
+    "price_side": "same",
+    "use_order_book": true,
+    "order_book_top": 1
+  },
+  "exit_pricing": {
+    "price_side": "same",
+    "use_order_book": true,
+    "order_book_top": 1
+  },
+  "exchange": {
+    "name": "okx",
+    "api_key": "",
+    "secret": "",
+    "password": "",
+    "ccxt_config": {
+      "options": {
+        "sandboxMode": true
+      },
+      "headers": {
+        "x-simulated-trading": "1"
+      },
+      "hostname": "openapi.okx.com",
+      "urls": {
+        "api": {
+          "ws": "wss://wspap.okx.com:8443/ws/v5",
+          "rest": "https://openapi.okx.com"
+        }
+      }
+    },
+    "pair_whitelist": [],
+    "pair_blacklist": [
+      "GOOGL/USDT:USDT",
+      "HOOD/USDT:USDT",
+      "NVDA/USDT:USDT",
+      "TSLA/USDT:USDT",
+      "AAPL/USDT:USDT",
+      "AMZN/USDT:USDT",
+      "META/USDT:USDT",
+      "MSFT/USDT:USDT",
+      "SPY/USDT:USDT",
+      "QQQ/USDT:USDT",
+      "XAU/USDT:USDT",
+      "XAG/USDT:USDT",
+      "US100/USDT:USDT",
+      "US30/USDT:USDT",
+      "SPX/USDT:USDT"
+    ]
+  },
+  "pairlists": [
+    {
+      "method": "VolumePairList",
+      "number_assets": 15,
+      "sort_key": "quoteVolume",
+      "min_value": 2000000,
+      "refresh_period": 3600,
+      "lookback_timeframe": "1h",
+      "lookback_period": 24
+    },
+    {
+      "method": "AgeFilter",
+      "min_days_listed": 10
+    },
+    {
+      "method": "SpreadFilter",
+      "max_spread_ratio": 0.003
+    }
+  ],
+  "telegram": {
+    "enabled": false,
+    "token": "",
+    "chat_id": ""
+  },
+  "api_server": {
+    "enabled": true,
+    "listen_ip_address": "127.0.0.1",
+    "listen_port": 8081,
+    "username": "admin",
+    "password": "49e071aa2de299c6390a48bc",
+    "jwt_secret_key": "317ddd194d3d0a0aa8a6fc7556ae2205",
+    "ws_token": "48cc4ce7910e94f89ec6ce0534b65f96"
+  },
+  "bot_name": "okx-demo-mr-5m",
+  "initial_state": "running",
+  "force_entry_enable": false,
+  "internals": {
+    "process_throttle_secs": 5
+  }
+}
