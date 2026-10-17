@@ -32,6 +32,7 @@ DEFAULT_AGENT_CONFIG: Dict[str, Any] = {
     'temperature': 0.25,
     'max_tokens': 2000,
     'timeout_sec': 90,
+    'json_mode': False,           # 部分接口支持 response_format=json_object
     'model_trade': '',            # 空则用账户 model
     'model_learn': '',            # 空则用账户 model
 }

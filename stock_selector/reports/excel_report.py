@@ -156,7 +156,7 @@ def _write_history(wb, stocks):
     if not stocks:
         return
     ws = wb.create_sheet('近5日走势')
-    headers = ['名称', '代码', '日期', '收盘价', '涨跌幅%', '换手率%', '成交量(手)']
+    headers = ['名称', '代码', '日期', '收盘价', '涨跌幅%', '换手率%', '成交量(万手)']
     rows = []
     for s in stocks[:20]:
         hist = s.get('hist_data')
@@ -170,6 +170,6 @@ def _write_history(wb, stocks):
                 round(float(r['收盘']), 2),
                 round(float(r['涨跌幅']), 2),
                 round(float(r['换手率']), 2),
-                int(r['成交量']),
+                round(float(r['成交量']) / 10000, 2) if r.get('成交量') is not None else '',
             ])
     _write_table(ws, 1, headers, rows, [12, 10, 12, 10, 10, 10, 14])

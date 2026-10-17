@@ -16,17 +16,61 @@ from stock_selector.agent import tools as agent_tools
 from stock_selector.agent.llm import LLMClient, extract_json
 
 
+def _clip(text: Any, limit: int = 400) -> str:
+    s = text if isinstance(text, str) else json.dumps(text, ensure_ascii=False, default=str)
+    return s if len(s) <= limit else s[:limit] + '…'
+
+
+def _to_float(value: Any) -> Optional[float]:
+    try:
+        if value in (None, ''):
+            return None
+        f = float(value)
+        return f if f == f else None
+    except (TypeError, ValueError):
+        return None
+
+
+def _digest(playbook: Dict[str, Any]) -> Dict[str, str]:
+    out: Dict[str, str] = {}
+    for section, content in list(playbook.items())[:8]:
+        out[str(section)] = _clip(content, 300)
+    return out
+
+
+def _memory_digest(memory: Dict[str, Any]) -> Dict[str, str]:
+    out: Dict[str, str] = {}
+    for key, item in list(memory.items())[:12]:
+        value = item.get('value') if isinstance(item, dict) and 'value' in item else item
+        out[str(key)] = _clip(value, 300)
+    return out
+
+
 def _system_prompt() -> str:
     lines = [
-        '你是 A 股短线研判 Agent，拥有取证工具，负责给出「大盘研判 + 个股排序」。',
-        '重要：你只做分析，不直接下单；输出供人工参考。',
-        '工作方式：先调用取证工具了解大盘/板块/候选/资金，再给出结论。',
-        '规则：',
-        '1) 结论必须基于工具返回的数据，不得编造行情；',
-        '2) 每轮可调用多个工具，但请节约调用；',
-        '3) 必须且只能通过 submit_analysis 或 skip 结束本轮；',
-        '4) 候选股票请给出 1~8 只，按 rank 排序，action∈{buy,sell,watch,avoid}。',
-        '5) 盘中决策必须先读取持仓并用 read_trade_history 复盘已完成交易，再输出持仓卖出或新候选买入意见；学习批次总结近期盈亏和失误，不直接产生交易。',
+        '你是「A股短线研判 Agent」，拥有取证工具，负责给出「大盘研判 + 个股排序」。',
+        '你只做分析与建议，不直接下单；所有结论供人工参考。',
+        '',
+        '【工作方式】',
+        '1) 先调用取证工具了解大盘、板块、候选、资金与持仓，再下结论；',
+        '2) 涉及持仓决策时，必须先 get_positions 读取持仓，并用 read_trade_history /',
+        '   review_performance 复盘近期成交与研判胜率，再决定卖出或加仓；',
+        '3) 每轮可调用多个工具，但请节约调用、避免重复查询；',
+        '4) 必须且只能通过 submit_analysis 或 skip 结束本轮。',
+        '',
+        '【交易纪律（A股）】',
+        '- T+1：当日买入不能当日卖出；涨跌停价附近无法成交；ST/退市风险股回避；',
+        '- 结论必须基于工具返回的真实数据，不得编造行情、价格或新闻；',
+        '- 控制仓位、分散持股；单票不重仓，亏损股不加仓摊薄；',
+        '- 给买入建议时必须同时给出 target_price（止盈）与 stop_loss（止损），',
+        '  且满足 stop_loss < price < target_price；缺失或不合理一律按风险否决。',
+        '',
+        '【产出要求】',
+        '- 候选 1~8 只，按 rank 排序，action∈{buy,sell,watch,avoid}；',
+        '- confidence 取 0~100 的整数，越低越谨慎；',
+        '- 每只都给出简洁 reason（引用数据），避免空话。',
+        '- 学习批次（session=learn）：重点输出 lessons，并调用 update_playbook /',
+        '  save_memory 沉淀可复用的经验与教训，不下单。',
         '',
     ]
     lines.extend(agent_tools.tool_prompt_lines())
@@ -60,26 +104,54 @@ class ReActAgent:
                 'amount': row.get('amount'), 'score': row.get('score'),
                 'sector': row.get('sector'), 'explanation': row.get('explanation'),
             })
-        memory = {}
-        playbook = {}
-        try:
-            if ctx.agent_store:
-                memory = ctx.agent_store.get_memory()
-                playbook = ctx.agent_store.get_playbook()
-        except Exception:  # noqa: BLE001
-            pass
-        return {
+        now = time.localtime()
+        payload: Dict[str, Any] = {
             'session': session,
             'trigger': trigger,
-            'date': time.strftime('%Y-%m-%d'),
-            'time': time.strftime('%H:%M:%S'),
+            'date': time.strftime('%Y-%m-%d', now),
+            'weekday': '一二三四五六日'[now.tm_wday],
+            'time': time.strftime('%H:%M:%S', now),
             'candidate_count': len(ctx.candidates or []),
             'candidates': candidates,
-            'memory': list(memory.keys()),
-            'playbook_sections': list(playbook.keys()),
             'max_react_rounds': self.max_rounds,
-            'note': '如需完整记忆/战法内容请调用 read_memory / read_playbook。',
         }
+        if session == 'learn':
+            payload['task'] = '学习批次：复盘近期研判与成交，沉淀教训与战法，不产生买入。'
+        else:
+            payload['task'] = '盘中研判：结合持仓给出卖出/加仓与新的买入候选。'
+
+        # 记忆 / 战法 / 绩效 / 持仓：直接内联，减少一次来回
+        try:
+            if ctx.agent_store:
+                payload['performance'] = ctx.agent_store.performance_summary(days=30)
+                playbook = ctx.agent_store.get_playbook()
+                payload['playbook_sections'] = list(playbook.keys())
+                payload['playbook_digest'] = _digest(playbook)
+                memory = ctx.agent_store.get_memory()
+                payload['memory_keys'] = list(memory.keys())
+                payload['memory_digest'] = _memory_digest(memory)
+        except Exception:  # noqa: BLE001
+            pass
+        try:
+            if ctx.store is not None and ctx.account:
+                positions = ctx.store.get_paper_positions(ctx.account['id'])
+                payload['account'] = {
+                    'cash_balance': ctx.account.get('cash_balance'),
+                    'initial_cash': ctx.account.get('initial_cash'),
+                    'position_count': len(positions),
+                }
+                payload['positions'] = [{
+                    'code': p.get('code'), 'name': p.get('name'),
+                    'volume': p.get('volume'), 'avg_cost': p.get('avg_cost'),
+                    'last_price': p.get('last_price'), 'target_price': p.get('target_price'),
+                    'stop_loss': p.get('stop_loss'), 'opened_on': str(p.get('opened_on') or ''),
+                } for p in positions]
+        except Exception:  # noqa: BLE001
+            pass
+        payload['note'] = ('完整记忆/战法可调用 read_memory / read_playbook；'
+                           '实时持仓盈亏可调用 get_positions；'
+                           '历史研判胜率可调用 review_performance。')
+        return payload
 
     # ---------------- 主循环 ----------------
 
@@ -184,11 +256,15 @@ class ReActAgent:
         result['market_view'] = str(args.get('market_view') or '')[:4000]
         result['lessons'] = str(args.get('lessons') or '')[:4000]
         try:
-            result['confidence'] = float(args.get('confidence')) \
+            confidence = float(args.get('confidence')) \
                 if args.get('confidence') is not None else None
+            if confidence is not None:
+                confidence = min(100.0, max(0.0, confidence))
         except (TypeError, ValueError):
-            result['confidence'] = None
+            confidence = None
+        result['confidence'] = confidence
         picks = []
+        risk_flags: List[str] = []
         for i, item in enumerate(args.get('picks') or []):
             if not isinstance(item, dict):
                 continue
@@ -198,17 +274,32 @@ class ReActAgent:
             action = str(item.get('action') or 'watch').lower()
             if action not in ('buy', 'sell', 'watch', 'avoid'):
                 action = 'watch'
+            price = _to_float(item.get('price'))
+            target = _to_float(item.get('target_price'))
+            stop = _to_float(item.get('stop_loss'))
+            pick_conf = _to_float(item.get('confidence'))
+            if pick_conf is not None:
+                pick_conf = min(100.0, max(0.0, pick_conf))
+            # 风控校验：买入建议必须给出合理止损/止盈，否则降级为观察。
+            if action == 'buy':
+                if stop is None or target is None:
+                    risk_flags.append(f'{code} 买入缺少止损/止盈，降级为观察')
+                    action = 'watch'
+                elif price is not None and not (stop < price < target):
+                    risk_flags.append(f'{code} 止损/止盈与现价不匹配，降级为观察')
+                    action = 'watch'
             picks.append({
                 'rank': item.get('rank') or (i + 1),
                 'code': code,
                 'name': str(item.get('name') or ''),
                 'action': action,
-                'confidence': item.get('confidence'),
-                'price': item.get('price'),
-                'target_price': item.get('target_price'),
-                'stop_loss': item.get('stop_loss'),
-                'score': item.get('score'),
+                'confidence': pick_conf,
+                'price': price,
+                'target_price': target,
+                'stop_loss': stop,
+                'score': _to_float(item.get('score')),
                 'sector': str(item.get('sector') or ''),
-                'reason': str(item.get('reason') or ''),
+                'reason': str(item.get('reason') or '')[:1000],
             })
         result['picks'] = picks[:20]
+        result['risk_flags'] = risk_flags[:20]

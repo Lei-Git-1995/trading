@@ -33,6 +33,9 @@ def resolve_llm_settings(settings: Optional[Dict[str, Any]] = None,
     timeout = settings.get('timeout_sec')
     if timeout is None:
         timeout = agent_cfg.get('timeout_sec', 90)
+    json_mode = settings.get('json_mode')
+    if json_mode is None:
+        json_mode = agent_cfg.get('json_mode', False)
     return {
         'base_url': str(settings.get('base_url') or agent_cfg.get('base_url')
                         or DEFAULT_BASE_URL).rstrip('/'),
@@ -44,13 +47,15 @@ def resolve_llm_settings(settings: Optional[Dict[str, Any]] = None,
         'temperature': float(temperature if temperature is not None else 0.25),
         'max_tokens': int(max_tokens if max_tokens is not None else 2000),
         'timeout': float(timeout if timeout is not None else 90),
+        'json_mode': bool(json_mode),
     }
 
 
 def chat_completions(*, base_url: str, api_key: str, model: str,
                      messages: List[Dict[str, Any]],
                      temperature: float = 0.25, max_tokens: int = 2000,
-                     timeout: float = 90) -> Dict[str, Any]:
+                     timeout: float = 90,
+                     response_format: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """调用 ``/chat/completions``，返回 ``{ok, text, raw, error, usage}``。"""
     if not api_key:
         return {'ok': False, 'text': '', 'raw': None, 'error': '未配置 API Key', 'usage': {}}
@@ -59,6 +64,8 @@ def chat_completions(*, base_url: str, api_key: str, model: str,
                'Authorization': f'Bearer {api_key}'}
     body = {'model': model, 'messages': messages,
             'temperature': temperature, 'max_tokens': max_tokens}
+    if response_format:
+        body['response_format'] = response_format
     try:
         resp = requests.post(url, headers=headers, json=body, timeout=timeout)
     except Exception as exc:  # noqa: BLE001
@@ -195,6 +202,7 @@ class LLMClient:
         self.temperature = spec['temperature']
         self.max_tokens = spec['max_tokens']
         self.timeout = spec['timeout']
+        self.json_mode = spec['json_mode']
         self.last_usage: Dict[str, Any] = {}
 
     @property
@@ -205,11 +213,12 @@ class LLMClient:
              temperature: Optional[float] = None,
              max_tokens: Optional[int] = None) -> Dict[str, Any]:
         model = self.model_learn if kind == 'learn' else self.model_trade
+        response_format = {'type': 'json_object'} if self.json_mode else None
         result = chat_completions(
             base_url=self.base_url, api_key=self.api_key, model=model,
             messages=messages,
             temperature=self.temperature if temperature is None else temperature,
             max_tokens=self.max_tokens if max_tokens is None else max_tokens,
-            timeout=self.timeout)
+            timeout=self.timeout, response_format=response_format)
         self.last_usage = result.get('usage') or {}
         return result

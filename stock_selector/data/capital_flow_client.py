@@ -91,7 +91,7 @@ class CapitalFlowClient:
         返回字段:
         - 时间
         - 价格
-        - 成交量(手)
+        - 成交量(万手)
         - 成交额(万元)
         - 买卖方向(1=买入, 2=卖出, 4=中性)
         """
@@ -124,7 +124,7 @@ class CapitalFlowClient:
                 rows.append({
                     '时间': parts[0],
                     '价格': float(parts[1]),
-                    '成交量': int(parts[2]),  # 手
+                    '成交量': float(parts[2]) / 10000.0 if parts[2].isdigit() or (parts[2].lstrip('-').isdigit() if parts[2].startswith('-') else False) else float(parts[2]) / 10000.0 if parts[2] else 0.0,  # 手->万手
                     '成交额': round(amount, 2),  # 万元
                     '方向': int(parts[4]),  # 1=买 2=卖 4=中性
                 })

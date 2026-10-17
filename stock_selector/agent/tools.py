@@ -25,6 +25,7 @@ import requests
 class ToolContext:
     store: Any = None                 # PostgresStore
     agent_store: Any = None           # AgentStore
+    account: Any = None               # 当前模拟盘账户（dict）
     candidates: List[Dict[str, Any]] = field(default_factory=list)
     log: Callable[[str], None] = print
     _provider: Any = None
@@ -71,6 +72,10 @@ TOOL_SPECS: List[Dict[str, str]] = [
      'desc': '读取历史记忆（此前沉淀的判断与教训）', 'args': '{}'},
     {'name': 'read_trade_history', 'category': OBSERVE,
      'desc': '读取模拟盘最近成交和盈亏，用于复盘学习', 'args': '{"limit": 20}'},
+    {'name': 'get_positions', 'category': OBSERVE,
+     'desc': '获取当前模拟盘持仓及实时浮盈浮亏（无需参数）', 'args': '{}'},
+    {'name': 'review_performance', 'category': OBSERVE,
+     'desc': '获取历史研判胜率与收益统计，用于多轮复盘学习', 'args': '{"days": 30}'},
     {'name': 'read_playbook', 'category': OBSERVE,
      'desc': '读取战法库（选股/择时经验）', 'args': '{}'},
     {'name': 'save_memory', 'category': ACTION,
@@ -293,6 +298,56 @@ def _tool_trade_history(ctx: ToolContext, args: Dict[str, Any]) -> Dict[str, Any
         return {'ok': False, 'error': str(exc)}
 
 
+def _tool_positions(ctx: ToolContext, args: Dict[str, Any]) -> Dict[str, Any]:
+    if ctx.store is None or not ctx.account:
+        return {'ok': False, 'error': '未配置模拟盘账户'}
+    try:
+        positions = ctx.store.get_paper_positions(ctx.account['id'])
+    except Exception as exc:  # noqa: BLE001
+        return {'ok': False, 'error': str(exc)}
+    if not positions:
+        return {'ok': True, 'count': 0, 'positions': []}
+    quotes = {}
+    try:
+        for row in fetch_quotes([p['code'] for p in positions]):
+            quotes[str(row.get('code')).zfill(6)] = row
+    except Exception:  # noqa: BLE001
+        quotes = {}
+    result = []
+    total_pnl = 0.0
+    for p in positions:
+        code = str(p['code']).zfill(6)
+        quote = quotes.get(code) or {}
+        price = _num(quote.get('price')) or _num(p.get('last_price')) or 0.0
+        avg = _num(p.get('avg_cost')) or 0.0
+        volume = int(p.get('volume') or 0)
+        profit = (price - avg) * volume
+        pct = ((price / avg - 1) * 100) if avg else 0.0
+        total_pnl += profit
+        result.append({
+            'code': code, 'name': p.get('name'), 'volume': volume,
+            'avg_cost': round(avg, 3), 'last_price': round(price, 3),
+            'profit_pct': round(pct, 2), 'profit': round(profit, 2),
+            'market_value': round(price * volume, 2),
+            'target_price': _num(p.get('target_price')),
+            'stop_loss': _num(p.get('stop_loss')), 'opened_on': p.get('opened_on'),
+        })
+    return {'ok': True, 'count': len(result), 'total_pnl': round(total_pnl, 2),
+            'cash_balance': _num((ctx.account or {}).get('cash_balance')),
+            'positions': result}
+
+
+def _tool_review_performance(ctx: ToolContext, args: Dict[str, Any]) -> Dict[str, Any]:
+    if ctx.agent_store is None:
+        return {'ok': False, 'error': '未配置数据库'}
+    try:
+        days = int(args.get('days') or 30)
+        summary = ctx.agent_store.performance_summary(days=days)
+        return {'ok': True, **summary}
+    except Exception as exc:  # noqa: BLE001
+        return {'ok': False, 'error': str(exc)}
+
+
 def _tool_read_playbook(ctx: ToolContext, args: Dict[str, Any]) -> Dict[str, Any]:
     if ctx.agent_store is None:
         return {'ok': False, 'error': '未配置数据库'}
@@ -364,6 +419,8 @@ HANDLERS: Dict[str, Callable[[ToolContext, Dict[str, Any]], Dict[str, Any]]] = {
     'list_watchlist': _tool_watchlist,
     'read_memory': _tool_read_memory,
     'read_trade_history': _tool_trade_history,
+    'get_positions': _tool_positions,
+    'review_performance': _tool_review_performance,
     'read_playbook': _tool_read_playbook,
     'save_memory': _tool_save_memory,
     'update_playbook': _tool_update_playbook,

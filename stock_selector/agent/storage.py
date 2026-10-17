@@ -91,6 +91,29 @@ CREATE TABLE IF NOT EXISTS agent_playbook (
 
 CREATE INDEX IF NOT EXISTS idx_agent_playbook_created
     ON agent_playbook (created_at DESC);
+
+CREATE TABLE IF NOT EXISTS agent_pick_reviews (
+    id BIGSERIAL PRIMARY KEY,
+    analysis_id BIGINT,
+    code VARCHAR(12) NOT NULL,
+    name TEXT NOT NULL DEFAULT '',
+    action TEXT NOT NULL DEFAULT 'buy',
+    pick_date DATE,
+    pick_price NUMERIC,
+    eval_date DATE,
+    eval_price NUMERIC,
+    ret_pct NUMERIC,
+    hit BOOLEAN,
+    note TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (analysis_id, code, action)
+);
+
+CREATE INDEX IF NOT EXISTS idx_agent_pick_reviews_code
+    ON agent_pick_reviews (code, pick_date DESC);
+
+CREATE INDEX IF NOT EXISTS idx_agent_pick_reviews_eval
+    ON agent_pick_reviews (eval_date DESC);
 """
 
 
@@ -273,3 +296,93 @@ class AgentStore:
                     """INSERT INTO agent_playbook (section, content, note)
                        VALUES (%s, %s, %s)""",
                     (str(section or 'general'), Json(_json_safe(content)), note))
+
+    # ---------------- 研判复盘（结果跟踪） ----------------
+
+    def add_pick_review(self, *, code: str, name: str = '', action: str = 'buy',
+                        analysis_id: Optional[int] = None,
+                        pick_date: Optional[date] = None, pick_price: Optional[float] = None,
+                        eval_date: Optional[date] = None, eval_price: Optional[float] = None,
+                        ret_pct: Optional[float] = None, hit: Optional[bool] = None,
+                        note: str = '') -> None:
+        with self.store.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """INSERT INTO agent_pick_reviews
+                    (analysis_id, code, name, action, pick_date, pick_price,
+                     eval_date, eval_price, ret_pct, hit, note)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (analysis_id, code, action) DO UPDATE SET
+                        eval_date = EXCLUDED.eval_date, eval_price = EXCLUDED.eval_price,
+                        ret_pct = EXCLUDED.ret_pct, hit = EXCLUDED.hit,
+                        note = EXCLUDED.note""",
+                    (analysis_id, str(code).zfill(6), name, str(action or 'buy'),
+                     pick_date, _number(pick_price), eval_date, _number(eval_price),
+                     _number(ret_pct), hit, note[:500]))
+
+    def unreviewed_picks(self, *, lookback_days: int = 15, limit: int = 200) -> List[Dict[str, Any]]:
+        """返回近期尚无复盘记录、且带价格的 buy 研判。"""
+        with self.store.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """SELECT p.analysis_id, p.code, p.name, p.action, p.price,
+                              COALESCE(a.trade_date, a.created_at::date) AS pick_date
+                       FROM agent_picks p
+                       JOIN agent_analyses a ON a.id = p.analysis_id
+                       LEFT JOIN agent_pick_reviews r
+                              ON r.analysis_id = p.analysis_id AND r.code = p.code
+                             AND r.action = p.action
+                       WHERE p.action = 'buy' AND p.price IS NOT NULL
+                         AND r.id IS NULL
+                         AND COALESCE(a.trade_date, a.created_at::date)
+                             >= CURRENT_DATE - %s
+                       ORDER BY a.created_at DESC
+                       LIMIT %s""",
+                    (int(lookback_days), int(limit)))
+                return [{'analysis_id': r[0], 'code': r[1], 'name': r[2] or '',
+                         'action': r[3], 'price': _number(r[4]),
+                         'pick_date': r[5]} for r in cur.fetchall()]
+
+    def list_pick_reviews(self, limit: int = 500) -> List[Dict[str, Any]]:
+        with self.store.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """SELECT analysis_id, code, name, action, pick_date, pick_price,
+                              eval_date, eval_price, ret_pct, hit, note
+                       FROM agent_pick_reviews
+                       ORDER BY eval_date DESC NULLS LAST, created_at DESC LIMIT %s""",
+                    (int(limit),))
+                return [{
+                    'analysis_id': r[0], 'code': r[1], 'name': r[2] or '',
+                    'action': r[3], 'pick_date': str(r[4]) if r[4] else '',
+                    'pick_price': _number(r[5]), 'eval_date': str(r[6]) if r[6] else '',
+                    'eval_price': _number(r[7]), 'ret_pct': _number(r[8]),
+                    'hit': r[9], 'note': r[10] or '',
+                } for r in cur.fetchall()]
+
+    def performance_summary(self, days: int = 30) -> Dict[str, Any]:
+        """汇总近期研判胜率与平均收益，供提示词注入与展示。"""
+        with self.store.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """SELECT COUNT(*),
+                              COUNT(*) FILTER (WHERE hit),
+                              AVG(ret_pct),
+                              AVG(ret_pct) FILTER (WHERE hit),
+                              AVG(ret_pct) FILTER (WHERE NOT hit)
+                       FROM agent_pick_reviews
+                       WHERE eval_date >= CURRENT_DATE - %s AND ret_pct IS NOT NULL""",
+                    (int(days),))
+                row = cur.fetchone() or (0, 0, None, None, None)
+        total = int(row[0] or 0)
+        hits = int(row[1] or 0)
+        avg = _number(row[2])
+        avg_win = _number(row[3])
+        avg_loss = _number(row[4])
+        return {
+            'days': int(days), 'total': total, 'hits': hits,
+            'win_rate': round(hits / total * 100, 1) if total else None,
+            'avg_ret_pct': round(avg, 2) if avg is not None else None,
+            'avg_win_pct': round(avg_win, 2) if avg_win is not None else None,
+            'avg_loss_pct': round(avg_loss, 2) if avg_loss is not None else None,
+        }

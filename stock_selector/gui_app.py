@@ -90,7 +90,8 @@ COL_RIGHT = {'价格', '涨跌幅%', '换手%', '量比', '成交量', '成交�
 # ---------------------------------------------------------------
 # 视觉风格（参考「致富研究员」：微软雅黑 + 红涨绿跌 + 分区卡片）
 # ---------------------------------------------------------------
-COLOR_UP = '#d0021b'      # 涨/净流入
+COLOR_UP = '#d0021b'      # 涨/净流入（深红）
+COLOR_UP_LIGHT = '#e57373'  # 低板/次级（浅红）
 COLOR_DOWN = '#009900'    # 跌/净流出
 COLOR_FLAT = '#333333'
 COLOR_HINT = '#888888'
@@ -152,6 +153,12 @@ class StockSelectorApp:
         self.risk_enabled = threading.Event()
         self.risk_last_blocked = None
         self._sort_states = {}
+        # 实时行情（自选股 / 持仓）刷新
+        self.live_queue = queue.Queue()
+        self.live_busy = False
+        self.live_quotes = {}
+        self.live_interval_sec = 10
+        self.live_refresh_var = tk.BooleanVar(value=True)
 
         # LLM 持续分析 Agent
         self.agent_store = None
@@ -171,6 +178,7 @@ class StockSelectorApp:
         self.root.after(900, self._board_timer)
         self.root.after(800, self._toggle_auto_refresh)
         self.root.after(1500, self._risk_timer)
+        self.root.after(2000, self._live_timer)
 
     # ---------------- 基础 ----------------
 
@@ -392,7 +400,7 @@ class StockSelectorApp:
         lad_box.grid(row=0, column=1, sticky='nsew', padx=(4, 0))
         hcols = ('rank', 'code', 'name', 'bn', 'kind', 'seal', 'pct', 'broken', 'fund')
         self.hunt_tree = ttk.Treeview(hunt_box, columns=hcols, show='headings', height=14)
-        hheaders = {'rank':('#',28),'code':('代码',58),'name':('名称',72),'bn':('板',36),'kind':('类型',70),'seal':('封板',56),'pct':('涨幅',56),'broken':('炸板',44),'fund':('封单亿',60)}
+        hheaders = {'rank':('#',28),'code':('代码',58),'name':('名称',72),'bn':('板',36),'kind':('类型',70),'seal':('首封时间',68),'pct':('涨幅',56),'broken':('炸板',44),'fund':('封单亿',60)}
         for c,(t,w) in hheaders.items():
             self.hunt_tree.heading(c,text=t); self.hunt_tree.column(c,width=w,anchor='center')
         self.hunt_tree.tag_configure('sealed',foreground=COLOR_UP); self.hunt_tree.tag_configure('broken',foreground=COLOR_DOWN); self.hunt_tree.tag_configure('flat',foreground=COLOR_FLAT)
@@ -400,10 +408,10 @@ class StockSelectorApp:
         self.hunt_tree.pack(side='left', fill='both', expand=True); hscroll.pack(side='right', fill='y')
         lcols = ('h','code','name','industry','seal','pct')
         self.ladder_tree = ttk.Treeview(lad_box, columns=lcols, show='headings', height=14)
-        lheaders = {'h':('高度',50),'code':('代码',58),'name':('名称',72),'industry':('行业',90),'seal':('封板',56),'pct':('涨幅',56)}
+        lheaders = {'h':('高度',50),'code':('代码',58),'name':('名称',72),'industry':('行业',90),'seal':('首封时间',68),'pct':('涨幅',56)}
         for c,(t,w) in lheaders.items():
             self.ladder_tree.heading(c,text=t); self.ladder_tree.column(c,width=w,anchor='w' if c=='industry' else 'center')
-        self.ladder_tree.tag_configure('high',foreground=COLOR_UP); self.ladder_tree.tag_configure('low',foreground=COLOR_FLAT)
+        self.ladder_tree.tag_configure('high',foreground=COLOR_UP); self.ladder_tree.tag_configure('low',foreground=COLOR_UP_LIGHT)
         lscroll = ttk.Scrollbar(lad_box, orient='vertical', command=self.ladder_tree.yview); self.ladder_tree.configure(yscrollcommand=lscroll.set)
         self.ladder_tree.pack(side='left', fill='both', expand=True); lscroll.pack(side='right', fill='y')
         pend_box = ttk.LabelFrame(board_frame, text='情绪研判 / 操作偏向', padding=4)
@@ -492,12 +500,22 @@ class StockSelectorApp:
         ttk.Entry(watch_controls, textvariable=self.watch_name_var, width=12).pack(side='left')
         ttk.Button(watch_controls, text='添加', command=self._on_add_watch).pack(side='left', padx=4)
         ttk.Button(watch_controls, text='移除选中', command=self._on_remove_watch).pack(side='left', padx=2)
+        ttk.Checkbutton(watch_controls, text='实时刷新(10秒)',
+                        variable=self.live_refresh_var).pack(side='right', padx=(6, 0))
+        self.watch_live_var = tk.StringVar(value='')
+        ttk.Label(watch_controls, textvariable=self.watch_live_var,
+                  style='Hint.TLabel').pack(side='right', padx=(8, 0))
 
         self.watch_tree = ttk.Treeview(
-            watch_frame, columns=('代码', '名称', '备注'), show='headings', height=3)
-        for col, width in (('代码', 80), ('名称', 120), ('备注', 300)):
+            watch_frame, columns=('代码', '名称', '现价', '涨跌幅%', '备注'), show='headings', height=3)
+        for col, width, anchor in (('代码', 80, 'w'), ('名称', 120, 'w'),
+                                   ('现价', 70, 'center'), ('涨跌幅%', 70, 'center'),
+                                   ('备注', 240, 'w')):
             self.watch_tree.heading(col, text=col)
-            self.watch_tree.column(col, width=width, anchor='w')
+            self.watch_tree.column(col, width=width, anchor=anchor)
+        self.watch_tree.tag_configure('up', foreground=COLOR_UP)
+        self.watch_tree.tag_configure('down', foreground=COLOR_DOWN)
+        self.watch_tree.tag_configure('flat', foreground=COLOR_FLAT)
         self.watch_tree.pack(fill='x', expand=True, pady=(4, 0))
 
         pos_box = ttk.LabelFrame(watch_frame, text='模拟盘持仓', padding=4)
@@ -870,9 +888,81 @@ class StockSelectorApp:
             return
         try:
             for stock in self.db_store.list_stocks(group):
-                self.watch_tree.insert('', 'end', values=(stock['code'], stock['name'], stock['note']))
+                code = str(stock.get('code') or '').strip()
+                quote = self.live_quotes.get(code.zfill(6)) or {}
+                price = quote.get('price')
+                pct = quote.get('pct_chg')
+                pct_tag = _chg_tag(pct) if pct is not None else 'flat'
+                self.watch_tree.insert('', 'end', tags=(pct_tag,), values=(
+                    stock['code'], stock['name'],
+                    _fmt(price, 2), '' if pct is None else f'{float(pct):+.2f}',
+                    stock['note']))
         except Exception as exc:  # noqa: BLE001
             print(f'自选股读取失败：{exc}')
+
+    # ---------------- 自选/持仓实时行情 ----------------
+
+    def _live_timer(self):
+        if self.live_refresh_var.get():
+            try:
+                from stock_selector.agent.config import in_trading_session
+                trading = in_trading_session()
+            except Exception:  # noqa: BLE001
+                trading = False
+            if trading and self.db_ready and not self.live_busy:
+                self.live_busy = True
+                group = self.watch_group_var.get()
+                threading.Thread(target=self._live_worker, args=(group,),
+                                 daemon=True).start()
+                self.root.after(300, self._poll_live)
+            elif not trading:
+                self.watch_live_var.set('非交易时段')
+        self.root.after(self.live_interval_sec * 1000, self._live_timer)
+
+    def _live_worker(self, group):
+        quotes = {}
+        try:
+            from stock_selector.agent.tools import fetch_quotes
+            codes = []
+            if group:
+                codes.extend(str(s['code']).strip() for s in self.db_store.list_stocks(group))
+            account = self.db_store.get_account('模拟盘')
+            positions = self.db_store.get_paper_positions(account['id']) if account else []
+            codes.extend(str(p['code']).strip() for p in positions)
+            wanted = [c.zfill(6) for c in codes if str(c).strip()]
+            rows = fetch_quotes(wanted) if wanted else []
+            fresh = {}
+            for row in rows:
+                code6 = str(row.get('code') or '').strip().zfill(6)
+                price = row.get('price')
+                pct = row.get('pct_chg')
+                try:
+                    price = float(price) if price is not None else None
+                except (TypeError, ValueError):
+                    price = None
+                quotes[code6] = {'price': price, 'pct_chg': pct, 'name': row.get('name', '')}
+                if price and price > 0:
+                    fresh[code6] = price
+            if fresh and account:
+                self.db_store.update_paper_prices(account['id'], fresh)
+            status = f"更新 {len(quotes)} 只"
+        except Exception as exc:  # noqa: BLE001
+            status = f'行情获取失败：{exc}'
+        self.live_queue.put((quotes, status))
+
+    def _poll_live(self):
+        try:
+            quotes, status = self.live_queue.get_nowait()
+        except queue.Empty:
+            self.root.after(300, self._poll_live)
+            return
+        self.live_busy = False
+        if quotes:
+            self.live_quotes.update(quotes)
+        self.watch_live_var.set(status)
+        self._refresh_watch_stocks()
+        self._refresh_positions()
+        self._refresh_paper_overview()
 
     # ---------------- LLM 持续分析 Agent ----------------
 
@@ -931,10 +1021,22 @@ class StockSelectorApp:
 
         row3 = ttk.Frame(parent)
         row3.pack(fill='x', pady=(6, 0))
-        ttk.Label(row3, text='Agent 盘中间隔(秒):').pack(side='left')
-        ttk.Combobox(row3, textvariable=self.agent_interval_var, width=7, state='readonly',
+        ttk.Label(row3, text='交易模型:').pack(side='left')
+        self.llm_model_trade_var = tk.StringVar(value=str(llm.get('model_trade') or ''))
+        ttk.Entry(row3, textvariable=self.llm_model_trade_var, width=18).pack(side='left', padx=(2, 12))
+        ttk.Label(row3, text='学习模型:').pack(side='left')
+        self.llm_model_learn_var = tk.StringVar(value=str(llm.get('model_learn') or ''))
+        ttk.Entry(row3, textvariable=self.llm_model_learn_var, width=18).pack(side='left', padx=(2, 12))
+        self.llm_json_mode_var = tk.BooleanVar(value=bool(llm.get('json_mode', False)))
+        ttk.Checkbutton(row3, text='JSON结构化输出',
+                        variable=self.llm_json_mode_var).pack(side='left')
+
+        row4 = ttk.Frame(parent)
+        row4.pack(fill='x', pady=(6, 0))
+        ttk.Label(row4, text='Agent 盘中间隔(秒):').pack(side='left')
+        ttk.Combobox(row4, textvariable=self.agent_interval_var, width=7, state='readonly',
                      values=('60', '120', '300', '600')).pack(side='left', padx=(4, 12))
-        ttk.Button(row3, text='保存配置', command=self._save_config).pack(side='left')
+        ttk.Button(row4, text='保存配置', command=self._save_config).pack(side='left')
 
         row4 = ttk.Frame(parent)
         row4.pack(fill='x', pady=(8, 0))
@@ -978,6 +1080,9 @@ class StockSelectorApp:
             'base_url': self.llm_base_url_var.get().strip() or 'https://api.openai.com/v1',
             'api_key': self.llm_key_var.get().strip(),
             'model': self.llm_model_var.get().strip() or 'gpt-4o-mini',
+            'model_trade': self.llm_model_trade_var.get().strip(),
+            'model_learn': self.llm_model_learn_var.get().strip(),
+            'json_mode': bool(self.llm_json_mode_var.get()),
             'timeout_sec': timeout,
             'temperature': temperature,
             'max_tokens': max_tokens,
@@ -1025,6 +1130,10 @@ class StockSelectorApp:
                      values=('60', '120', '300', '600')).pack(side='left')
         ttk.Button(top, text='立即分析', command=self._on_agent_once).pack(side='left', padx=(12, 2))
         ttk.Button(top, text='刷新记录', command=self._refresh_agent_analyses).pack(side='left', padx=2)
+        ttk.Button(top, text='复盘评估', command=self._on_review_picks).pack(side='left', padx=2)
+        self.agent_perf_var = tk.StringVar(value='复盘: —')
+        ttk.Label(top, textvariable=self.agent_perf_var,
+                  style='Hint.TLabel').pack(side='left', padx=(12, 0))
         if not hasattr(self, 'paper_overview_var'):
             self.paper_overview_var = tk.StringVar(value='模拟盘：读取中')
         ttk.Label(top, textvariable=self.paper_overview_var,
@@ -1060,7 +1169,8 @@ class StockSelectorApp:
                                           padx=6, pady=4)
         self.agent_summary_text.pack(fill='x')
         ttk.Label(parent, text='盘中每 5 分钟自动研判候选股票；开盘前/午间/收盘三个学习时段各沉淀一次经验。'
-                               '结果写入 PostgreSQL（agent_analyses / agent_picks），供本页回看。',
+                               '结果写入 PostgreSQL（agent_analyses / agent_picks），'
+                               '研判胜率记入 agent_pick_reviews，供本页回看与多轮复盘。',
                   style='Hint.TLabel').pack(anchor='w', pady=(6, 0))
 
     def _ensure_agent_store(self):
@@ -1614,6 +1724,50 @@ class StockSelectorApp:
         if labels:
             self.agent_hist_var.set(labels[0])
             self._on_agent_hist_selected()
+        self._refresh_agent_performance()
+
+    def _refresh_agent_performance(self):
+        if getattr(self, 'agent_store', None) is None:
+            return
+        try:
+            s = self.agent_store.performance_summary(days=30)
+        except Exception as exc:  # noqa: BLE001
+            self.agent_perf_var.set(f'复盘: 读取失败({exc})')
+            return
+        total, hits = s.get('total', 0), s.get('hits', 0)
+        if total:
+            self.agent_perf_var.set(
+                f"近30日研判 {total} 只 · 胜率 {s.get('win_rate')}% · "
+                f"均收 {s.get('avg_ret_pct')}%")
+        else:
+            self.agent_perf_var.set('复盘: 暂无样本')
+
+    def _on_review_picks(self):
+        agent_store = self._ensure_agent_store()
+        if agent_store is None:
+            return
+        self.agent_perf_var.set('复盘评估中…')
+        threading.Thread(target=self._review_worker, args=(agent_store,),
+                         daemon=True).start()
+
+    def _review_worker(self, agent_store):
+        try:
+            from stock_selector.agent.review import evaluate_pick_outcomes
+            from stock_selector.agent.tools import fetch_quotes
+            out = evaluate_pick_outcomes(self.db_store, agent_store, fetch_quotes,
+                                         log=print)
+            msg = f"评估 {out.get('evaluated', 0)} 只，跳过 {out.get('skipped', 0)} 只"
+        except Exception as exc:  # noqa: BLE001
+            msg = f'评估失败：{exc}'
+        self.log_queue.put(f'\n[复盘] {msg}\n')
+        try:
+            s = agent_store.performance_summary(days=30)
+            total, hits = s.get('total', 0), s.get('hits', 0)
+            perf = (f"近30日研判 {total} 只 · 胜率 {s.get('win_rate')}% · "
+                    f"均收 {s.get('avg_ret_pct')}%") if total else '复盘: 暂无样本'
+        except Exception as exc:  # noqa: BLE001
+            perf = f'复盘: 读取失败({exc})'
+        self.log_queue.put(('perf', perf))
 
     def _on_agent_hist_selected(self):
         label = self.agent_hist_var.get()
@@ -1668,6 +1822,10 @@ class StockSelectorApp:
         self._refresh_trades()
         self._refresh_review()
         self._refresh_agent_analyses()
+        flags = result.get('risk_flags') or []
+        if flags:
+            for line in flags:
+                print(f'[agent 风控] {line}')
 
     def _toggle_auto_refresh(self):
         if self.auto_refresh_job is not None:
@@ -2295,8 +2453,10 @@ class StockSelectorApp:
             raw = str(tree.set(item, column)).strip()
             try:
                 cleaned = raw.replace(',', '').replace('%', '')
-                multiplier = 10000 if cleaned.endswith('万手') else 1
-                number = float(cleaned.replace('万手', '').replace('手', '')) * multiplier
+                if cleaned.endswith('万手'):
+                    number = float(cleaned.replace('万手', '')) * 10000
+                else:
+                    number = float(cleaned.replace('手', ''))
             except (TypeError, ValueError):
                 missing.append(item)
             else:
@@ -2315,9 +2475,7 @@ class StockSelectorApp:
             number = float(value)
         except (TypeError, ValueError):
             return '' if value is None else str(value)
-        if abs(number) >= 10000:
-            return f'{number / 10000:.2f}万手'
-        return f'{number:.0f}手'
+        return f'{number / 10000:.2f}万手'
 
     def _cell(self, value, column=None):
         if column == '成交量':
@@ -2352,6 +2510,8 @@ class StockSelectorApp:
                             self._render_ladder(item[1])
                         elif kind == 'agent':
                             self._render_agent_result(item[1])
+                        elif kind == 'perf':
+                            self.agent_perf_var.set(item[1])
                         else:
                             chunks.append(str(item[1]))
                     else:

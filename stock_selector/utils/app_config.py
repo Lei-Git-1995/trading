@@ -44,6 +44,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
         'timeout_sec': 180,
         'temperature': 0.2,
         'max_tokens': 4096,
+        'json_mode': False,     # 结构化输出（部分接口支持）
     },
     'agent': {
         'enabled': False,

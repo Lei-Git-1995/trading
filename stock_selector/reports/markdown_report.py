@@ -173,15 +173,19 @@ def _render_detail_blocks(stocks) -> str:
             '',
             '**近5日走势：**',
             '',
-            '| 日期 | 收盘价 | 涨跌幅% | 换手率% | 成交量(手) |',
+            '| 日期 | 收盘价 | 涨跌幅% | 换手率% | 成交量(万手) |',
             '|------|--------|---------|---------|------------|',
         ]
         hist = s.get('hist_data')
         if hist is not None and not hist.empty:
             for _, r in hist.iterrows():
                 t = '-' if str(r['换手率']) == 'nan' else f'{r["换手率"]:.2f}'
+                try:
+                    vol = float(r.get('成交量') or 0) / 10000
+                except Exception:
+                    vol = 0
                 L.append(
-                    f"| {r['日期']} | {r['收盘']:.2f} | {r['涨跌幅']:.2f} | {t} | {int(r['成交量'])} |"
+                    f"| {r['日期']} | {r['收盘']:.2f} | {r['涨跌幅']:.2f} | {t} | {vol:.2f} |"
                 )
 
         reasons = _build_reasons(s)

@@ -189,6 +189,14 @@ class AgentScheduler:
 
     def _execute(self, *, trigger: str, session: str) -> None:
         self.log(f'[agent] 触发 {trigger}/{session} 分析…')
+        if session == 'learn':
+            # 学习批次前先跟踪历史研判结果，保证复盘数据新鲜
+            try:
+                from stock_selector.agent.review import evaluate_pick_outcomes
+                from stock_selector.agent.tools import fetch_quotes
+                evaluate_pick_outcomes(self.store, self.agent_store, fetch_quotes, log=self.log)
+            except Exception as exc:  # noqa: BLE001
+                self.log(f'[review] 复盘评估失败：{exc}')
         result = run_analysis_once(
             store=self.store, agent_store=self.agent_store,
             llm_settings=self.llm_settings, agent_cfg=self.cfg,
