@@ -78,7 +78,7 @@
     "listen_ip_address": "127.0.0.1",
     "listen_port": 8080,
     "username": "admin",
-    "password": "_cG-yDXXcRziMdkj",
+    "password": "123456",
     "jwt_secret_key": "Vr2BUjWPKq54U2fXOIDtxXv09m0asCYZGpiwnfEDQY4",
     "ws_token": "JPS6h36LzJTLoESPwTNgUPS912-NfTNb"
   },

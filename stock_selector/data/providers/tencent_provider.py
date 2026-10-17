@@ -48,6 +48,8 @@ def _to_symbol(code6: str) -> str:
 
 @register
 class TencentProvider(DataProvider):
+    _sector_map = None
+    _sector_map_at = 0.0
     name = 'tencent'
     display = '腾讯 (经 akshare: stock_zh_a_spot_tx / stock_zh_a_hist_tx)'
 
@@ -82,6 +84,25 @@ class TencentProvider(DataProvider):
             'inner_ratio': np.nan,
             'sector': df['_sector'],
         })
+        # 腾讯快照没有细分行业，尽量用东方财富 f100 行业字段补齐。
+        # 接口失败时保留按代码推断的市场板块，不影响主流程。
+        try:
+            now = datetime.now().timestamp()
+            if self.__class__._sector_map is None or now - self.__class__._sector_map_at > 900:
+                from stock_selector.data.eastmoney_client import EastMoneyClient
+                em = EastMoneyClient(timeout=8, sleep=0.1).get_all_stocks()
+                if em is not None and not em.empty and {'code', 'sector'} <= set(em.columns):
+                    mapping = dict(zip(em['code'].astype(str).str.zfill(6), em['sector'].astype(str)))
+                    self.__class__._sector_map = {
+                        k: v for k, v in mapping.items()
+                        if v and v not in ('链垎绫?', '未分类', 'undefined', 'nan')
+                    }
+                    self.__class__._sector_map_at = now
+            mapping = self.__class__._sector_map or {}
+            out['sector'] = out.apply(
+                lambda row: mapping.get(str(row['code']).zfill(6), row['sector']), axis=1)
+        except Exception:
+            pass
         return out[STOCK_COLS]
 
     def get_stock_history(self, code: str, days: int = 10, end_date: str = None):
