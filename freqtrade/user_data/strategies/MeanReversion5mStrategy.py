@@ -31,8 +31,8 @@ class MeanReversion5mStrategy(IStrategy):
          "trade_limit": 5, "stop_duration_candles": 144,
          "max_allowed_drawdown": 0.12, "calculation_mode": "equity"},
     ]
-    stoploss = -0.04
-    minimal_roi = {"0": 0.02, "15": 0.012, "45": 0.006, "90": 0}
+    stoploss = -0.05
+    minimal_roi = {"0": 0.04, "30": 0.025, "90": 0.012, "180": 0}
 
     def populate_indicators(self, dataframe, metadata):
         dataframe["ema_fast"] = ta.EMA(dataframe, timeperiod=20)
@@ -53,7 +53,7 @@ class MeanReversion5mStrategy(IStrategy):
         ranging = dataframe["bb_width"] < 0.08
 
         dip_buy = (
-            (dataframe["rsi"] <= 35)
+            (dataframe["rsi"] <= 30)
             & (dataframe["low"] <= dataframe["bb_lower"])
             & (dataframe["close"] > dataframe["open"])
             & (dataframe["close"] > dataframe["ema_trend"])
@@ -61,7 +61,7 @@ class MeanReversion5mStrategy(IStrategy):
             & liquid
         )
         rally_sell = (
-            (dataframe["rsi"] >= 65)
+            (dataframe["rsi"] >= 70)
             & (dataframe["high"] >= dataframe["bb_upper"])
             & (dataframe["close"] < dataframe["open"])
             & (dataframe["close"] < dataframe["ema_trend"])
@@ -75,11 +75,11 @@ class MeanReversion5mStrategy(IStrategy):
     def populate_exit_trend(self, dataframe, metadata):
         liquid = dataframe["volume"] > 0
         long_target = (
-            ((dataframe["rsi"] >= 65) | (dataframe["close"] >= dataframe["bb_mid"]))
+            ((dataframe["rsi"] >= 70) | (dataframe["close"] >= dataframe["bb_upper"]))
             & liquid
         )
         short_target = (
-            ((dataframe["rsi"] <= 35) | (dataframe["close"] <= dataframe["bb_mid"]))
+            ((dataframe["rsi"] <= 30) | (dataframe["close"] <= dataframe["bb_lower"]))
             & liquid
         )
         dataframe.loc[long_target, ["exit_long", "exit_tag"]] = (1, "mr_target")
@@ -90,4 +90,4 @@ class MeanReversion5mStrategy(IStrategy):
         self, pair, current_time, current_rate, proposed_leverage,
         max_leverage, entry_tag, side, **kwargs
     ) -> float:
-        return max(1.0, min(2.0, float(max_leverage)))
+        return 1.0
