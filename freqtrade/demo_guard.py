@@ -1,4 +1,4 @@
-"""Guarded OKX Demo startup. Never falls back to real-market orders."""
+"""受保护的 OKX 模拟盘启动脚本。绝不回退到实盘下单。"""
 from __future__ import annotations
 
 import argparse
@@ -176,13 +176,13 @@ def check_demo_credentials(config: dict, proxy: str | None = None) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--check-config", action="store_true", help="offline static checks only")
-    parser.add_argument("--preflight", action="store_true", help="signed read-only Demo API check")
-    parser.add_argument("--local-proxy", action="store_true", help="use optional localhost proxy overlay")
-    parser.add_argument("--config", default=str(CONFIG), help="config path (default: main demo config)")
-    parser.add_argument("--strategy", default=STRATEGY, help="strategy class name")
-    parser.add_argument("--db", default="tradesv3-demo.sqlite", help="sqlite filename inside user_data")
-    parser.add_argument("--logfile", default="freqtrade-demo.log", help="log filename inside user_data/logs")
+    parser.add_argument("--check-config", action="store_true", help="仅做离线静态配置检查")
+    parser.add_argument("--preflight", action="store_true", help="签名只读的模拟盘 API 预检")
+    parser.add_argument("--local-proxy", action="store_true", help="使用可选的本地代理覆盖配置")
+    parser.add_argument("--config", default=str(CONFIG), help="配置文件路径（默认：主模拟盘配置）")
+    parser.add_argument("--strategy", default=STRATEGY, help="策略类名")
+    parser.add_argument("--db", default="tradesv3-demo.sqlite", help="user_data 内的 sqlite 文件名")
+    parser.add_argument("--logfile", default="freqtrade-demo.log", help="user_data/logs 内的日志文件名")
     args = parser.parse_args()
     config_path = Path(args.config)
     try:

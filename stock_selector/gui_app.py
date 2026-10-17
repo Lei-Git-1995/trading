@@ -260,7 +260,7 @@ class StockSelectorApp:
 
         ttk.Label(toolbar, text='处理上限(0=全部):', style='Field.TLabel').grid(
             row=0, column=6, sticky='w')
-        self.limit_var = tk.StringVar(value='500')
+        self.limit_var = tk.StringVar(value='200')
         ttk.Entry(toolbar, textvariable=self.limit_var, width=8).grid(
             row=0, column=7, sticky='w', padx=(4, 18))
 
@@ -655,7 +655,8 @@ class StockSelectorApp:
         self._refresh_market_async()
 
     def _market_timer(self):
-        self._refresh_market_async()
+        if not self.running:
+            self._refresh_market_async()
         self.root.after(30000, self._market_timer)
 
     def _refresh_market_async(self):
@@ -731,7 +732,8 @@ class StockSelectorApp:
     # ---------------- 连板/阶梯 ----------------
 
     def _board_timer(self):
-        self._refresh_board_async()
+        if not self.running:
+            self._refresh_board_async()
         self.root.after(60000, self._board_timer)
 
     def _refresh_board_async(self):
@@ -2265,9 +2267,12 @@ class StockSelectorApp:
     def _poll_log(self):
         try:
             chunks = []
+            processed = 0
+            max_items = 200
             try:
-                while True:
+                while processed < max_items:
                     item = self.log_queue.get_nowait()
+                    processed += 1
                     if isinstance(item, tuple):
                         kind = item[0]
                         if kind == 'done':
@@ -2289,6 +2294,8 @@ class StockSelectorApp:
             if chunks:
                 # 折叠 tqdm 等用 '\r' 刷新的进度帧，只保留每行最后一段，避免日志刷屏
                 text = re.sub(r'[^\n\r]*\r', '', ''.join(chunks))
+                if len(text) > 12000:
+                    text = '[日志过多，已折叠较早内容]\n' + text[-12000:]
                 if text:
                     self.log_text.configure(state='normal')
                     self.log_text.insert('end', text)

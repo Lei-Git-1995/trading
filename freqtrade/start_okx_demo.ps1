@@ -1,6 +1,6 @@
-# One-click start for OKX demo (local .venv + proxy 127.0.0.1:7897)
-# Usage: run .\start_okx_demo.ps1 from E:\trading\freqtrade
-# Requires: fill OKX demo API key/secret/passphrase in .env.demo first.
+﻿# OKX 模拟盘一键启动（使用本地 .venv + 代理 127.0.0.1:7897）
+# 用法：在 E:\trading\freqtrade 下运行 .\start_okx_demo.ps1
+# 前置条件：先在 .env.demo 中填写 OKX 模拟盘的 API Key / Secret / Passphrase。
 $ErrorActionPreference = "Stop"
 
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -8,7 +8,7 @@ Set-Location -LiteralPath $root
 
 $envFile = Join-Path $root ".env.demo"
 if (-not (Test-Path -LiteralPath $envFile)) {
-    Write-Host "[ERROR] .env.demo not found. Copy .env.demo.example to .env.demo and fill demo keys."
+    Write-Host "[错误] 未找到 .env.demo。请将 .env.demo.example 复制为 .env.demo 并填写模拟盘密钥。"
     exit 1
 }
 
@@ -27,14 +27,14 @@ Get-Content -LiteralPath $envFile -Encoding UTF8 | ForEach-Object {
 
 $python = Join-Path $root ".venv\Scripts\python.exe"
 if (-not (Test-Path -LiteralPath $python)) {
-    Write-Host "[ERROR] .venv\Scripts\python.exe not found. Prepare the virtualenv first."
+    Write-Host "[错误] 未找到 .venv\Scripts\python.exe。请先准备虚拟环境。"
     exit 1
 }
 
 foreach ($n in @("FREQTRADE__EXCHANGE__API_KEY", "FREQTRADE__EXCHANGE__SECRET", "FREQTRADE__EXCHANGE__PASSWORD")) {
     $v = [Environment]::GetEnvironmentVariable($n, "Process")
     if ([string]::IsNullOrWhiteSpace($v)) {
-        Write-Host "[ERROR] $n is empty. Fill the demo keys in .env.demo first."
+        Write-Host "[错误] $n 为空。请先在 .env.demo 中填写模拟盘密钥。"
         exit 1
     }
 }
