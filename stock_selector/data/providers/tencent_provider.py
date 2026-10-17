@@ -91,8 +91,8 @@ class TencentProvider(DataProvider):
             if self.__class__._sector_map is None or now - self.__class__._sector_map_at > 900:
                 from stock_selector.data.eastmoney_client import EastMoneyClient
                 em = EastMoneyClient(timeout=8, sleep=0.1).get_all_stocks()
-                if em is not None and not em.empty and {'code', 'sector'} <= set(em.columns):
-                    mapping = dict(zip(em['code'].astype(str).str.zfill(6), em['sector'].astype(str)))
+                if em is not None and not em.empty and {'f12', 'f100'} <= set(em.columns):
+                    mapping = dict(zip(em['f12'].astype(str).str.zfill(6), em['f100'].astype(str)))
                     self.__class__._sector_map = {
                         k: v for k, v in mapping.items()
                         if v and v not in ('链垎绫?', '未分类', 'undefined', 'nan')

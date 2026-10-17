@@ -66,6 +66,7 @@ ALTER TABLE daily_selections ADD COLUMN IF NOT EXISTS volume NUMERIC;
 ALTER TABLE daily_selections ADD COLUMN IF NOT EXISTS amount NUMERIC;
 ALTER TABLE daily_selections ADD COLUMN IF NOT EXISTS outer_ratio NUMERIC;
 ALTER TABLE daily_selections ADD COLUMN IF NOT EXISTS sector TEXT;
+ALTER TABLE daily_selections ADD COLUMN IF NOT EXISTS signal_at TIMESTAMPTZ;
 
 CREATE TABLE IF NOT EXISTS watchlist_groups (
     id BIGSERIAL PRIMARY KEY,
@@ -252,19 +253,22 @@ class PostgresStore:
                     turnover = row.get('换手%', row.get('turnover'))
                     volume_ratio = row.get('量比', row.get('volume_ratio'))
                     score = row.get('评分', row.get('score'))
-                    signal_date = row.get('日期') or row.get('latest_date')
+                    signal_at = row.get('时间') or row.get('signal_at') or row.get('日期') or row.get('latest_date')
+                    signal_date = signal_at
                     explanation = row.get('说明', row.get('reason', ''))
                     try:
-                        if signal_date:
-                            signal_date = date.fromisoformat(str(signal_date)[:10])
+                        if signal_at:
+                            signal_at = datetime.fromisoformat(str(signal_at).replace('Z', '+00:00'))
+                            signal_date = signal_at.date()
                     except ValueError:
+                        signal_at = None
                         signal_date = None
                     cur.execute(
                         """INSERT INTO daily_selections
                         (run_id, trade_date, code, name, price, change_pct,
                          turnover, volume_ratio, volume, amount, outer_ratio, sector, score,
-                         signal_date, explanation, raw_data)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                         signal_date, signal_at, explanation, raw_data)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                         ON CONFLICT (run_id, code) DO UPDATE SET
                             name = EXCLUDED.name, price = EXCLUDED.price,
                             change_pct = EXCLUDED.change_pct, turnover = EXCLUDED.turnover,
@@ -272,7 +276,8 @@ class PostgresStore:
                             amount = EXCLUDED.amount, outer_ratio = EXCLUDED.outer_ratio,
                             sector = EXCLUDED.sector,
                             score = EXCLUDED.score,
-                            signal_date = EXCLUDED.signal_date, explanation = EXCLUDED.explanation,
+                            signal_date = EXCLUDED.signal_date, signal_at = EXCLUDED.signal_at,
+                            explanation = EXCLUDED.explanation,
                             raw_data = EXCLUDED.raw_data""",
                         (run_id, trade_date, str(code).zfill(6), str(name), _number(price),
                          _number(change_pct), _number(turnover), _number(volume_ratio),
@@ -280,7 +285,7 @@ class PostgresStore:
                          _number(row.get('成交额(亿)', row.get('成交额', row.get('amount')))),
                          _number(row.get('外盘%', row.get('outer_ratio'))),
                          str(row.get('行业/板块', row.get('sector', ''))),
-                         _number(score), signal_date, str(explanation), Json(_json_safe(row))),
+                         _number(score), signal_date, signal_at, str(explanation), Json(_json_safe(row))),
                     )
         return int(run_id)
 
@@ -636,7 +641,7 @@ class PostgresStore:
             with conn.cursor() as cur:
                 cur.execute(
                     """SELECT code, name, price, change_pct, turnover, volume_ratio,
-                              volume, amount, outer_ratio, sector, score, signal_date, explanation
+                              volume, amount, outer_ratio, sector, score, signal_date, signal_at, explanation
                        FROM daily_selections WHERE run_id = %s
                        ORDER BY score DESC NULLS LAST, code""", (run_id,))
                 return [{'code': row[0], 'name': row[1], 'price': _number(row[2]),
@@ -644,7 +649,8 @@ class PostgresStore:
                          'volume_ratio': _number(row[5]), 'volume': _number(row[6]),
                          'amount': _number(row[7]), 'outer_ratio': _number(row[8]),
                          'sector': row[9] or '', 'score': _number(row[10]),
-                         'signal_date': str(row[11]) if row[11] else '', 'explanation': row[12]}
+                         'signal_date': str(row[11]) if row[11] else '',
+                         'signal_at': str(row[12]) if row[12] else '', 'explanation': row[13]}
                         for row in cur.fetchall()]
 
     def query_selections(self, *, date_from: Optional[str] = None,
@@ -675,7 +681,7 @@ class PostgresStore:
                 cur.execute(
                     'SELECT d.trade_date, r.category, r.strategy_name, d.code, d.name, '
                     'd.price, d.change_pct, d.turnover, d.volume_ratio, d.volume, d.amount, '
-                    'd.outer_ratio, d.sector, d.score, d.signal_date, d.explanation '
+                    'd.outer_ratio, d.sector, d.score, d.signal_date, d.signal_at, d.explanation '
                     + base + ' ORDER BY d.trade_date DESC, d.score DESC NULLS LAST, d.code '
                     'LIMIT %s OFFSET %s', params + [int(limit), int(offset)])
                 rows = [{'trade_date': str(r[0]) if r[0] else '',
@@ -685,7 +691,8 @@ class PostgresStore:
                          'volume_ratio': _number(r[8]), 'volume': _number(r[9]),
                          'amount': _number(r[10]), 'outer_ratio': _number(r[11]),
                          'sector': r[12] or '', 'score': _number(r[13]),
-                         'signal_date': str(r[14]) if r[14] else '', 'explanation': r[15]}
+                         'signal_date': str(r[14]) if r[14] else '',
+                         'signal_at': str(r[15]) if r[15] else '', 'explanation': r[16]}
                         for r in cur.fetchall()]
         return rows, total
 

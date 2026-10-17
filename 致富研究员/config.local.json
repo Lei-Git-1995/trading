@@ -1,0 +1,33 @@
+{
+  "paper_trade": {
+    "agent_loop": {
+      "fade_allow_trial": true,
+      "fade_trial_min_score": 72,
+      "fade_trial_lot_mult": 0.8,
+      "fade_forbid_high": true,
+      "fade_forbid_sealed": true,
+      "fade_trial_phases": [
+        "ice",
+        "fade",
+        "repair"
+      ],
+      "fade_attack_pct_lo": 3.0,
+      "fade_attack_pct_hi": 9.2,
+      "mode": "free"
+    },
+    "min_buy_score": 72,
+    "min_live_pct_buy": 3.0,
+    "llm": {
+      "enabled": true,
+      "base_url": "https://api.hcnsec.cn/v1/",
+      "api_key": "sk-siDhtMwDJ8og9UGQepst6Y1v3NsMHX1x8jgkbA98OQOEdtdC",
+      "model_trade": "auto",
+      "model_learn": "auto",
+      "model": "auto",
+      "force_model_split": true,
+      "timeout_sec": 180.0,
+      "temperature": 0.2,
+      "max_tokens": 4096
+    }
+  }
+}

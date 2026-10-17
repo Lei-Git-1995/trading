@@ -13,6 +13,7 @@
 from __future__ import annotations
 
 import io
+import calendar
 import queue
 import re
 import sys
@@ -80,9 +81,9 @@ CATEGORY_CHOICES = [CATEGORY_PRESET, CATEGORY_TECH, CATEGORY_V2]
 NUMERIC_COLUMNS = frozenset({'价格', '涨跌幅%', '换手%', '量比', '成交量', '成交额(亿)', '评分'})
 COLUMNS = ('代码', '名称', '行业/板块', '价格', '涨跌幅%', '换手%', '量比',
            '成交量', '成交额(亿)', '评分', '日期', '说明')
-COL_WIDTHS = {'代码': 70, '名称': 100, '行业/板块': 110, '价格': 70, '涨跌幅%': 70,
-              '换手%': 70, '量比': 60, '成交量': 85, '成交额(亿)': 90,
-              '评分': 60, '日期': 90, '说明': 420}
+COL_WIDTHS = {'代码': 70, '名称': 100, '行业/板块': 150, '价格': 70, '涨跌幅%': 70,
+              '换手%': 70, '量比': 60, '成交量': 95, '成交额(亿)': 90,
+              '评分': 60, '日期': 155, '说明': 420}
 # 数值列右对齐，其余左对齐；表头与单元格用同一对齐方式，避免表头/数据错位
 COL_RIGHT = {'价格', '涨跌幅%', '换手%', '量比', '成交量', '成交额(亿)', '评分'}
 
@@ -543,14 +544,14 @@ class StockSelectorApp:
         q_controls.pack(fill='x')
         ttk.Label(q_controls, text='起始日期:').pack(side='left')
         self.q_from_var = tk.StringVar(value='')
-        self.q_from_box = ttk.Combobox(
-            q_controls, textvariable=self.q_from_var, width=12, values=[])
+        self.q_from_box = ttk.Entry(q_controls, textvariable=self.q_from_var, width=12)
         self.q_from_box.pack(side='left', padx=(4, 8))
+        ttk.Button(q_controls, text='选择', command=lambda: self._open_date_picker(self.q_from_var)).pack(side='left', padx=(0, 8))
         ttk.Label(q_controls, text='结束日期:').pack(side='left')
         self.q_to_var = tk.StringVar(value='')
-        self.q_to_box = ttk.Combobox(
-            q_controls, textvariable=self.q_to_var, width=12, values=[])
+        self.q_to_box = ttk.Entry(q_controls, textvariable=self.q_to_var, width=12)
         self.q_to_box.pack(side='left', padx=(4, 8))
+        ttk.Button(q_controls, text='选择', command=lambda: self._open_date_picker(self.q_to_var)).pack(side='left', padx=(0, 8))
         ttk.Label(q_controls, text='类别:').pack(side='left')
         self.q_category_var = tk.StringVar(value='全部')
         self.q_category_box = ttk.Combobox(
@@ -571,6 +572,7 @@ class StockSelectorApp:
         ttk.Button(q_quick, text='近5天', command=lambda: self._set_query_range(5)).pack(side='left', padx=2)
         ttk.Button(q_quick, text='近10天', command=lambda: self._set_query_range(10)).pack(side='left', padx=2)
         ttk.Button(q_quick, text='近30天', command=lambda: self._set_query_range(30)).pack(side='left', padx=2)
+        ttk.Button(q_quick, text='当天', command=lambda: self._set_query_range(1)).pack(side='left', padx=2)
         ttk.Button(q_quick, text='全部', command=lambda: self._set_query_range(0)).pack(side='left', padx=2)
 
         q_row2 = ttk.Frame(query_frame)
@@ -1749,8 +1751,6 @@ class StockSelectorApp:
             return
         try:
             dates = self.db_store.list_run_dates()
-            self.q_from_box.configure(values=dates)
-            self.q_to_box.configure(values=dates)
             categories = ['全部'] + self.db_store.list_run_categories()
             self.q_category_box.configure(values=categories)
             if self.q_category_var.get() not in categories:
@@ -1785,6 +1785,49 @@ class StockSelectorApp:
         today = datetime.now().date()
         self.q_to_var.set(str(today))
         self.q_from_var.set(str(today - timedelta(days=days - 1)))
+
+    def _open_date_picker(self, variable):
+        dialog = tk.Toplevel(self.root)
+        dialog.title('选择日期')
+        dialog.transient(self.root)
+        dialog.grab_set()
+        today = datetime.now().date()
+        current = variable.get().strip()
+        try:
+            selected = datetime.strptime(current, '%Y-%m-%d').date() if current else today
+        except ValueError:
+            selected = today
+        year_var = tk.IntVar(value=selected.year)
+        month_var = tk.IntVar(value=selected.month)
+        ttk.Label(dialog, text='年').grid(row=0, column=0, padx=4, pady=6)
+        ttk.Spinbox(dialog, from_=2000, to=2100, textvariable=year_var, width=6).grid(row=0, column=1)
+        ttk.Label(dialog, text='月').grid(row=0, column=2, padx=4)
+        ttk.Spinbox(dialog, from_=1, to=12, textvariable=month_var, width=4).grid(row=0, column=3)
+        day_frame = ttk.Frame(dialog, padding=6)
+        day_frame.grid(row=1, column=0, columnspan=4)
+        def render_days():
+            for child in day_frame.winfo_children():
+                child.destroy()
+            ttk.Label(day_frame, text='一 二 三 四 五 六 日').grid(row=0, column=0, columnspan=7)
+            try:
+                first_weekday, days_in_month = calendar.monthrange(year_var.get(), month_var.get())
+            except (ValueError, tk.TclError):
+                return
+            for day in range(1, days_in_month + 1):
+                position = first_weekday + day - 1
+                ttk.Button(day_frame, text=str(day), width=3,
+                           command=lambda d=day: choose(d)).grid(
+                               row=1 + position // 7, column=position % 7, padx=1, pady=1)
+        def choose(day):
+            try:
+                value = datetime(year_var.get(), month_var.get(), day).date()
+                variable.set(value.isoformat())
+                dialog.destroy()
+            except ValueError:
+                pass
+        year_var.trace_add('write', lambda *_: render_days())
+        month_var.trace_add('write', lambda *_: render_days())
+        render_days()
 
     def _on_query_page(self, reset=False, delta=0):
         if not self._ensure_db_ready():
@@ -1836,10 +1879,10 @@ class StockSelectorApp:
                 '价格': r.get('price'), '涨跌幅%': r.get('change_pct'),
                 '换手%': r.get('turnover'), '量比': r.get('volume_ratio'),
                 '成交量': r.get('volume'), '成交额(亿)': r.get('amount'),
-                '评分': r.get('score'), '日期': r.get('trade_date') or r.get('signal_date'),
+                '评分': r.get('score'), '日期': r.get('signal_at') or r.get('trade_date') or r.get('signal_date'),
                 '说明': r.get('explanation'),
             }
-            values = [self._cell(display_row.get(col)) for col in COLUMNS]
+            values = [self._cell(display_row.get(col), col) for col in COLUMNS]
             self.q_tree.insert('', 'end', values=values,
                                tags=(_chg_tag(display_row.get('涨跌幅%')),))
             self.q_rows.append(display_row)
@@ -2217,10 +2260,14 @@ class StockSelectorApp:
     # ---------------- 界面回调 ----------------
 
     def _show_results(self, rows, columns, db_message=''):
+        signal_at = datetime.now().astimezone().isoformat(timespec='seconds')
+        for row in rows:
+            row.setdefault('时间', signal_at)
+            row.setdefault('日期', signal_at)
         self.result_rows = rows
         self.last_export_columns = columns
         for row in rows:
-            values = [self._cell(row.get(col)) for col in columns]
+            values = [self._cell(row.get(col), col) for col in columns]
             self.tree.insert('', 'end', values=values,
                              tags=(_chg_tag(row.get('涨跌幅%')),))
         self.running = False
@@ -2246,7 +2293,9 @@ class StockSelectorApp:
         for item in tree.get_children(''):
             raw = str(tree.set(item, column)).strip()
             try:
-                number = float(raw.replace(',', '').replace('%', ''))
+                cleaned = raw.replace(',', '').replace('%', '')
+                multiplier = 10000 if cleaned.endswith('万手') else 1
+                number = float(cleaned.replace('万手', '').replace('手', '')) * multiplier
             except (TypeError, ValueError):
                 missing.append(item)
             else:
@@ -2259,7 +2308,24 @@ class StockSelectorApp:
             tree.heading(col, text=col + indicator)
         self._sort_states[state_key] = not descending
 
-    def _cell(self, value):
+    @staticmethod
+    def _format_volume(value):
+        try:
+            number = float(value)
+        except (TypeError, ValueError):
+            return '' if value is None else str(value)
+        if abs(number) >= 10000:
+            return f'{number / 10000:.2f}万手'
+        return f'{number:.0f}手'
+
+    def _cell(self, value, column=None):
+        if column == '成交量':
+            return self._format_volume(value)
+        if column == '日期' and value:
+            try:
+                return datetime.fromisoformat(str(value).replace('Z', '+00:00')).astimezone().strftime('%Y-%m-%d %H:%M:%S')
+            except (TypeError, ValueError, OverflowError):
+                pass
         if isinstance(value, float):
             return _fmt(value)
         return '' if value is None else str(value)
